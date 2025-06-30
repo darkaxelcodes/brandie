@@ -32,6 +32,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const { data: { session } } = await supabase.auth.getSession()
         setUser(session?.user ?? null)
+        
+        // If we have a new user, ensure they have tokens
+        if (session?.user) {
+          try {
+            // Check if user has tokens
+            const { data: tokenData } = await supabase
+              .from('user_tokens')
+              .select('*')
+              .eq('user_id', session.user.id)
+              .maybeSingle();
+              
+            // If no tokens exist, create a record with default balance
+            if (!tokenData) {
+              await supabase
+                .from('user_tokens')
+                .insert([{ 
+                  user_id: session.user.id, 
+                  balance: 15 
+                }]);
+            }
+          } catch (tokenError) {
+            console.error('Error setting up user tokens:', tokenError);
+          }
+        }
       } catch (error) {
         console.error('Error getting session:', error)
         showToast('error', 'Failed to authenticate. Please try again.')
@@ -45,8 +69,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const currentUser = session?.user ?? null
+      setUser(currentUser)
+      
+      // If we have a new user, ensure they have tokens
+      if (currentUser && _event === 'SIGNED_IN') {
+        try {
+          // Check if user has tokens
+          const { data: tokenData } = await supabase
+            .from('user_tokens')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .maybeSingle();
+            
+          // If no tokens exist, create a record with default balance
+          if (!tokenData) {
+            await supabase
+              .from('user_tokens')
+              .insert([{ 
+                user_id: currentUser.id, 
+                balance: 15 
+              }]);
+          }
+        } catch (tokenError) {
+          console.error('Error setting up user tokens:', tokenError);
+        }
+      }
+      
       setLoading(false)
     })
 

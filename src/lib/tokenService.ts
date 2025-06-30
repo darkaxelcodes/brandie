@@ -24,7 +24,7 @@ export const tokenService = {
         if (error.code === 'PGRST116') {
           const { data: newData, error: createError } = await supabase
             .from('user_tokens')
-            .insert([{ user_id: userId, balance: 50 }])
+            .insert([{ user_id: userId, balance: 15 }])
             .select()
             .single();
 
