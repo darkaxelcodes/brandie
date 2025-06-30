@@ -27,171 +27,34 @@ import { PoweredBySection } from '../components/ui/PoweredBySection'
 export const Landing: React.FC = () => {
   const features = [
     {
-      category: 'Brand Strategy',
       icon: Target,
-      color: 'blue',
-      items: [
-        {
-          title: 'AI Purpose Discovery',
-          description: 'Define your brand\'s mission, vision, and purpose through guided AI conversations.',
-          icon: Brain
-        },
-        {
-          title: 'Core Values Generator',
-          description: 'Identify and articulate your brand\'s core values and positioning.',
-          icon: Zap
-        },
-        {
-          title: 'Audience Analysis',
-          description: 'Define your target audience with detailed demographics and psychographics.',
-          icon: Users
-        },
-        {
-          title: 'Competitive Analysis',
-          description: 'Analyze your market position and competitive advantages.',
-          icon: BarChart
-        },
-        {
-          title: 'Brand Archetype',
-          description: 'Discover your brand\'s personality archetype for consistent storytelling.',
-          icon: Layers
-        }
-      ]
+      title: 'Brand Strategy',
+      description: 'Define your purpose, values, and positioning with AI-guided insights'
     },
     {
-      category: 'Visual Identity',
       icon: Palette,
-      color: 'purple',
-      items: [
-        {
-          title: 'AI Logo Generator',
-          description: 'Create professional logos using DALL-E AI technology tailored to your brand.',
-          icon: Sparkles
-        },
-        {
-          title: 'Color Psychology',
-          description: 'Generate scientifically-backed color palettes based on brand personality.',
-          icon: Palette
-        },
-        {
-          title: 'Typography Science',
-          description: 'Select font pairings optimized for readability and brand personality.',
-          icon: Type
-        },
-        {
-          title: 'Visual Asset Export',
-          description: 'Export your visual identity in multiple formats for any use case.',
-          icon: Download
-        }
-      ]
+      title: 'Visual Identity',
+      description: 'Create logos, color palettes, and typography that represent your brand'
     },
     {
-      category: 'Brand Voice',
       icon: MessageSquare,
-      color: 'green',
-      items: [
-        {
-          title: 'Tone Analysis',
-          description: 'Define your brand\'s communication style with AI-powered tone scales.',
-          icon: Activity
-        },
-        {
-          title: 'Messaging Framework',
-          description: 'Create consistent key messages, taglines, and elevator pitches.',
-          icon: MessageSquare
-        },
-        {
-          title: 'Voice Guidelines',
-          description: 'Establish clear do\'s and don\'ts for your brand\'s communication.',
-          icon: CheckCircle
-        },
-        {
-          title: 'Content Generator',
-          description: 'Generate on-brand content for various platforms and contexts.',
-          icon: FileText
-        }
-      ]
+      title: 'Brand Voice',
+      description: 'Establish your communication style and messaging framework'
     },
     {
-      category: 'Brand Guidelines',
       icon: FileText,
-      color: 'amber',
-      items: [
-        {
-          title: 'Comprehensive Guidelines',
-          description: 'Generate complete brand guidelines with all your brand elements.',
-          icon: FileText
-        },
-        {
-          title: 'Multi-format Export',
-          description: 'Export guidelines as PDF, web page, or presentation.',
-          icon: Download
-        },
-        {
-          title: 'AI Enhancement',
-          description: 'Use AI to enhance and expand your brand guidelines.',
-          icon: Brain
-        },
-        {
-          title: 'Shareable Links',
-          description: 'Share your guidelines with team members and stakeholders.',
-          icon: ArrowRight
-        }
-      ]
+      title: 'Brand Guidelines',
+      description: 'Generate comprehensive guidelines to maintain brand consistency'
     },
     {
-      category: 'Brand Consistency',
       icon: CheckCircle,
-      color: 'green',
-      items: [
-        {
-          title: 'Compliance Checker',
-          description: 'Verify if your marketing materials follow brand guidelines.',
-          icon: CheckCircle
-        },
-        {
-          title: 'Template Library',
-          description: 'Access ready-to-use templates that follow your brand guidelines.',
-          icon: Layers
-        },
-        {
-          title: 'Social Media Templates',
-          description: 'Create on-brand social media content with customizable templates.',
-          icon: MessageSquare
-        },
-        {
-          title: 'Marketing Materials',
-          description: 'Generate consistent marketing collateral across all channels.',
-          icon: FileText
-        }
-      ]
+      title: 'Brand Consistency',
+      description: 'Ensure your brand is consistently applied across all materials'
     },
     {
-      category: 'Brand Health',
       icon: Activity,
-      color: 'blue',
-      items: [
-        {
-          title: 'Brand Health Score',
-          description: 'Monitor your brand\'s overall health with comprehensive metrics.',
-          icon: Activity
-        },
-        {
-          title: 'Industry Analysis',
-          description: 'Get AI-powered insights on industry trends and opportunities.',
-          icon: BarChart
-        },
-        {
-          title: 'Competitive Tracking',
-          description: 'Track your position against competitors in your market.',
-          icon: Target
-        },
-        {
-          title: 'Improvement Recommendations',
-          description: 'Receive actionable suggestions to strengthen your brand.',
-          icon: Zap
-        }
-      ]
+      title: 'Brand Health',
+      description: 'Monitor your brand\'s overall health with comprehensive metrics'
     }
   ];
 
@@ -388,53 +251,24 @@ export const Landing: React.FC = () => {
             </p>
           </motion.div>
 
-          {features.map((category, index) => (
-            <div key={category.category} className="mb-20 last:mb-0">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
               <motion.div
+                key={feature.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="mb-8"
+                className="bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-all duration-300"
               >
-                <div className="flex items-center justify-center md:justify-start space-x-3 mb-6">
-                  <div className={`flex items-center justify-center w-12 h-12 bg-${category.color}-100 rounded-xl`}>
-                    <category.icon className={`w-6 h-6 text-${category.color}-600`} />
-                  </div>
-                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900">{category.category}</h2>
+                <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl mb-6">
+                  <feature.icon className="w-8 h-8 text-white" />
                 </div>
-                <p className="text-xl text-gray-600 max-w-3xl">
-                  {category.category === 'Brand Strategy' && 'Define your brand\'s foundation with AI-powered strategic tools.'}
-                  {category.category === 'Visual Identity' && 'Create stunning visual elements that represent your brand perfectly.'}
-                  {category.category === 'Brand Voice' && 'Establish a consistent communication style that resonates with your audience.'}
-                  {category.category === 'Brand Guidelines' && 'Generate and maintain comprehensive brand guidelines for consistency.'}
-                  {category.category === 'Brand Consistency' && 'Ensure your brand is consistently applied across all materials and platforms.'}
-                  {category.category === 'Brand Health' && 'Monitor and improve your brand\'s performance with AI-powered analytics.'}
-                </p>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
               </motion.div>
-
-              <div className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8">
-                {category.items.map((feature, featureIndex) => (
-                  <motion.div
-                    key={feature.title}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: featureIndex * 0.1 }}
-                    viewport={{ once: true }}
-                    className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-all duration-300"
-                  >
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className={`flex items-center justify-center w-12 h-12 bg-${category.color}-100 rounded-xl`}>
-                        <feature.icon className={`w-6 h-6 text-${category.color}-600`} />
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-900">{feature.title}</h3>
-                    </div>
-                    <p className="text-gray-600 mb-6">{feature.description}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
           
           <div className="text-center mt-12">
             <Link to="/features">
