@@ -43,28 +43,60 @@ export const RotatingLogoCircle: React.FC<RotatingLogoCircleProps> = ({ classNam
     window.open(logos[currentLogoIndex].link, '_blank');
   };
 
+  // Create the circular text
+  const createCircularText = () => {
+    const text = "POWERED BY • POWERED BY • ";
+    const characters = text.split('');
+    const degree = 360 / characters.length;
+    
+    return characters.map((char, i) => (
+      <div
+        key={i}
+        className="absolute text-xs text-white opacity-70"
+        style={{
+          height: '100%',
+          width: '20px',
+          transformOrigin: 'bottom center',
+          left: '50%',
+          top: '-10px',
+          transform: `rotate(${i * degree}deg)`
+        }}
+      >
+        {char}
+      </div>
+    ));
+  };
+
   return (
-    <div 
-      className={`relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-black flex items-center justify-center cursor-pointer ${className}`}
-      onClick={handleClick}
-    >
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentLogoIndex}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-          className="absolute inset-0 flex items-center justify-center"
-        >
-          <img 
-            src={logos[currentLogoIndex].url} 
-            alt="Logo" 
-            className="w-10 h-10 md:w-12 md:h-12 object-contain"
-            style={{ filter: 'brightness(0) invert(1)' }} // Make logos white
-          />
-        </motion.div>
-      </AnimatePresence>
+    <div className={`relative ${className}`}>
+      {/* Circular text */}
+      <div className="absolute w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center">
+        {createCircularText()}
+      </div>
+      
+      {/* Black circle with logo */}
+      <div 
+        className="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-black flex items-center justify-center cursor-pointer m-4"
+        onClick={handleClick}
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentLogoIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <img 
+              src={logos[currentLogoIndex].url} 
+              alt={`${logos[currentLogoIndex].link} Logo`}
+              className="w-10 h-10 md:w-12 md:h-12 object-contain"
+              style={{ filter: 'brightness(0) invert(1)' }} // Make logos white
+            />
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
