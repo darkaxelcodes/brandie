@@ -14,6 +14,8 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Navbar } from '../components/layout/Navbar';
+import { ScrollToTop } from '../components/ui/ScrollToTop';
+import { PoweredBySection } from '../components/ui/PoweredBySection';
 
 export const Pricing: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
@@ -420,7 +422,12 @@ export const Pricing: React.FC = () => {
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
+          {/* Powered By Section */}
+          <div className="mt-16 pt-8 border-t border-gray-800">
+            <PoweredBySection />
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
               © {new Date().getFullYear()} Brandie. All rights reserved.
             </p>
@@ -432,7 +439,29 @@ export const Pricing: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
     </div>
+  );
+};
+
+// X component for comparison table
+const X = (props: any) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
   );
 };
 

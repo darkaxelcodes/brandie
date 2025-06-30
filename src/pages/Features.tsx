@@ -22,6 +22,8 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Navbar } from '../components/layout/Navbar';
+import { ScrollToTop } from '../components/ui/ScrollToTop';
+import { PoweredBySection } from '../components/ui/PoweredBySection';
 
 export const Features: React.FC = () => {
   const features = [
@@ -507,7 +509,12 @@ export const Features: React.FC = () => {
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
+          {/* Powered By Section */}
+          <div className="mt-16 pt-8 border-t border-gray-800">
+            <PoweredBySection />
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
               © {new Date().getFullYear()} Brandie. All rights reserved.
             </p>
@@ -519,6 +526,9 @@ export const Features: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
     </div>
   );
 };
