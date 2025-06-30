@@ -1,6 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Sparkles, Brain, Palette, MessageSquare, FileText, CheckCircle } from 'lucide-react';
 
 interface RotatingCubeProps {
   className?: string;
@@ -32,59 +30,102 @@ export const RotatingCube: React.FC<RotatingCubeProps> = ({ className = '' }) =>
     };
   }, []);
 
+  const logos = [
+    {
+      url: "https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie/bolt_logo.svg",
+      link: "https://bolt.new",
+      bgColor: "bg-blue-600"
+    },
+    {
+      url: "https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie/eleven_labs_logo.svg",
+      link: "https://elevenlabs.io",
+      bgColor: "bg-purple-600"
+    },
+    {
+      url: "https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie/entri_logo.svg",
+      link: "https://entri.com",
+      bgColor: "bg-green-600"
+    },
+    {
+      url: "https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie/netlify_logo.svg",
+      link: "https://netlify.com",
+      bgColor: "bg-red-600"
+    },
+    {
+      url: "https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie/supabase_logo.svg",
+      link: "https://supabase.co",
+      bgColor: "bg-amber-600"
+    },
+    {
+      url: "https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie/Logo.png",
+      link: "/",
+      bgColor: "bg-teal-600"
+    }
+  ];
+
+  const handleClick = (link: string) => {
+    window.open(link, '_blank');
+  };
+
   return (
     <div className={`perspective-500 ${className}`}>
       <div 
         ref={cubeRef}
-        className="relative w-24 h-24 transform-style-3d transition-transform duration-500"
+        className="relative w-16 h-16 transform-style-3d transition-transform duration-500 cursor-pointer"
         style={{ transformStyle: 'preserve-3d' }}
       >
         {/* Front face */}
         <div 
-          className="absolute w-full h-full flex items-center justify-center bg-blue-600 text-white rounded-lg shadow-lg"
-          style={{ transform: 'translateZ(12rem)' }}
+          className={`absolute w-full h-full flex items-center justify-center ${logos[0].bgColor} text-white rounded-lg shadow-lg`}
+          style={{ transform: 'translateZ(8rem)' }}
+          onClick={() => handleClick(logos[0].link)}
         >
-          <Sparkles className="w-12 h-12" />
+          <img src={logos[0].url} alt="Logo" className="w-10 h-10 object-contain" />
         </div>
         
         {/* Back face */}
         <div 
-          className="absolute w-full h-full flex items-center justify-center bg-purple-600 text-white rounded-lg shadow-lg"
-          style={{ transform: 'rotateY(180deg) translateZ(12rem)' }}
+          className={`absolute w-full h-full flex items-center justify-center ${logos[1].bgColor} text-white rounded-lg shadow-lg`}
+          style={{ transform: 'rotateY(180deg) translateZ(8rem)' }}
+          onClick={() => handleClick(logos[1].link)}
         >
-          <Brain className="w-12 h-12" />
+          <img src={logos[1].url} alt="Logo" className="w-10 h-10 object-contain" />
         </div>
         
         {/* Right face */}
         <div 
-          className="absolute w-full h-full flex items-center justify-center bg-green-600 text-white rounded-lg shadow-lg"
-          style={{ transform: 'rotateY(90deg) translateZ(12rem)' }}
+          className={`absolute w-full h-full flex items-center justify-center ${logos[2].bgColor} text-white rounded-lg shadow-lg`}
+          style={{ transform: 'rotateY(90deg) translateZ(8rem)' }}
+          onClick={() => handleClick(logos[2].link)}
         >
-          <Palette className="w-12 h-12" />
+          <img src={logos[2].url} alt="Logo" className="w-10 h-10 object-contain" />
         </div>
         
         {/* Left face */}
         <div 
-          className="absolute w-full h-full flex items-center justify-center bg-red-600 text-white rounded-lg shadow-lg"
-          style={{ transform: 'rotateY(-90deg) translateZ(12rem)' }}
+          className={`absolute w-full h-full flex items-center justify-center ${logos[3].bgColor} text-white rounded-lg shadow-lg`}
+          style={{ transform: 'rotateY(-90deg) translateZ(8rem)' }}
+          onClick={() => handleClick(logos[3].link)}
         >
-          <MessageSquare className="w-12 h-12" />
+          <img src={logos[3].url} alt="Logo" className="w-10 h-10 object-contain" />
         </div>
         
         {/* Top face */}
         <div 
-          className="absolute w-full h-full flex items-center justify-center bg-amber-600 text-white rounded-lg shadow-lg"
-          style={{ transform: 'rotateX(90deg) translateZ(12rem)' }}
+          className={`absolute w-full h-full flex items-center justify-center ${logos[4].bgColor} text-white rounded-lg shadow-lg`}
+          style={{ transform: 'rotateX(90deg) translateZ(8rem)' }}
+          onClick={() => handleClick(logos[4].link)}
         >
-          <FileText className="w-12 h-12" />
+          <img src={logos[4].url} alt="Logo" className="w-10 h-10 object-contain" />
         </div>
         
         {/* Bottom face */}
         <div 
-          className="absolute w-full h-full flex items-center justify-center bg-teal-600 text-white rounded-lg shadow-lg"
-          style={{ transform: 'rotateX(-90deg) translateZ(12rem)' }}
+          className={`absolute w-full h-full flex items-center justify-center ${logos[5].bgColor} text-white rounded-lg shadow-lg`}
+          style={{ transform: 'rotateX(-90deg) translateZ(8rem)' }}
+          onClick={() => handleClick(logos[5].link)}
         >
-          <CheckCircle className="w-12 h-12" />
+          <img src={logos[5].url} alt="Logo" className="w-10 h-10 object-contain" />
         </div>
       </div>
     </div>
