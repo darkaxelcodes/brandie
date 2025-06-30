@@ -22,7 +22,6 @@ import { Link } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Navbar } from '../components/layout/Navbar'
-import { RotatingLogoCircle } from '../components/ui/RotatingLogoCircle'
 import { PoweredBySection } from '../components/ui/PoweredBySection'
 
 export const Landing: React.FC = () => {
@@ -224,9 +223,15 @@ export const Landing: React.FC = () => {
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 py-24 md:py-32 pt-32">
-          {/* Rotating Logo Circle */}
+          {/* Bolt Logo */}
           <div className="absolute top-20 right-10 md:right-20 z-10">
-            <RotatingLogoCircle />
+            <a href="https://bolt.new" target="_blank" rel="noopener noreferrer">
+              <img 
+                src="https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie//bolt_logo_dark.svg" 
+                alt="Bolt Logo" 
+                className="w-16 h-16 md:w-20 md:h-20 object-contain"
+              />
+            </a>
           </div>
           
           <motion.div
