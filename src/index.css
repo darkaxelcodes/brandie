@@ -130,3 +130,12 @@
 .dark ::-webkit-scrollbar-thumb {
   @apply bg-gray-600 hover:bg-gray-500;
 }
+
+/* 3D Cube Styles */
+.perspective-500 {
+  perspective: 500px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+}

@@ -1,34 +1,200 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Sparkles, Zap, Target, Palette, MessageSquare, FileText, ArrowRight, Brain, Check, Layers, Users, Type, Activity } from 'lucide-react'
+import { 
+  Sparkles, 
+  Zap, 
+  Target, 
+  Palette, 
+  MessageSquare, 
+  FileText, 
+  ArrowRight, 
+  Brain, 
+  Check, 
+  Type, 
+  Activity,
+  BarChart,
+  Users,
+  Layers,
+  Download,
+  CheckCircle
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Navbar } from '../components/layout/Navbar'
+import { RotatingCube } from '../components/ui/RotatingCube'
+import { PoweredBySection } from '../components/ui/PoweredBySection'
 
 export const Landing: React.FC = () => {
   const features = [
     {
+      category: 'Brand Strategy',
       icon: Target,
-      title: 'Brand Strategy',
-      description: 'Define your purpose, values, and positioning with AI-guided insights'
+      color: 'blue',
+      items: [
+        {
+          title: 'AI Purpose Discovery',
+          description: 'Define your brand\'s mission, vision, and purpose through guided AI conversations.',
+          icon: Brain
+        },
+        {
+          title: 'Core Values Generator',
+          description: 'Identify and articulate your brand\'s core values and positioning.',
+          icon: Zap
+        },
+        {
+          title: 'Audience Analysis',
+          description: 'Define your target audience with detailed demographics and psychographics.',
+          icon: Users
+        },
+        {
+          title: 'Competitive Analysis',
+          description: 'Analyze your market position and competitive advantages.',
+          icon: BarChart
+        },
+        {
+          title: 'Brand Archetype',
+          description: 'Discover your brand\'s personality archetype for consistent storytelling.',
+          icon: Layers
+        }
+      ]
     },
     {
+      category: 'Visual Identity',
       icon: Palette,
-      title: 'Visual Identity',
-      description: 'Create logos, color palettes, and typography that represent your brand'
+      color: 'purple',
+      items: [
+        {
+          title: 'AI Logo Generator',
+          description: 'Create professional logos using DALL-E AI technology tailored to your brand.',
+          icon: Sparkles
+        },
+        {
+          title: 'Color Psychology',
+          description: 'Generate scientifically-backed color palettes based on brand personality.',
+          icon: Palette
+        },
+        {
+          title: 'Typography Science',
+          description: 'Select font pairings optimized for readability and brand personality.',
+          icon: Type
+        },
+        {
+          title: 'Visual Asset Export',
+          description: 'Export your visual identity in multiple formats for any use case.',
+          icon: Download
+        }
+      ]
     },
     {
+      category: 'Brand Voice',
       icon: MessageSquare,
-      title: 'Brand Voice',
-      description: 'Establish your communication style and messaging framework'
+      color: 'green',
+      items: [
+        {
+          title: 'Tone Analysis',
+          description: 'Define your brand\'s communication style with AI-powered tone scales.',
+          icon: Activity
+        },
+        {
+          title: 'Messaging Framework',
+          description: 'Create consistent key messages, taglines, and elevator pitches.',
+          icon: MessageSquare
+        },
+        {
+          title: 'Voice Guidelines',
+          description: 'Establish clear do\'s and don\'ts for your brand\'s communication.',
+          icon: CheckCircle
+        },
+        {
+          title: 'Content Generator',
+          description: 'Generate on-brand content for various platforms and contexts.',
+          icon: FileText
+        }
+      ]
     },
     {
+      category: 'Brand Guidelines',
       icon: FileText,
-      title: 'Brand Guidelines',
-      description: 'Generate comprehensive guidelines to maintain brand consistency'
+      color: 'amber',
+      items: [
+        {
+          title: 'Comprehensive Guidelines',
+          description: 'Generate complete brand guidelines with all your brand elements.',
+          icon: FileText
+        },
+        {
+          title: 'Multi-format Export',
+          description: 'Export guidelines as PDF, web page, or presentation.',
+          icon: Download
+        },
+        {
+          title: 'AI Enhancement',
+          description: 'Use AI to enhance and expand your brand guidelines.',
+          icon: Brain
+        },
+        {
+          title: 'Shareable Links',
+          description: 'Share your guidelines with team members and stakeholders.',
+          icon: ArrowRight
+        }
+      ]
+    },
+    {
+      category: 'Brand Consistency',
+      icon: CheckCircle,
+      color: 'green',
+      items: [
+        {
+          title: 'Compliance Checker',
+          description: 'Verify if your marketing materials follow brand guidelines.',
+          icon: CheckCircle
+        },
+        {
+          title: 'Template Library',
+          description: 'Access ready-to-use templates that follow your brand guidelines.',
+          icon: Layers
+        },
+        {
+          title: 'Social Media Templates',
+          description: 'Create on-brand social media content with customizable templates.',
+          icon: MessageSquare
+        },
+        {
+          title: 'Marketing Materials',
+          description: 'Generate consistent marketing collateral across all channels.',
+          icon: FileText
+        }
+      ]
+    },
+    {
+      category: 'Brand Health',
+      icon: Activity,
+      color: 'blue',
+      items: [
+        {
+          title: 'Brand Health Score',
+          description: 'Monitor your brand\'s overall health with comprehensive metrics.',
+          icon: Activity
+        },
+        {
+          title: 'Industry Analysis',
+          description: 'Get AI-powered insights on industry trends and opportunities.',
+          icon: BarChart
+        },
+        {
+          title: 'Competitive Tracking',
+          description: 'Track your position against competitors in your market.',
+          icon: Target
+        },
+        {
+          title: 'Improvement Recommendations',
+          description: 'Receive actionable suggestions to strengthen your brand.',
+          icon: Zap
+        }
+      ]
     }
-  ]
+  ];
 
   const testimonials = [
     {
@@ -49,7 +215,7 @@ export const Landing: React.FC = () => {
       role: "Creative Director, Pixel Perfect",
       avatar: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
     }
-  ]
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -58,6 +224,11 @@ export const Landing: React.FC = () => {
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 py-24 md:py-32 pt-32">
+          {/* 3D Rotating Cube */}
+          <div className="absolute top-20 right-10 md:right-20 z-10">
+            <RotatingCube />
+          </div>
+          
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -543,7 +714,12 @@ export const Landing: React.FC = () => {
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center">
+          {/* Powered By Section */}
+          <div className="mt-16 pt-8 border-t border-gray-800">
+            <PoweredBySection />
+          </div>
+          
+          <div className="mt-8 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
               © {new Date().getFullYear()} Brandie. All rights reserved.
             </p>
@@ -576,3 +752,5 @@ const Star = (props: any) => {
     </svg>
   );
 };
+
+export default Landing;
