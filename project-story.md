@@ -79,6 +79,7 @@ This vision became **Brandie** - an AI-powered platform that helps create compel
 * **Brand consistency browser extension** to flag off-brand elements on websites
 * **Advanced analytics** for tracking brand performance metrics
 * **Integration with design tools** like Figma and Canva
+* **User fingerprinting** to prevent platform abuse
 
 ## 🌟 Take-away
 
