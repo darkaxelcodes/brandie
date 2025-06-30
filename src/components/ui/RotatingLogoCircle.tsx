@@ -10,7 +10,7 @@ export const RotatingLogoCircle: React.FC<RotatingLogoCircleProps> = ({ classNam
   
   const logos = [
     {
-      url: "https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie/bolt_logo.svg",
+      url: "https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie//bolt_logo_dark.svg",
       link: "https://bolt.new",
     },
     {
@@ -52,13 +52,13 @@ export const RotatingLogoCircle: React.FC<RotatingLogoCircleProps> = ({ classNam
     return characters.map((char, i) => (
       <div
         key={i}
-        className="absolute text-xs text-white opacity-70"
+        className="absolute text-xs text-black opacity-70"
         style={{
           height: '100%',
           width: '20px',
           transformOrigin: 'bottom center',
           left: '50%',
-          top: '-10px',
+          top: '-5px',
           transform: `rotate(${i * degree}deg)`
         }}
       >
@@ -69,14 +69,14 @@ export const RotatingLogoCircle: React.FC<RotatingLogoCircleProps> = ({ classNam
 
   return (
     <div className={`relative ${className}`}>
-      {/* Circular text */}
-      <div className="absolute w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center">
+      {/* Circular text - slightly bigger than the main circle */}
+      <div className="absolute w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center">
         {createCircularText()}
       </div>
       
       {/* Black circle with logo */}
       <div 
-        className="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-black flex items-center justify-center cursor-pointer m-4"
+        className="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-black flex items-center justify-center cursor-pointer m-2"
         onClick={handleClick}
       >
         <AnimatePresence mode="wait">
