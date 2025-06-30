@@ -58,7 +58,7 @@ export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
         if (tokenError.code === 'PGRST116') {
           const { data: newTokenData, error: createError } = await supabase
             .from('user_tokens')
-            .insert([{ user_id: user.id, balance: 50 }])
+            .insert([{ user_id: user.id, balance: 15 }])
             .select()
             .single();
 
