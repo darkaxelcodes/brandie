@@ -22,7 +22,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Navbar } from '../components/layout/Navbar'
-import { RotatingCube } from '../components/ui/RotatingCube'
+import { RotatingLogoCircle } from '../components/ui/RotatingLogoCircle'
 import { PoweredBySection } from '../components/ui/PoweredBySection'
 
 export const Landing: React.FC = () => {
@@ -224,9 +224,9 @@ export const Landing: React.FC = () => {
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 py-24 md:py-32 pt-32">
-          {/* 3D Rotating Cube */}
+          {/* Rotating Logo Circle */}
           <div className="absolute top-20 right-10 md:right-20 z-10">
-            <RotatingCube />
+            <RotatingLogoCircle />
           </div>
           
           <motion.div
@@ -383,24 +383,53 @@ export const Landing: React.FC = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
+          {features.map((category, index) => (
+            <div key={category.category} className="mb-20 last:mb-0">
               <motion.div
-                key={feature.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.8 }}
                 viewport={{ once: true }}
-                className="bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-all duration-300"
+                className="mb-8"
               >
-                <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl mb-6">
-                  <feature.icon className="w-8 h-8 text-white" />
+                <div className="flex items-center justify-center md:justify-start space-x-3 mb-6">
+                  <div className={`flex items-center justify-center w-12 h-12 bg-${category.color}-100 rounded-xl`}>
+                    <category.icon className={`w-6 h-6 text-${category.color}-600`} />
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900">{category.category}</h2>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <p className="text-xl text-gray-600 max-w-3xl">
+                  {category.category === 'Brand Strategy' && 'Define your brand\'s foundation with AI-powered strategic tools.'}
+                  {category.category === 'Visual Identity' && 'Create stunning visual elements that represent your brand perfectly.'}
+                  {category.category === 'Brand Voice' && 'Establish a consistent communication style that resonates with your audience.'}
+                  {category.category === 'Brand Guidelines' && 'Generate and maintain comprehensive brand guidelines for consistency.'}
+                  {category.category === 'Brand Consistency' && 'Ensure your brand is consistently applied across all materials and platforms.'}
+                  {category.category === 'Brand Health' && 'Monitor and improve your brand\'s performance with AI-powered analytics.'}
+                </p>
               </motion.div>
-            ))}
-          </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-8">
+                {category.items.map((feature, featureIndex) => (
+                  <motion.div
+                    key={feature.title}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: featureIndex * 0.1 }}
+                    viewport={{ once: true }}
+                    className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-all duration-300"
+                  >
+                    <div className="flex items-center space-x-4 mb-4">
+                      <div className={`flex items-center justify-center w-12 h-12 bg-${category.color}-100 rounded-xl`}>
+                        <feature.icon className={`w-6 h-6 text-${category.color}-600`} />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900">{feature.title}</h3>
+                    </div>
+                    <p className="text-gray-600 mb-6">{feature.description}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ))}
           
           <div className="text-center mt-12">
             <Link to="/features">
@@ -732,8 +761,8 @@ export const Landing: React.FC = () => {
         </div>
       </footer>
     </div>
-  )
-}
+  );
+};
 
 // Star component for testimonials
 const Star = (props: any) => {
