@@ -16,13 +16,15 @@ import {
   Users,
   Layers,
   Download,
-  CheckCircle
+  CheckCircle,
+  ArrowUp
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Navbar } from '../components/layout/Navbar'
 import { PoweredBySection } from '../components/ui/PoweredBySection'
+import { ScrollToTop } from '../components/ui/ScrollToTop'
 
 export const Landing: React.FC = () => {
   const features = [
@@ -599,6 +601,9 @@ export const Landing: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
     </div>
   );
 };
