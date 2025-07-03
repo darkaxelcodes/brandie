@@ -1,58 +1,124 @@
-/*
-  # Fix Token Allocation for New Users
+-- Create user_tokens table if it doesn't exist
+CREATE TABLE IF NOT EXISTS user_tokens (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+  balance integer DEFAULT 15,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
 
-  1. Problem
-    - The user_tokens table already exists with policies
-    - Need to update the default token balance from 50 to 15
-    - Need to ensure new users get tokens automatically
+-- Create token_transactions table if it doesn't exist
+CREATE TABLE IF NOT EXISTS token_transactions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  amount integer NOT NULL,
+  action_type text NOT NULL,
+  description text,
+  created_at timestamptz DEFAULT now()
+);
 
-  2. Solution
-    - Update the default balance in the user_tokens table
-    - Add a trigger to create tokens for new users
-    - Avoid recreating existing policies
-*/
+-- Enable RLS
+ALTER TABLE user_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE token_transactions ENABLE ROW LEVEL SECURITY;
 
--- Update default balance for user_tokens table if it exists
+-- Create policies for user_tokens if they don't exist
 DO $$
 BEGIN
-  IF EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'user_tokens' AND column_name = 'balance'
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_tokens' 
+    AND policyname = 'Users can view their own tokens'
   ) THEN
-    -- Update the default value for the balance column
-    ALTER TABLE user_tokens 
-    ALTER COLUMN balance SET DEFAULT 15;
+    CREATE POLICY "Users can view their own tokens"
+      ON user_tokens
+      FOR SELECT
+      TO authenticated
+      USING (auth.uid() = user_id);
+  END IF;
+  
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'user_tokens' 
+    AND policyname = 'Users can update their own tokens'
+  ) THEN
+    CREATE POLICY "Users can update their own tokens"
+      ON user_tokens
+      FOR UPDATE
+      TO authenticated
+      USING (auth.uid() = user_id)
+      WITH CHECK (auth.uid() = user_id);
   END IF;
 END $$;
 
--- Add default tokens for existing users who don't have tokens yet
-INSERT INTO user_tokens (user_id, balance)
-SELECT id, 15
-FROM auth.users
-WHERE id NOT IN (SELECT user_id FROM user_tokens)
-ON CONFLICT (user_id) DO NOTHING;
-
--- Create a function to automatically add tokens for new users
-CREATE OR REPLACE FUNCTION add_tokens_for_new_user()
-RETURNS TRIGGER AS $$
+-- Create policies for token_transactions if they don't exist
+DO $$
 BEGIN
-  INSERT INTO user_tokens (user_id, balance)
-  VALUES (NEW.id, 15)
-  ON CONFLICT (user_id) DO NOTHING;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'token_transactions' 
+    AND policyname = 'Users can view their own token transactions'
+  ) THEN
+    CREATE POLICY "Users can view their own token transactions"
+      ON token_transactions
+      FOR SELECT
+      TO authenticated
+      USING (auth.uid() = user_id);
+  END IF;
+  
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies 
+    WHERE tablename = 'token_transactions' 
+    AND policyname = 'Users can create their own token transactions'
+  ) THEN
+    CREATE POLICY "Users can create their own token transactions"
+      ON token_transactions
+      FOR INSERT
+      TO authenticated
+      WITH CHECK (auth.uid() = user_id);
+  END IF;
+END $$;
 
--- Create a trigger to call the function when a new user is created
+-- Add trigger for updated_at if it doesn't exist
 DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_trigger 
-    WHERE tgname = 'add_tokens_for_new_user_trigger'
+    WHERE tgname = 'update_user_tokens_updated_at'
   ) THEN
-    CREATE TRIGGER add_tokens_for_new_user_trigger
-    AFTER INSERT ON auth.users
-    FOR EACH ROW
-    EXECUTE FUNCTION add_tokens_for_new_user();
+    CREATE TRIGGER update_user_tokens_updated_at
+      BEFORE UPDATE ON user_tokens
+      FOR EACH ROW
+      EXECUTE FUNCTION update_updated_at_column();
   END IF;
 END $$;
+
+-- Create indexes for better performance if they don't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_indexes 
+    WHERE indexname = 'idx_user_tokens_user_id'
+  ) THEN
+    CREATE INDEX idx_user_tokens_user_id ON user_tokens(user_id);
+  END IF;
+  
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_indexes 
+    WHERE indexname = 'idx_token_transactions_user_id'
+  ) THEN
+    CREATE INDEX idx_token_transactions_user_id ON token_transactions(user_id);
+  END IF;
+  
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_indexes 
+    WHERE indexname = 'idx_token_transactions_created_at'
+  ) THEN
+    CREATE INDEX idx_token_transactions_created_at ON token_transactions(created_at);
+  END IF;
+END $$;
+
+-- Add default tokens for existing users
+INSERT INTO user_tokens (user_id, balance)
+SELECT id, 15
+FROM auth.users
+ON CONFLICT (user_id) DO NOTHING;
