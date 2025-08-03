@@ -14,70 +14,16 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Navbar } from '../components/layout/Navbar';
+import { PricingCard } from '../components/subscription/PricingCard';
 import { ScrollToTop } from '../components/ui/ScrollToTop';
 import { PoweredBySection } from '../components/ui/PoweredBySection';
+import { products } from '../stripe-config';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Pricing: React.FC = () => {
+  const { user } = useAuth();
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
   const [showEnterprise, setShowEnterprise] = useState(false);
-
-  const plans = [
-    {
-      name: 'Starter',
-      description: 'Perfect for individuals and small projects',
-      price: billingCycle === 'monthly' ? 29 : 19,
-      features: [
-        '1 brand identity',
-        'AI-powered brand strategy',
-        'Logo generation (3 options)',
-        'Color palette generation',
-        'Typography recommendations',
-        'Basic brand voice',
-        'PDF brand guidelines',
-        'Email support'
-      ],
-      cta: 'Start Free Trial',
-      popular: false
-    },
-    {
-      name: 'Professional',
-      description: 'Ideal for businesses and agencies',
-      price: billingCycle === 'monthly' ? 79 : 59,
-      features: [
-        '5 brand identities',
-        'Advanced AI brand strategy',
-        'Logo generation (10 options)',
-        'Advanced color psychology',
-        'Typography science',
-        'Comprehensive brand voice',
-        'Multi-format guidelines export',
-        'Brand consistency tools',
-        'Brand health monitoring',
-        'Priority support'
-      ],
-      cta: 'Start Free Trial',
-      popular: true
-    },
-    {
-      name: 'Agency',
-      description: 'For agencies managing multiple brands',
-      price: billingCycle === 'monthly' ? 199 : 149,
-      features: [
-        'Unlimited brand identities',
-        'Team collaboration',
-        'Client access management',
-        'White-label exports',
-        'Advanced customization',
-        'API access',
-        'Brand asset library',
-        'Dedicated account manager',
-        'Training sessions',
-        'Phone & email support'
-      ],
-      cta: 'Contact Sales',
-      popular: false
-    }
-  ];
 
   const faqs = [
     {
@@ -159,60 +105,35 @@ export const Pricing: React.FC = () => {
           </motion.div>
 
           {/* Pricing Cards */}
-          <div className="grid md:grid-cols-3 gap-8">
-            {plans.map((plan, index) => (
+          <div className="flex justify-center">
+            {products.map((product, index) => (
               <motion.div
-                key={plan.name}
+                key={product.priceId}
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className={`relative ${plan.popular ? 'md:-mt-8 md:mb-8' : ''}`}
+                className="max-w-md"
               >
-                {plan.popular && (
-                  <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-bold px-4 py-1 rounded-full shadow-lg">
-                    Most Popular
-                  </div>
-                )}
-                <Card className={`p-8 h-full flex flex-col ${
-                  plan.popular 
-                    ? 'border-blue-200 shadow-xl bg-gradient-to-b from-white to-blue-50' 
-                    : ''
-                }`}>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                  <p className="text-gray-600 mb-6">{plan.description}</p>
-                  
-                  <div className="mb-6">
-                    <span className="text-5xl font-bold text-gray-900">${plan.price}</span>
-                    <span className="text-gray-600 ml-2">/ month</span>
-                    {billingCycle === 'annual' && (
-                      <p className="text-sm text-green-600 mt-1">Billed annually (${plan.price * 12}/year)</p>
-                    )}
-                  </div>
-                  
-                  <ul className="space-y-3 mb-8 flex-grow">
-                    {plan.features.map((feature, i) => (
-                      <li key={i} className="flex items-start">
-                        <Check className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-600">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
-                  <Link to="/auth" className="mt-auto">
-                    <Button 
-                      className={`w-full ${
-                        plan.popular 
-                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700' 
-                          : ''
-                      }`}
-                    >
-                      {plan.cta}
-                    </Button>
-                  </Link>
-                </Card>
+                <PricingCard 
+                  product={product} 
+                  isPopular={true}
+                />
               </motion.div>
             ))}
           </div>
+          
+          {!user && (
+            <div className="text-center mt-8">
+              <p className="text-gray-600 mb-4">
+                Sign up to get started with your subscription
+              </p>
+              <Link to="/auth">
+                <Button variant="outline" size="lg">
+                  Create Account
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 

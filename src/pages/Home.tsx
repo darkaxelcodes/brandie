@@ -19,6 +19,7 @@ import { Button } from '../components/ui/Button'
 import { brandService } from '../lib/brandService'
 import { visualService } from '../lib/visualService'
 import { useAuth } from '../contexts/AuthContext'
+import { SubscriptionStatus } from '../components/subscription/SubscriptionStatus'
 import { Brand } from '../types/brand'
 import { TourButton } from '../components/ui/TourButton'
 import { useToast } from '../contexts/ToastContext'
@@ -137,6 +138,15 @@ export const Home: React.FC = () => {
       </motion.div>
 
       {/* Stats Overview */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="mb-8"
+      >
+        <SubscriptionStatus />
+      </motion.div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

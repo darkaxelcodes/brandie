@@ -13,6 +13,7 @@ import { TokenProvider } from './contexts/TokenContext'
 const Landing = lazy(() => import('./pages/Landing').then(module => ({ default: module.Landing })))
 const Features = lazy(() => import('./pages/Features').then(module => ({ default: module.Features })))
 const Pricing = lazy(() => import('./pages/Pricing').then(module => ({ default: module.Pricing })))
+const Success = lazy(() => import('./pages/Success').then(module => ({ default: module.Success })))
 const Auth = lazy(() => import('./pages/Auth').then(module => ({ default: module.Auth })))
 const Dashboard = lazy(() => import('./pages/Dashboard').then(module => ({ default: module.Dashboard })))
 const Home = lazy(() => import('./pages/Home').then(module => ({ default: module.Home })))
@@ -74,6 +75,11 @@ function App() {
                   <Route path="/pricing" element={
                     <Suspense fallback={<PageLoader />}>
                       <Pricing />
+                    </Suspense>
+                  } />
+                  <Route path="/success" element={
+                    <Suspense fallback={<PageLoader />}>
+                      <Success />
                     </Suspense>
                   } />
                   <Route path="/auth" element={

@@ -10,6 +10,7 @@ import { Card } from '../components/ui/Card'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import { supabase } from '../lib/supabase'
+import { SubscriptionStatus } from '../components/subscription/SubscriptionStatus'
 import { TourButton } from '../components/ui/TourButton'
 import { useTokens } from '../contexts/TokenContext'
 import { tokenService, TokenTransaction } from '../lib/tokenService'
@@ -219,6 +220,15 @@ export const UserPreferences: React.FC = () => {
       )}
 
       {/* AI Tokens */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="mb-6"
+      >
+        <SubscriptionStatus />
+      </motion.div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

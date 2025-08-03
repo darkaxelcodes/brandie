@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
+import { stripeService } from '../lib/stripe'
 import { useToast } from './ToastContext'
 import { useNavigate } from 'react-router-dom'
 
@@ -94,6 +95,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } catch (tokenError) {
           console.error('Error setting up user tokens:', tokenError);
+        }
+        
+        // Initialize Stripe customer for new sign-ins
+        if (_event === 'SIGNED_IN') {
+          try {
+            await stripeService.getUserSubscription();
+          } catch (stripeError) {
+            console.error('Error initializing Stripe customer:', stripeError);
+          }
+        }
+        
+        // Initialize Stripe customer if needed
+        try {
+          await stripeService.getUserSubscription();
+        } catch (stripeError) {
+          console.error('Error initializing Stripe customer:', stripeError);
         }
       }
       

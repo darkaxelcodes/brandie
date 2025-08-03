@@ -5,6 +5,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { Button } from '../ui/Button'
 import { useToast } from '../../contexts/ToastContext'
+import { SubscriptionBadge } from '../ui/SubscriptionBadge'
 import { KeyboardShortcutsPanel } from '../ui/KeyboardShortcutsPanel'
 import { useKeyboardShortcut } from '../../hooks/useKeyboardShortcut'
 import { useTour } from '../../contexts/TourContext'
@@ -83,6 +84,7 @@ export const Header: React.FC = () => {
             <div>
               <h1 className="text-xl font-bold text-gray-900">Brandie</h1>
               <p className="text-sm text-gray-500">Build every brand overnight</p>
+              <SubscriptionBadge className="mt-1" />
             </div>
           </Link>
         </div>

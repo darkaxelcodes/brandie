@@ -130,9 +130,11 @@ export const Landing: React.FC = () => {
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
-              <Button variant="outline" size="lg" className="border-2">
-                Watch Demo
-              </Button>
+              <Link to="/pricing">
+                <Button variant="outline" size="lg" className="border-2">
+                  View Pricing
+                </Button>
+              </Link>
             </div>
           </motion.div>
         </div>

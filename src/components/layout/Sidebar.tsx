@@ -16,6 +16,8 @@ import {
 import { useAuth } from '../../contexts/AuthContext'
 import { useTour } from '../../contexts/TourContext'
 import { Button } from '../ui/Button'
+import { stripeService } from '../../lib/stripe'
+import { getProductByPriceId } from '../../stripe-config'
 import { useTokens } from '../../contexts/TokenContext'
 import { TokenDisplay } from '../tokens/TokenDisplay'
 
@@ -29,6 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
   const { user } = useAuth()
   const { showTour } = useTour()
   const { tokenBalance, isLoading } = useTokens()
+  const [subscription, setSubscription] = useState<any>(null)
   const location = useLocation()
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null)
 
@@ -43,6 +46,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
   const bottomNavItems = [
     { path: '/preferences', label: 'Settings', icon: Settings }
   ]
+
+  useEffect(() => {
+    if (user) {
+      loadSubscription()
+    }
+  }, [user])
+
+  const loadSubscription = async () => {
+    try {
+      const data = await stripeService.getUserSubscription()
+      setSubscription(data)
+    } catch (error) {
+      console.error('Error loading subscription:', error)
+    }
+  }
 
   const isActive = (path: string) => {
     if (path === '/home' && location.pathname === '/home') return true
@@ -83,6 +101,56 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
       {/* Token Display */}
       <div className="px-3 py-4 border-b border-gray-200">
         <TokenDisplay collapsed={true} />
+        
+        {/* Subscription Status */}
+        {subscription && (
+          <div className="mt-3 pt-3 border-t border-gray-200">
+            <div 
+              className="relative flex justify-center"
+              onMouseEnter={() => handleMouseEnter('Subscription')}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className={`flex items-center justify-center w-12 h-12 rounded-lg ${
+                subscription.subscription_status === 'active' 
+                  ? 'bg-green-100' 
+                  : 'bg-amber-100'
+              }`}>
+                <Crown className={`w-6 h-6 ${
+                  subscription.subscription_status === 'active' 
+                    ? 'text-green-600' 
+                    : 'text-amber-600'
+                }`} />
+              </div>
+              
+              {/* Status badge */}
+              <div className={`absolute -top-1 -right-1 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center ${
+                subscription.subscription_status === 'active' 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-amber-600 text-white'
+              }`}>
+                {subscription.subscription_status === 'active' ? '✓' : '!'}
+              </div>
+              
+              {/* Tooltip */}
+              {activeTooltip === 'Subscription' && (
+                <div 
+                  className="fixed z-50 bg-white text-gray-900 text-sm py-2 px-3 rounded shadow-lg whitespace-nowrap border border-gray-200" 
+                  style={{ 
+                    left: '70px', 
+                    top: `${getTooltipPosition(document.querySelector('.bg-green-100, .bg-amber-100')).top}px` 
+                  }}
+                >
+                  <div className="font-medium">
+                    {getProductByPriceId(subscription.price_id)?.name || 'Subscription'}
+                  </div>
+                  <div className="text-xs text-gray-600 capitalize">
+                    {subscription.subscription_status.replace('_', ' ')}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Main Navigation */}
