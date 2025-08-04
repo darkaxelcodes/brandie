@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'luxury'
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'terminal' | 'ai-primary'
   size?: 'sm' | 'md' | 'lg' | 'xl'
   loading?: boolean
   children: React.ReactNode
@@ -20,14 +20,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   glow = false,
   ...props
 }, ref) => {
-  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group'
+  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neon-green focus:ring-offset-void disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group'
   
   const variants = {
-    primary: 'bg-gradient-luxury text-white hover:shadow-xl focus:ring-electric-blue shadow-lg hover:scale-[1.02] active:scale-[0.98]',
-    secondary: 'bg-white text-gray-900 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 focus:ring-gray-500 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]',
-    outline: 'border-2 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-white focus:ring-electric-blue hover:scale-[1.02] active:scale-[0.98]',
-    ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:ring-gray-500 hover:scale-[1.02] active:scale-[0.98]',
-    luxury: 'bg-gradient-to-r from-gray-900 to-black text-white hover:from-black hover:to-gray-900 shadow-luxury focus:ring-gray-800 hover:scale-[1.02] active:scale-[0.98]'
+    primary: 'bg-neon-green text-void hover:bg-neon-green/90 shadow-neon hover:shadow-neon-lg hover:scale-[1.02] active:scale-[0.98]',
+    secondary: 'bg-dark-800 text-light border border-dark-500 hover:border-dark-400 hover:bg-dark-700 shadow-cyber hover:shadow-neon hover:scale-[1.02] active:scale-[0.98]',
+    outline: 'border border-neon-green text-neon-green hover:bg-neon-green hover:text-void hover:scale-[1.02] active:scale-[0.98]',
+    ghost: 'text-dark-100 hover:text-light hover:bg-dark-800 hover:scale-[1.02] active:scale-[0.98]',
+    terminal: 'bg-dark-800 text-neon-green font-mono border border-dark-500 hover:border-neon-green hover:bg-dark-700 hover:shadow-neon hover:scale-[1.02] active:scale-[0.98]',
+    'ai-primary': 'text-void font-semibold bg-gradient-ai hover:shadow-neon-lg hover:scale-[1.02] active:scale-[0.98] neon-glow'
   }
   
   const sizes = {
@@ -48,20 +49,36 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
         ${baseClasses} 
         ${variants[variant]} 
         ${sizes[size]} 
-        ${glow ? 'shadow-glow hover:shadow-glow-lg' : ''} 
+        ${glow ? 'neon-glow' : ''} 
         ${className}
       `}
       disabled={isDisabled}
       aria-disabled={isDisabled}
       {...props}
     >
-      {/* Shimmer effect for primary buttons */}
-      {variant === 'primary' && (
+      {/* Holographic effect for AI buttons */}
+      {variant === 'ai-primary' && (
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
           initial={{ x: '-100%' }}
           whileHover={{ x: '100%' }}
-          transition={{ duration: 0.6, ease: 'easeInOut' }}
+          transition={{ 
+            duration: 0.6, 
+            ease: 'easeInOut' 
+          }}
+        />
+      )}
+      
+      {/* Data flow effect for terminal buttons */}
+      {variant === 'terminal' && (
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-green/10 to-transparent"
+          initial={{ x: '-100%' }}
+          whileHover={{ x: '100%' }}
+          transition={{ 
+            duration: 1, 
+            ease: 'easeInOut' 
+          }}
         />
       )}
       

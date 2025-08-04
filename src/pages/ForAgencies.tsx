@@ -20,7 +20,10 @@ import {
   Target,
   BarChart,
   Layers,
-  Download
+  Download,
+  Terminal,
+  Code,
+  Database
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
@@ -35,28 +38,32 @@ export const ForAgencies: React.FC = () => {
       title: '10x Faster Delivery',
       description: 'Complete brand identities in hours instead of weeks. Take on more clients without hiring more staff.',
       stat: '10x',
-      statLabel: 'faster than traditional methods'
+      statLabel: 'faster than traditional methods',
+      accent: 'neon-green'
     },
     {
       icon: DollarSign,
       title: 'Higher Profit Margins',
       description: 'Reduce production costs while maintaining premium pricing. Increase your agency\'s profitability.',
       stat: '300%',
-      statLabel: 'increase in profit margins'
+      statLabel: 'increase in profit margins',
+      accent: 'neon-cyan'
     },
     {
       icon: Users,
       title: 'Scale Your Team',
       description: 'Handle enterprise clients without expanding your team. AI handles the heavy lifting.',
       stat: '5x',
-      statLabel: 'more clients per team member'
+      statLabel: 'more clients per team member',
+      accent: 'neon-magenta'
     },
     {
       icon: Shield,
       title: 'White-Label Ready',
       description: 'Present AI-generated work as your own. Maintain your agency brand and client relationships.',
       stat: '100%',
-      statLabel: 'white-label customization'
+      statLabel: 'white-label customization',
+      accent: 'neon-green'
     }
   ];
 
@@ -133,15 +140,15 @@ export const ForAgencies: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-void text-light">
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden hero-gradient pt-32">
+      <section className="relative overflow-hidden hero-grid pt-32 cyber-overlay">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
-            className="absolute top-20 left-10 w-72 h-72 bg-electric-purple/5 rounded-full blur-3xl"
+            className="absolute top-20 left-10 w-72 h-72 bg-neon-cyan/5 rounded-full blur-3xl"
             animate={{ 
               scale: [1, 1.2, 1],
               opacity: [0.3, 0.5, 0.3]
@@ -149,7 +156,7 @@ export const ForAgencies: React.FC = () => {
             transition={{ duration: 8, repeat: Infinity }}
           />
           <motion.div
-            className="absolute top-40 right-20 w-96 h-96 bg-electric-blue/5 rounded-full blur-3xl"
+            className="absolute top-40 right-20 w-96 h-96 bg-neon-magenta/5 rounded-full blur-3xl"
             animate={{ 
               scale: [1.2, 1, 1.2],
               opacity: [0.2, 0.4, 0.2]
@@ -158,17 +165,17 @@ export const ForAgencies: React.FC = () => {
           />
         </div>
 
-        <div className="relative max-w-7xl mx-auto container-padding section-padding">
+        <div className="relative max-w-7xl mx-auto container-padding-cyber section-padding-cyber">
           <div className="text-center">
             {/* Badge */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center space-x-2 bg-electric-purple/10 border border-electric-purple/20 rounded-full px-6 py-3 mb-8"
+              className="inline-flex items-center space-x-2 glass-accent border border-neon-cyan/20 rounded-full px-6 py-3 mb-8"
             >
-              <Building2 className="w-4 h-4 text-electric-purple" />
-              <span className="text-sm font-semibold text-electric-purple">Built for Agencies</span>
+              <Building2 className="w-4 h-4 text-neon-cyan" />
+              <span className="text-sm font-semibold text-neon-cyan font-terminal">AGENCY_OPTIMIZED</span>
             </motion.div>
             
             {/* Main Headline */}
@@ -176,10 +183,10 @@ export const ForAgencies: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-hero font-black text-gray-900 mb-8 text-balance"
+              className="text-cyber-hero font-black text-light mb-8 text-balance"
             >
               Scale your agency with
-              <span className="block gradient-text">AI-powered branding</span>
+              <span className="block gradient-ai-text">AI-powered branding</span>
             </motion.h1>
             
             {/* Subheadline */}
@@ -187,7 +194,7 @@ export const ForAgencies: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="text-xl md:text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed text-balance"
+              className="text-xl md:text-2xl text-dark-100 mb-12 max-w-4xl mx-auto leading-relaxed text-balance font-terminal"
             >
               Deliver Fortune 500-quality brand identities to all your clients. 
               Increase capacity 10x without hiring. White-label ready.
@@ -201,15 +208,15 @@ export const ForAgencies: React.FC = () => {
               className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16"
             >
               <Link to="/auth">
-                <Button className="btn-primary text-lg px-10 py-5 group shadow-glow hover:shadow-glow-lg">
-                  <Building2 className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                  Start Agency Trial
+                <Button className="btn-ai-primary text-lg px-10 py-5 group neon-glow-cyan">
+                  <Terminal className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+                  <span className="font-terminal">./start_agency_trial</span>
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Button className="btn-secondary text-lg px-10 py-5 group">
+              <Button className="btn-terminal text-lg px-10 py-5 group">
                 <Users className="w-5 h-5 mr-2" />
-                Book Demo
+                <span className="font-terminal">./book_demo</span>
               </Button>
             </motion.div>
 
@@ -228,11 +235,11 @@ export const ForAgencies: React.FC = () => {
                   transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
                   className="text-center group"
                 >
-                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-luxury rounded-xl mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <stat.icon className="w-6 h-6 text-white" />
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-ai rounded-xl mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 neon-glow">
+                    <stat.icon className="w-6 h-6 text-void" />
                   </div>
-                  <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{stat.number}</div>
-                  <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+                  <div className="text-2xl md:text-3xl font-bold text-light mb-1 font-terminal">{stat.number}</div>
+                  <div className="text-sm text-dark-100 font-medium font-terminal">{stat.label}</div>
                 </motion.div>
               ))}
             </motion.div>
@@ -241,8 +248,8 @@ export const ForAgencies: React.FC = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="section-padding bg-gray-50/50">
-        <div className="max-w-7xl mx-auto container-padding">
+      <section className="section-padding-cyber bg-dark-950/50 border-y border-dark-500">
+        <div className="max-w-7xl mx-auto container-padding-cyber">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -250,11 +257,11 @@ export const ForAgencies: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-20"
           >
-            <h2 className="text-display text-gray-900 mb-6 text-balance">
+            <h2 className="text-cyber-display text-light mb-6 text-balance">
               Transform your agency with 
-              <span className="gradient-text"> AI superpowers</span>
+              <span className="gradient-ai-text"> AI superpowers</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto text-balance">
+            <p className="text-xl text-dark-100 max-w-3xl mx-auto text-balance font-terminal">
               Built specifically for agencies who want to scale without compromising quality.
             </p>
           </motion.div>
@@ -267,20 +274,25 @@ export const ForAgencies: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="luxury-card p-8 group"
+                className="cyber-card p-8 group"
               >
                 <div className="flex items-start space-x-6">
-                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-luxury rounded-2xl group-hover:scale-110 transition-transform duration-300">
-                    <benefit.icon className="w-8 h-8 text-white" />
+                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-ai rounded-2xl group-hover:scale-110 transition-transform duration-300 neon-glow">
+                    <benefit.icon className="w-8 h-8 text-void" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">{benefit.title}</h3>
-                    <p className="text-gray-600 mb-4 leading-relaxed">{benefit.description}</p>
+                    <h3 className="text-xl font-bold text-light mb-3 font-terminal">{benefit.title}</h3>
+                    <p className="text-dark-100 mb-4 leading-relaxed">{benefit.description}</p>
                     <div className="flex items-center space-x-4">
-                      <div className="text-2xl font-bold gradient-text">{benefit.stat}</div>
-                      <div className="text-sm text-gray-500">{benefit.statLabel}</div>
+                      <div className="text-2xl font-bold gradient-ai-text font-terminal">{benefit.stat}</div>
+                      <div className="text-sm text-dark-200 font-terminal">{benefit.statLabel}</div>
                     </div>
                   </div>
+                </div>
+                
+                {/* Terminal accent */}
+                <div className="mt-6 pt-4 border-t border-dark-500">
+                  <span className={`text-xs text-${benefit.accent} font-terminal`}>// AGENCY_OPTIMIZED</span>
                 </div>
               </motion.div>
             ))}
@@ -289,8 +301,8 @@ export const ForAgencies: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className="section-padding bg-white">
-        <div className="max-w-7xl mx-auto container-padding">
+      <section className="section-padding-cyber bg-dark-900 grid-section">
+        <div className="max-w-7xl mx-auto container-padding-cyber">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -298,11 +310,11 @@ export const ForAgencies: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-20"
           >
-            <h2 className="text-display text-gray-900 mb-6 text-balance">
+            <h2 className="text-cyber-display text-light mb-6 text-balance">
               Enterprise features for 
-              <span className="gradient-text"> growing agencies</span>
+              <span className="gradient-ai-text"> growing agencies</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto text-balance">
+            <p className="text-xl text-dark-100 max-w-3xl mx-auto text-balance font-terminal">
               Everything you need to manage multiple clients and deliver exceptional results.
             </p>
           </motion.div>
@@ -315,23 +327,28 @@ export const ForAgencies: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="luxury-card p-8 group"
+                className="cyber-card p-8 group holographic"
               >
                 <div className="flex items-center space-x-4 mb-6">
-                  <div className="flex items-center justify-center w-14 h-14 bg-gradient-luxury rounded-xl group-hover:scale-110 transition-transform duration-300">
-                    <feature.icon className="w-7 h-7 text-white" />
+                  <div className="flex items-center justify-center w-14 h-14 bg-gradient-ai rounded-xl group-hover:scale-110 transition-transform duration-300 neon-glow">
+                    <feature.icon className="w-7 h-7 text-void" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">{feature.title}</h3>
+                  <h3 className="text-xl font-bold text-light font-terminal">{feature.title}</h3>
                 </div>
-                <p className="text-gray-600 mb-6 leading-relaxed">{feature.description}</p>
+                <p className="text-dark-100 mb-6 leading-relaxed">{feature.description}</p>
                 <ul className="space-y-3">
                   {feature.benefits.map((benefit, i) => (
                     <li key={i} className="flex items-center space-x-3">
-                      <Check className="w-4 h-4 text-electric-green flex-shrink-0" />
-                      <span className="text-gray-700">{benefit}</span>
+                      <Check className="w-4 h-4 text-neon-green flex-shrink-0" />
+                      <span className="text-dark-100 font-terminal">{benefit}</span>
                     </li>
                   ))}
                 </ul>
+                
+                {/* Terminal accent */}
+                <div className="mt-6 pt-4 border-t border-dark-500">
+                  <span className="text-xs text-neon-cyan font-terminal">// ENTERPRISE_FEATURE</span>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -339,8 +356,8 @@ export const ForAgencies: React.FC = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="section-padding bg-gray-50/50">
-        <div className="max-w-7xl mx-auto container-padding">
+      <section className="section-padding-cyber bg-dark-950/50 border-y border-dark-500">
+        <div className="max-w-7xl mx-auto container-padding-cyber">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -348,11 +365,11 @@ export const ForAgencies: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-20"
           >
-            <h2 className="text-display text-gray-900 mb-6 text-balance">
+            <h2 className="text-cyber-display text-light mb-6 text-balance">
               Trusted by leading 
-              <span className="gradient-text"> creative agencies</span>
+              <span className="gradient-ai-text"> creative agencies</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto text-balance">
+            <p className="text-xl text-dark-100 max-w-3xl mx-auto text-balance font-terminal">
               See how top agencies are scaling their operations with Brandie.
             </p>
           </motion.div>
@@ -365,26 +382,26 @@ export const ForAgencies: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="luxury-card p-8 group"
+                className="cyber-card p-8 group"
               >
-                <div className="flex text-electric-blue mb-6">
+                <div className="flex text-neon-green mb-6">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 fill-current" />
                   ))}
                 </div>
-                <blockquote className="text-gray-700 text-lg leading-relaxed mb-6 italic">
+                <blockquote className="text-dark-100 text-lg leading-relaxed mb-6 italic">
                   "{testimonial.quote}"
                 </blockquote>
                 <div className="flex items-center space-x-4">
                   <img 
                     src={testimonial.avatar} 
                     alt={testimonial.author} 
-                    className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-100"
+                    className="w-12 h-12 rounded-full object-cover ring-2 ring-dark-500"
                   />
                   <div>
-                    <div className="font-bold text-gray-900">{testimonial.author}</div>
-                    <div className="text-sm text-gray-600">{testimonial.role}</div>
-                    <div className="text-xs text-electric-blue font-semibold">{testimonial.company} • {testimonial.clients}</div>
+                    <div className="font-bold text-light font-terminal">{testimonial.author}</div>
+                    <div className="text-sm text-dark-100">{testimonial.role}</div>
+                    <div className="text-xs text-neon-cyan font-semibold font-terminal">{testimonial.company} • {testimonial.clients}</div>
                   </div>
                 </div>
               </motion.div>
@@ -394,8 +411,8 @@ export const ForAgencies: React.FC = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="section-padding bg-white">
-        <div className="max-w-7xl mx-auto container-padding">
+      <section className="section-padding-cyber bg-dark-900">
+        <div className="max-w-7xl mx-auto container-padding-cyber">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -403,11 +420,11 @@ export const ForAgencies: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-20"
           >
-            <h2 className="text-display text-gray-900 mb-6 text-balance">
+            <h2 className="text-cyber-display text-light mb-6 text-balance">
               Agency pricing that 
-              <span className="gradient-text"> scales with you</span>
+              <span className="gradient-ai-text"> scales with you</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto text-balance">
+            <p className="text-xl text-dark-100 max-w-3xl mx-auto text-balance font-terminal">
               Start with our standard plan and upgrade to enterprise as your agency grows.
             </p>
           </motion.div>
@@ -420,26 +437,26 @@ export const ForAgencies: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="luxury-card p-8"
+                className="cyber-card p-8"
               >
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Agency Standard</h3>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">$49<span className="text-lg text-gray-600">/month</span></div>
-                  <p className="text-gray-600">Perfect for growing agencies</p>
+                  <h3 className="text-2xl font-bold text-light mb-2 font-terminal">AGENCY_STANDARD</h3>
+                  <div className="text-4xl font-bold text-light mb-2 font-terminal">$49<span className="text-lg text-dark-100">/month</span></div>
+                  <p className="text-dark-100 font-terminal">Perfect for growing agencies</p>
                 </div>
                 
                 <ul className="space-y-4 mb-8">
                   {pricingFeatures.slice(0, 4).map((feature, i) => (
                     <li key={i} className="flex items-center space-x-3">
-                      <Check className="w-5 h-5 text-electric-green flex-shrink-0" />
-                      <span className="text-gray-700">{feature}</span>
+                      <Check className="w-5 h-5 text-neon-green flex-shrink-0" />
+                      <span className="text-dark-100 font-terminal">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 
                 <Link to="/auth">
-                  <Button className="btn-secondary w-full text-lg py-4">
-                    Start Free Trial
+                  <Button className="btn-terminal w-full text-lg py-4">
+                    <span className="font-terminal">./start_free_trial</span>
                   </Button>
                 </Link>
               </motion.div>
@@ -450,29 +467,29 @@ export const ForAgencies: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="luxury-card p-8 ring-2 ring-electric-blue relative"
+                className="cyber-card p-8 ring-2 ring-neon-cyan relative"
               >
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-luxury text-white text-sm font-bold px-6 py-2 rounded-full">
-                  Most Popular
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-ai text-void text-sm font-bold px-6 py-2 rounded-full font-terminal">
+                  MOST_POPULAR
                 </div>
                 
                 <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Agency Enterprise</h3>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">Custom<span className="text-lg text-gray-600"> pricing</span></div>
-                  <p className="text-gray-600">For established agencies</p>
+                  <h3 className="text-2xl font-bold text-light mb-2 font-terminal">AGENCY_ENTERPRISE</h3>
+                  <div className="text-4xl font-bold text-light mb-2 font-terminal">Custom<span className="text-lg text-dark-100"> pricing</span></div>
+                  <p className="text-dark-100 font-terminal">For established agencies</p>
                 </div>
                 
                 <ul className="space-y-4 mb-8">
                   {pricingFeatures.map((feature, i) => (
                     <li key={i} className="flex items-center space-x-3">
-                      <Check className="w-5 h-5 text-electric-green flex-shrink-0" />
-                      <span className="text-gray-700">{feature}</span>
+                      <Check className="w-5 h-5 text-neon-green flex-shrink-0" />
+                      <span className="text-dark-100 font-terminal">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 
-                <Button className="btn-primary w-full text-lg py-4">
-                  Contact Sales
+                <Button className="btn-ai-primary w-full text-lg py-4">
+                  <span className="font-terminal">./contact_sales</span>
                 </Button>
               </motion.div>
             </div>
@@ -481,11 +498,11 @@ export const ForAgencies: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="section-padding bg-gradient-to-r from-gray-950 via-gray-900 to-gray-950 text-white relative overflow-hidden">
+      <section className="section-padding-cyber bg-gradient-dark text-light relative overflow-hidden">
         {/* Animated background */}
         <div className="absolute inset-0">
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-electric-purple/20 via-electric-blue/20 to-electric-purple/20"
+            className="absolute inset-0 bg-gradient-ai opacity-10"
             animate={{
               backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
             }}
@@ -494,29 +511,29 @@ export const ForAgencies: React.FC = () => {
           />
         </div>
         
-        <div className="relative max-w-7xl mx-auto container-padding text-center">
+        <div className="relative max-w-7xl mx-auto container-padding-cyber text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-display text-white mb-6 text-balance">
+            <h2 className="text-cyber-display text-light mb-6 text-balance">
               Ready to scale your agency?
             </h2>
-            <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto text-balance">
+            <p className="text-xl text-dark-100 mb-12 max-w-2xl mx-auto text-balance font-terminal">
               Join 500+ agencies who've transformed their operations with AI-powered branding.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Link to="/auth">
-                <Button className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-10 py-5 font-bold shadow-2xl group">
+                <Button className="bg-light text-void hover:bg-dark-100 text-lg px-10 py-5 font-bold shadow-cyber group">
                   <Sparkles className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                  Start Agency Trial
+                  <span className="font-terminal">./start_agency_trial</span>
                 </Button>
               </Link>
               <Link to="/for-startups">
-                <Button className="glass-dark text-white border-white/20 hover:bg-white/10 text-lg px-10 py-5 font-semibold">
-                  Are you a startup?
+                <Button className="glass-dark text-light border-dark-500 hover:bg-dark-800 text-lg px-10 py-5 font-semibold">
+                  <span className="font-terminal">./are_you_a_startup</span>
                 </Button>
               </Link>
             </div>

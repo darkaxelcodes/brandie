@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Terminal } from 'lucide-react';
 
 interface ScrollToTopProps {
   showBelow?: number;
@@ -42,10 +42,10 @@ export const ScrollToTop: React.FC<ScrollToTopProps> = ({
           exit={{ opacity: 0, scale: 0.5 }}
           transition={{ duration: 0.3 }}
           onClick={handleClick}
-          className={`fixed bottom-8 right-8 z-50 p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${className}`}
+          className={`fixed bottom-8 right-8 z-50 p-3 rounded-lg bg-gradient-ai text-void shadow-cyber hover:shadow-neon focus:outline-none focus:ring-2 focus:ring-neon-green focus:ring-offset-2 focus:ring-offset-void neon-glow group ${className}`}
           aria-label="Scroll to top"
         >
-          <ArrowUp className="w-5 h-5" />
+          <ArrowUp className="w-5 h-5 group-hover:animate-pulse" />
         </motion.button>
       )}
     </AnimatePresence>
