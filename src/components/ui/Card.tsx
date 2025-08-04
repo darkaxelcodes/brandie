@@ -8,6 +8,7 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   glass?: boolean
   luxury?: boolean
   glow?: boolean
+  sharp?: boolean
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(({ 
@@ -17,9 +18,10 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(({
   glass = false,
   luxury = false,
   glow = false,
+  sharp = false,
   ...props
 }, ref) => {
-  const baseClasses = 'rounded-3xl overflow-hidden transition-all duration-500'
+  const baseClasses = `${sharp ? 'rounded-sm' : 'rounded-lg'} overflow-hidden transition-all duration-500`
   
   const getVariantClasses = () => {
     if (glass) {
@@ -27,10 +29,10 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(({
     }
     
     if (luxury) {
-      return 'bg-gradient-to-br from-white/90 to-white/70 dark:from-secondary-900/90 dark:to-secondary-800/70 backdrop-blur-xl border border-secondary-200/50 dark:border-secondary-700/50 shadow-luxury-lg'
+      return 'bg-gradient-to-br from-white/95 to-white/85 dark:from-neutral-900/95 dark:to-neutral-800/85 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 shadow-luxury-lg'
     }
     
-    return 'bg-white dark:bg-secondary-900 border border-secondary-200 dark:border-secondary-700 shadow-luxury'
+    return 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 shadow-luxury'
   }
   
   const hoverEffect = hover ? 'hover:shadow-luxury-xl hover:scale-[1.01] hover:-translate-y-1' : ''

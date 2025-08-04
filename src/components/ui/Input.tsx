@@ -7,6 +7,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   helperText?: string
   icon?: React.ReactNode
   luxury?: boolean
+  sharp?: boolean
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(({
@@ -16,26 +17,27 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
   className = '',
   icon,
   luxury = false,
+  sharp = false,
   ...props
 }, ref) => {
   const id = props.id || `input-${Math.random().toString(36).substring(2, 9)}`
   
   const baseClasses = luxury 
-    ? 'w-full px-6 py-4 bg-white/50 dark:bg-secondary-900/50 backdrop-blur-sm border border-secondary-300/50 dark:border-secondary-600/50 rounded-2xl text-secondary-900 dark:text-secondary-100 placeholder-secondary-500 focus:border-primary-500 focus:bg-white dark:focus:bg-secondary-800 focus:shadow-glow transition-all duration-300'
-    : 'w-full px-4 py-3 border rounded-xl shadow-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500'
+    ? `w-full px-6 py-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm border border-neutral-300/50 dark:border-neutral-600/50 ${sharp ? 'rounded-sm' : 'rounded-lg'} text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:border-sapphire-500 focus:bg-white dark:focus:bg-neutral-800 focus:shadow-glow transition-all duration-300`
+    : `w-full px-4 py-3 border ${sharp ? 'rounded-sm' : 'rounded-lg'} shadow-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sapphire-500/50 focus:border-sapphire-500`
   
   const errorClasses = error 
     ? 'border-red-300 focus:ring-red-500/50 focus:border-red-500' 
-    : 'border-secondary-300 dark:border-secondary-600'
+    : 'border-neutral-300 dark:border-neutral-600'
     
   const iconClasses = icon ? (luxury ? 'pl-14' : 'pl-12') : ''
   
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {label && (
         <motion.label 
           htmlFor={id} 
-          className={`block text-sm font-semibold ${luxury ? 'text-secondary-700 dark:text-secondary-300 tracking-wide uppercase' : 'text-secondary-700 dark:text-secondary-300'}`}
+          className={`block text-sm font-semibold ${luxury ? 'text-neutral-700 dark:text-neutral-300 tracking-wide' : 'text-neutral-700 dark:text-neutral-300'}`}
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
@@ -46,7 +48,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
       <div className="relative">
         {icon && (
           <div className={`absolute inset-y-0 left-0 ${luxury ? 'pl-6' : 'pl-4'} flex items-center pointer-events-none`}>
-            <div className="text-secondary-400 dark:text-secondary-500">
+            <div className="text-neutral-400 dark:text-neutral-500">
               {icon}
             </div>
           </div>
@@ -59,9 +61,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
             ${errorClasses}
             ${iconClasses}
             ${className}
-            bg-white dark:bg-secondary-900
-            text-secondary-900 dark:text-secondary-100
-            placeholder-secondary-500 dark:placeholder-secondary-400
+            bg-white dark:bg-neutral-900
+            text-neutral-900 dark:text-neutral-100
+            placeholder-neutral-500 dark:placeholder-neutral-400
           `}
           aria-invalid={error ? 'true' : 'false'}
           aria-describedby={error ? `${id}-error` : helperText ? `${id}-helper` : undefined}
@@ -84,7 +86,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
       {helperText && !error && (
         <motion.p 
           id={`${id}-helper`} 
-          className="text-sm text-secondary-500 dark:text-secondary-400"
+          className="text-sm text-neutral-500 dark:text-neutral-400"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}

@@ -126,10 +126,10 @@ export const Home: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-secondary-900 dark:text-white mb-2">
+            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
               Welcome back, {user?.email?.split('@')[0]}!
             </h1>
-            <p className="text-secondary-600 dark:text-secondary-400">
+            <p className="text-neutral-600 dark:text-neutral-400">
               Here's an overview of your brand building progress
             </p>
           </div>
@@ -151,52 +151,52 @@ export const Home: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 stats-overview"
+        className="professional-grid md:grid-cols-2 lg:grid-cols-4 mb-8 stats-overview"
       >
-        <Card luxury className="p-6">
+        <Card luxury sharp className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-luxury rounded-xl shadow-luxury">
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-sapphire rounded-lg shadow-luxury">
               <Layers className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-sm text-secondary-500 dark:text-secondary-400">Total Brands</p>
-              <h3 className="text-2xl font-bold text-secondary-900 dark:text-white">{stats.totalBrands}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">Total Brands</p>
+              <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">{stats.totalBrands}</h3>
             </div>
           </div>
         </Card>
 
-        <Card luxury className="p-6">
+        <Card luxury sharp className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-accent-gold-500 to-accent-gold-600 rounded-xl shadow-luxury">
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-gold rounded-lg shadow-luxury">
               <Activity className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-sm text-secondary-500 dark:text-secondary-400">In Progress</p>
-              <h3 className="text-2xl font-bold text-secondary-900 dark:text-white">{stats.inProgress}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">In Progress</p>
+              <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">{stats.inProgress}</h3>
             </div>
           </div>
         </Card>
 
-        <Card luxury className="p-6">
+        <Card luxury sharp className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-accent-rose-500 to-accent-rose-600 rounded-xl shadow-luxury">
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-rose-500 to-rose-600 rounded-lg shadow-luxury">
               <FileImage className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-sm text-secondary-500 dark:text-secondary-400">Assets Created</p>
-              <h3 className="text-2xl font-bold text-secondary-900 dark:text-white">{stats.assetsCount}</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">Assets Created</p>
+              <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">{stats.assetsCount}</h3>
             </div>
           </div>
         </Card>
 
-        <Card luxury className="p-6">
+        <Card luxury sharp className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-accent-silver-400 to-accent-silver-500 rounded-xl shadow-luxury">
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-silver rounded-lg shadow-luxury">
               <Users className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-sm text-secondary-500 dark:text-secondary-400">Team Members</p>
-              <h3 className="text-2xl font-bold text-secondary-900 dark:text-white">0</h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">Team Members</p>
+              <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">0</h3>
             </div>
           </div>
         </Card>

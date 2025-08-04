@@ -3,10 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base styles with luxury aesthetic */
+/* Base styles with ultra-luxury aesthetic */
 @layer base {
   * {
-    @apply border-secondary-200 dark:border-secondary-700;
+    @apply border-neutral-200 dark:border-neutral-700;
   }
   
   html {
@@ -14,19 +14,21 @@
   }
   
   body {
-    @apply bg-white dark:bg-secondary-950 text-secondary-900 dark:text-secondary-100 antialiased;
+    @apply bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-family: 'Inter', system-ui, sans-serif;
   }
   
   /* Enhanced focus styles for luxury feel */
   :focus-visible {
-    @apply outline-none ring-2 ring-primary-500/50 ring-offset-2 ring-offset-white dark:ring-offset-secondary-950;
+    @apply outline-none ring-2 ring-sapphire-500/50 ring-offset-2 ring-offset-white dark:ring-offset-neutral-950;
   }
   
-  /* Improved text readability with luxury typography */
+  /* Professional typography with luxury spacing */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading text-secondary-900 dark:text-white;
+    @apply font-heading text-neutral-900 dark:text-white;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    letter-spacing: -0.025em;
   }
   
   p, span, div {
@@ -35,72 +37,72 @@
   
   /* Skip to content link for accessibility */
   .skip-link {
-    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-6 focus:py-3 focus:bg-white focus:text-primary-600 focus:shadow-luxury-xl focus:rounded-2xl focus:font-medium;
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-6 focus:py-3 focus:bg-white focus:text-sapphire-600 focus:shadow-luxury-xl focus:rounded-lg focus:font-medium;
   }
   
   /* Enhanced form element styles */
   input, textarea, select, button {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-secondary-950;
+    @apply focus:outline-none focus:ring-2 focus:ring-sapphire-500/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-950;
   }
   
-  /* Luxury dark mode implementation */
+  /* Professional dark mode implementation */
   .dark {
     color-scheme: dark;
   }
   
   .dark .bg-white {
-    @apply bg-secondary-900;
+    @apply bg-neutral-900;
   }
   
   .dark .bg-gray-50 {
-    @apply bg-secondary-800;
+    @apply bg-neutral-800;
   }
   
   .dark .bg-gray-100 {
-    @apply bg-secondary-700;
+    @apply bg-neutral-700;
   }
   
   .dark .text-gray-900 {
-    @apply text-secondary-100;
+    @apply text-neutral-100;
   }
   
   .dark .text-gray-700 {
-    @apply text-secondary-300;
+    @apply text-neutral-300;
   }
   
   .dark .text-gray-600 {
-    @apply text-secondary-400;
+    @apply text-neutral-400;
   }
   
   .dark .text-gray-500 {
-    @apply text-secondary-500;
+    @apply text-neutral-500;
   }
   
   .dark .border-gray-200 {
-    @apply border-secondary-700;
+    @apply border-neutral-700;
   }
   
   .dark .border-gray-300 {
-    @apply border-secondary-600;
+    @apply border-neutral-600;
   }
 }
 
-/* Luxury component styles */
+/* Ultra-luxury component styles */
 @layer components {
   .luxury-card {
-    @apply bg-white/80 dark:bg-secondary-900/80 backdrop-blur-xl border border-secondary-200/50 dark:border-secondary-700/50 rounded-3xl shadow-luxury-lg;
+    @apply bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-lg shadow-luxury-lg;
   }
   
   .luxury-button {
-    @apply bg-gradient-luxury text-white font-semibold px-8 py-4 rounded-2xl shadow-luxury hover:shadow-luxury-lg transform hover:scale-105 transition-all duration-300;
+    @apply bg-gradient-sapphire text-white font-semibold px-8 py-4 rounded-lg shadow-luxury hover:shadow-luxury-lg transform hover:scale-[1.02] transition-all duration-300;
   }
   
   .luxury-input {
-    @apply bg-white/50 dark:bg-secondary-900/50 backdrop-blur-sm border border-secondary-300/50 dark:border-secondary-600/50 rounded-xl px-4 py-3 text-secondary-900 dark:text-secondary-100 placeholder-secondary-500 focus:border-primary-500 focus:bg-white dark:focus:bg-secondary-800 transition-all duration-300;
+    @apply bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm border border-neutral-300/50 dark:border-neutral-600/50 rounded-lg px-4 py-3 text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:border-sapphire-500 focus:bg-white dark:focus:bg-neutral-800 transition-all duration-300;
   }
   
   .luxury-gradient-text {
-    @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-sapphire-600 to-luxury-700 bg-clip-text text-transparent;
   }
   
   .luxury-glow {
@@ -108,18 +110,30 @@
   }
   
   .luxury-surface {
-    @apply bg-white/60 dark:bg-secondary-900/60 backdrop-blur-xl border border-white/20 dark:border-secondary-700/30;
+    @apply bg-white/80 dark:bg-neutral-900/80 backdrop-blur-xl border border-white/20 dark:border-neutral-700/30;
+  }
+  
+  .professional-grid {
+    @apply grid gap-8;
+  }
+  
+  .sharp-edges {
+    @apply rounded-lg;
+  }
+  
+  .ultra-sharp {
+    @apply rounded-sm;
   }
 }
 
 /* Utility classes for luxury design */
 @layer utilities {
   .focus-ring {
-    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-secondary-950;
+    @apply focus:outline-none focus:ring-2 focus:ring-sapphire-500/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-950;
   }
   
   .text-gradient {
-    @apply bg-gradient-to-r from-primary-600 to-primary-800 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-sapphire-600 to-luxury-700 bg-clip-text text-transparent;
   }
   
   .glass-effect {
@@ -128,6 +142,14 @@
   
   .luxury-shadow {
     @apply shadow-luxury-lg hover:shadow-luxury-xl transition-shadow duration-300;
+  }
+  
+  .professional-spacing {
+    @apply space-y-8;
+  }
+  
+  .luxury-container {
+    @apply max-w-7xl mx-auto px-6;
   }
 }
 
@@ -161,45 +183,36 @@
   80%, 100% { content: ''; }
 }
 
-/* Luxury scrollbar styling */
+/* Professional scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-secondary-100 dark:bg-secondary-800 rounded-full;
+  @apply bg-neutral-100 dark:bg-neutral-800 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-secondary-300 dark:bg-secondary-600 rounded-full hover:bg-secondary-400 dark:hover:bg-secondary-500 transition-colors;
+  @apply bg-neutral-300 dark:bg-neutral-600 rounded-full hover:bg-neutral-400 dark:hover:bg-neutral-500 transition-colors;
 }
 
 /* Luxury selection styles */
 ::selection {
-  @apply bg-primary-500/20 text-primary-900;
+  @apply bg-sapphire-500/20 text-sapphire-900;
 }
 
 ::-moz-selection {
-  @apply bg-primary-500/20 text-primary-900;
+  @apply bg-sapphire-500/20 text-sapphire-900;
 }
 
-/* 3D Cube Styles */
-.perspective-500 {
-  perspective: 500px;
-}
-
-.transform-style-3d {
-  transform-style: preserve-3d;
-}
-
-/* Luxury glassmorphism effects */
+/* Professional glassmorphism effects */
 .glass-card {
-  @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl;
+  @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-lg;
 }
 
 .glass-button {
-  @apply bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl hover:bg-white/30 transition-all duration-300;
+  @apply bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg hover:bg-white/30 transition-all duration-300;
 }
 
 /* Premium gradient overlays */
@@ -208,12 +221,12 @@
 }
 
 .gradient-mesh-bg {
-  background: radial-gradient(at 40% 20%, hsla(228,100%,70%,0.1) 0px, transparent 50%), 
-              radial-gradient(at 80% 0%, hsla(189,100%,56%,0.1) 0px, transparent 50%), 
-              radial-gradient(at 0% 50%, hsla(355,100%,93%,0.1) 0px, transparent 50%);
+  background: radial-gradient(at 40% 20%, hsla(228,100%,70%,0.05) 0px, transparent 50%), 
+              radial-gradient(at 80% 0%, hsla(189,100%,56%,0.05) 0px, transparent 50%), 
+              radial-gradient(at 0% 50%, hsla(355,100%,93%,0.05) 0px, transparent 50%);
 }
 
-/* Luxury animations */
+/* Professional animations */
 @keyframes luxuryPulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; }
@@ -225,16 +238,16 @@
 
 /* Enhanced button states */
 .luxury-button-primary {
-  @apply bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold px-8 py-4 rounded-2xl shadow-luxury hover:shadow-luxury-lg transform hover:scale-[1.02] transition-all duration-300;
+  @apply bg-gradient-to-r from-sapphire-600 to-sapphire-700 hover:from-sapphire-700 hover:to-sapphire-800 text-white font-semibold px-8 py-4 rounded-lg shadow-luxury hover:shadow-luxury-lg transform hover:scale-[1.02] transition-all duration-300;
 }
 
 .luxury-button-secondary {
-  @apply bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold px-8 py-4 rounded-2xl hover:bg-white/20 hover:border-white/30 transition-all duration-300;
+  @apply bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold px-8 py-4 rounded-lg hover:bg-white/20 hover:border-white/30 transition-all duration-300;
 }
 
 /* Premium card styles */
 .premium-card {
-  @apply bg-gradient-to-br from-white/80 to-white/60 dark:from-secondary-900/80 dark:to-secondary-800/60 backdrop-blur-xl border border-secondary-200/50 dark:border-secondary-700/50 rounded-3xl shadow-luxury-lg hover:shadow-luxury-xl transition-all duration-500;
+  @apply bg-gradient-to-br from-white/90 to-white/70 dark:from-neutral-900/90 dark:to-neutral-800/70 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-700/50 rounded-lg shadow-luxury-lg hover:shadow-luxury-xl transition-all duration-500;
 }
 
 /* AI-themed visual effects */
@@ -244,33 +257,33 @@
 
 .ai-glow::before {
   content: '';
-  @apply absolute inset-0 bg-gradient-to-r from-primary-500/20 to-primary-700/20 rounded-3xl blur-xl -z-10;
+  @apply absolute inset-0 bg-gradient-to-r from-sapphire-500/20 to-luxury-700/20 rounded-lg blur-xl -z-10;
   animation: glow 2s ease-in-out infinite alternate;
 }
 
-/* Luxury form styles */
+/* Professional form styles */
 .luxury-form-group {
-  @apply space-y-2;
+  @apply space-y-3;
 }
 
 .luxury-label {
-  @apply text-sm font-semibold text-secondary-700 dark:text-secondary-300 tracking-wide uppercase;
+  @apply text-sm font-semibold text-neutral-700 dark:text-neutral-300 tracking-wide;
 }
 
 .luxury-input {
-  @apply w-full px-6 py-4 bg-white/50 dark:bg-secondary-900/50 backdrop-blur-sm border border-secondary-300/50 dark:border-secondary-600/50 rounded-2xl text-secondary-900 dark:text-secondary-100 placeholder-secondary-500 focus:border-primary-500 focus:bg-white dark:focus:bg-secondary-800 focus:shadow-glow transition-all duration-300;
+  @apply w-full px-6 py-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm border border-neutral-300/50 dark:border-neutral-600/50 rounded-lg text-neutral-900 dark:text-neutral-100 placeholder-neutral-500 focus:border-sapphire-500 focus:bg-white dark:focus:bg-neutral-800 focus:shadow-glow transition-all duration-300;
 }
 
-/* Luxury navigation styles */
+/* Professional navigation styles */
 .luxury-nav-item {
-  @apply relative px-6 py-3 text-secondary-700 dark:text-secondary-300 font-medium rounded-xl hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-all duration-300;
+  @apply relative px-6 py-3 text-neutral-700 dark:text-neutral-300 font-medium rounded-lg hover:text-sapphire-600 dark:hover:text-sapphire-400 hover:bg-sapphire-50 dark:hover:bg-sapphire-900/20 transition-all duration-300;
 }
 
 .luxury-nav-item.active {
-  @apply text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20;
+  @apply text-sapphire-600 dark:text-sapphire-400 bg-sapphire-50 dark:bg-sapphire-900/20;
 }
 
 .luxury-nav-item.active::after {
   content: '';
-  @apply absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1/2 h-0.5 bg-gradient-to-r from-primary-500 to-primary-700 rounded-full;
+  @apply absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1/2 h-0.5 bg-gradient-to-r from-sapphire-500 to-luxury-700 rounded-full;
 }

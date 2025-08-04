@@ -37,7 +37,7 @@ export const Navbar: React.FC = () => {
     <motion.header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled || mobileMenuOpen 
-          ? 'bg-white/80 dark:bg-secondary-950/80 backdrop-blur-xl shadow-luxury-lg border-b border-secondary-200/50 dark:border-secondary-700/50 py-4' 
+          ? 'bg-white/90 dark:bg-neutral-950/90 backdrop-blur-xl shadow-luxury-lg border-b border-neutral-200/50 dark:border-neutral-700/50 py-4' 
           : 'bg-transparent py-6'
       }`}
       initial={{ y: -100 }}
@@ -58,17 +58,17 @@ export const Navbar: React.FC = () => {
                   alt="Brandie Logo" 
                   className="w-12 h-12 object-contain transition-transform duration-300 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-500/20 to-accent-gold-500/20 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
+                <div className="absolute inset-0 bg-gradient-to-r from-sapphire-500/20 to-gold-500/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm" />
               </div>
               <div className="flex flex-col">
                 <span className={`text-2xl font-bold transition-colors duration-300 ${
                   isScrolled || mobileMenuOpen 
-                    ? 'text-secondary-900 dark:text-white' 
-                    : 'text-secondary-900 dark:text-white'
+                    ? 'text-neutral-900 dark:text-white' 
+                    : 'text-neutral-900 dark:text-white'
                 }`}>
                   Brandie
                 </span>
-                <span className="text-xs font-medium text-primary-600 dark:text-primary-400 tracking-wider uppercase">
+                <span className="text-xs font-medium text-sapphire-600 dark:text-sapphire-400 tracking-wider uppercase">
                   AI-Powered Branding
                 </span>
               </div>
@@ -119,7 +119,7 @@ export const Navbar: React.FC = () => {
                 >
                   <Link 
                     to="/auth" 
-                    className="text-secondary-700 dark:text-secondary-300 hover:text-primary-600 dark:hover:text-primary-400 font-semibold transition-colors duration-300 px-4 py-2 rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/20"
+                    className="text-neutral-700 dark:text-neutral-300 hover:text-sapphire-600 dark:hover:text-sapphire-400 font-semibold transition-colors duration-300 px-4 py-2 rounded-lg hover:bg-sapphire-50 dark:hover:bg-sapphire-900/20"
                   >
                     Sign In
                   </Link>
@@ -142,7 +142,7 @@ export const Navbar: React.FC = () => {
 
           {/* Mobile Menu Button with luxury styling */}
           <motion.button 
-            className="lg:hidden p-3 text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800 rounded-xl transition-colors duration-300"
+            className="lg:hidden p-3 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg transition-colors duration-300"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             whileHover={{ scale: 1.05 }}
@@ -170,7 +170,7 @@ export const Navbar: React.FC = () => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="lg:hidden bg-white/95 dark:bg-secondary-950/95 backdrop-blur-xl border-t border-secondary-200/50 dark:border-secondary-700/50"
+            className="lg:hidden bg-white/95 dark:bg-neutral-950/95 backdrop-blur-xl border-t border-neutral-200/50 dark:border-neutral-700/50"
           >
             <div className="py-6 px-6 space-y-4">
               {navItems.map((item, index) => (
@@ -182,7 +182,7 @@ export const Navbar: React.FC = () => {
                 >
                   <Link 
                     to={item.path}
-                    className="block py-3 px-4 text-lg font-semibold text-secondary-900 dark:text-secondary-100 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-xl transition-all duration-300"
+                    className="block py-3 px-4 text-lg font-semibold text-neutral-900 dark:text-neutral-100 hover:text-sapphire-600 dark:hover:text-sapphire-400 hover:bg-sapphire-50 dark:hover:bg-sapphire-900/20 rounded-lg transition-all duration-300"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {item.label}
@@ -190,7 +190,7 @@ export const Navbar: React.FC = () => {
                 </motion.div>
               ))}
               
-              <div className="pt-6 border-t border-secondary-200/50 dark:border-secondary-700/50 space-y-4">
+              <div className="pt-6 border-t border-neutral-200/50 dark:border-neutral-700/50 space-y-4">
                 {user ? (
                   <Link to="/dashboard">
                     <Button variant="luxury" className="w-full" glow>
@@ -208,7 +208,7 @@ export const Navbar: React.FC = () => {
                     </Link>
                     <Link 
                       to="/auth" 
-                      className="block text-center text-secondary-700 dark:text-secondary-300 hover:text-primary-600 dark:hover:text-primary-400 font-semibold transition-colors duration-300"
+                      className="block text-center text-neutral-700 dark:text-neutral-300 hover:text-sapphire-600 dark:hover:text-sapphire-400 font-semibold transition-colors duration-300"
                     >
                       Sign In
                     </Link>
@@ -236,12 +236,12 @@ const NavLink: React.FC<NavLinkProps> = ({ to, children, isScrolled, isActive })
     <Link 
       to={to} 
       className={`
-        relative px-6 py-3 font-semibold transition-all duration-300 rounded-xl group
+        relative px-6 py-3 font-semibold transition-all duration-300 rounded-lg group
         ${isActive 
-          ? 'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20' 
+          ? 'text-sapphire-600 dark:text-sapphire-400 bg-sapphire-50 dark:bg-sapphire-900/20' 
           : isScrolled 
-            ? 'text-secondary-700 dark:text-secondary-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20' 
-            : 'text-secondary-800 dark:text-secondary-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-white/10 dark:hover:bg-secondary-800/50'
+            ? 'text-neutral-700 dark:text-neutral-300 hover:text-sapphire-600 dark:hover:text-sapphire-400 hover:bg-sapphire-50 dark:hover:bg-sapphire-900/20' 
+            : 'text-neutral-800 dark:text-neutral-200 hover:text-sapphire-600 dark:hover:text-sapphire-400 hover:bg-white/10 dark:hover:bg-neutral-800/50'
         }
       `}
     >
@@ -251,13 +251,13 @@ const NavLink: React.FC<NavLinkProps> = ({ to, children, isScrolled, isActive })
       {isActive && (
         <motion.div
           layoutId="activeTab"
-          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1/2 h-0.5 bg-gradient-to-r from-primary-500 to-accent-gold-500 rounded-full"
+          className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1/2 h-0.5 bg-gradient-to-r from-sapphire-500 to-gold-500 rounded-full"
           transition={{ type: "spring", damping: 30, stiffness: 300 }}
         />
       )}
       
       {/* Luxury hover effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary-500/0 to-accent-gold-500/0 group-hover:from-primary-500/5 group-hover:to-accent-gold-500/5 rounded-xl transition-all duration-300" />
+      <div className="absolute inset-0 bg-gradient-to-r from-sapphire-500/0 to-gold-500/0 group-hover:from-sapphire-500/5 group-hover:to-gold-500/5 rounded-lg transition-all duration-300" />
     </Link>
   );
 };
