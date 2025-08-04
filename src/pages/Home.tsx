@@ -346,6 +346,28 @@ export const Home: React.FC = () => {
               </Button>
             </div>
           </Card>
+          
+          <Card className="p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="flex items-center justify-center w-10 h-10 bg-gradient-luxury rounded-lg shadow-lg">
+                <Globe className="w-5 h-5 text-white" />
+              </div>
+              <h3 className="font-semibold text-black">Landing Page Generator</h3>
+            </div>
+            <p className="text-gray-700 text-sm mb-4">
+              Create and deploy professional landing pages using your brand assets
+            </p>
+            <div className="flex justify-end">
+              <Button
+                size="sm"
+                onClick={() => navigate('/brand/new/landing-page')}
+                className="flex items-center space-x-2"
+              >
+                <span>Create Page</span>
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+          </Card>
         </div>
       </motion.div>
 

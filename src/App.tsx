@@ -30,6 +30,7 @@ const BrandConsistency = lazy(() => import('./pages/consistency/BrandConsistency
 const BrandHealth = lazy(() => import('./pages/BrandHealth').then(module => ({ default: module.BrandHealth })))
 const UserPreferences = lazy(() => import('./pages/UserPreferences').then(module => ({ default: module.UserPreferences })))
 const ChatBubble = lazy(() => import('./components/chat/ChatBubble').then(module => ({ default: module.ChatBubble })))
+const LandingPageGenerator = lazy(() => import('./pages/LandingPageGenerator').then(module => ({ default: module.default })))
 
 // Loading fallback
 const PageLoader = () => (
@@ -175,6 +176,12 @@ function App() {
                     <Route path="/brand/:brandId/health" element={
                       <Suspense fallback={<PageLoader />}>
                         <BrandHealth />
+                      </Suspense>
+                    } />
+                    
+                    <Route path="/brand/:brandId/landing-page" element={
+                      <Suspense fallback={<PageLoader />}>
+                        <LandingPageGenerator />
                       </Suspense>
                     } />
                   </Route>

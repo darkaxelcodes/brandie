@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { 
   Target, Palette, MessageSquare, FileText, Plus, TrendingUp, Sparkles, CheckCircle,
   Star, StarOff, MoreHorizontal, Archive, Trash2, Copy, Edit, RefreshCw, Factory, Activity,
-  HelpCircle
+  HelpCircle, Globe
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -575,6 +575,26 @@ export const Dashboard: React.FC = () => {
                         )}
                       </motion.div>
                     ))}
+                    
+                    {/* Landing Page Generator */}
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      className="p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors cursor-pointer bg-gradient-to-r from-green-50 to-blue-50"
+                      onClick={() => navigate(`/brand/${brand.id}/landing-page`)}
+                    >
+                      <div className="flex items-center space-x-3 mb-3">
+                        <div className="flex items-center justify-center w-8 h-8 bg-gradient-luxury rounded-lg shadow-lg">
+                          <Globe className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-medium text-black text-sm">Landing Page</h3>
+                          <span className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Generate & Deploy
+                          </span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-700 mb-2">Create and deploy a professional landing page</p>
+                    </motion.div>
                   </div>
                 </Card>
               </motion.div>
