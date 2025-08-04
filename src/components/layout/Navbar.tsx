@@ -53,8 +53,12 @@ export const Navbar: React.FC = () => {
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <div className="w-10 h-10 bg-gradient-luxury rounded-xl flex items-center justify-center shadow-glow">
-                <Sparkles className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 bg-gradient-luxury rounded-xl flex items-center justify-center shadow-glow overflow-hidden">
+                <img 
+                  src="https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie/Logo.png" 
+                  alt="Brandie Logo" 
+                  className="w-8 h-8 object-contain"
+                />
               </div>
               <div className="absolute inset-0 bg-gradient-luxury rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300 blur-xl"></div>
             </motion.div>

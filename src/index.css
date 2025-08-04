@@ -24,7 +24,7 @@
   --color-electric-blue: #0066FF;
   --color-electric-blue-light: #3385FF;
   --color-electric-blue-dark: #0052CC;
-  --color-electric-purple: #6366F1;
+  --color-electric-purple: #8B5CF6;
   --color-electric-cyan: #06B6D4;
   --color-electric-green: #10B981;
   
@@ -138,6 +138,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    color: transparent;
   }
   
   /* Electric glow effect */
@@ -147,7 +148,7 @@
   
   /* Luxury card */
   .luxury-card {
-    @apply bg-white border border-gray-100 rounded-2xl shadow-xl;
+    @apply bg-white border border-gray-200 rounded-2xl shadow-xl;
     background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 100%);
     backdrop-filter: blur(20px);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -160,7 +161,7 @@
   
   /* Premium button styles */
   .btn-primary {
-    @apply px-8 py-4 bg-electric-blue text-white font-semibold rounded-xl;
+    @apply px-8 py-4 text-white font-semibold rounded-xl;
     background: var(--gradient-primary);
     box-shadow: var(--shadow-lg);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -172,12 +173,12 @@
   }
   
   .btn-secondary {
-    @apply px-8 py-4 bg-white text-gray-900 font-semibold rounded-xl border border-gray-200;
+    @apply px-8 py-4 bg-white text-gray-900 font-semibold rounded-xl border-2 border-gray-200;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .btn-secondary:hover {
-    @apply bg-gray-50 border-gray-300;
+    @apply bg-gray-50 border-gray-400;
     transform: translateY(-1px);
   }
   
