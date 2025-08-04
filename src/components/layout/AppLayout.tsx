@@ -46,7 +46,7 @@ export const AppLayout: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen bg-secondary-50 dark:bg-secondary-950">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar 
         onSignOut={handleSignOut} 
         collapsed={collapsed} 

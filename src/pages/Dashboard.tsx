@@ -334,7 +334,7 @@ export const Dashboard: React.FC = () => {
   const displayedBrands = showArchivedBrands ? archivedBrands : brands
 
   return (
-    <div className="luxury-container py-8">
+    <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Welcome Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -343,10 +343,10 @@ export const Dashboard: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome back, {user?.email?.split('@')[0]}!
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400">
+            <p className="text-gray-600">
               {brands.length === 0 
                 ? "Let's create your first brand identity. Click below to get started."
                 : "Continue building your brand identities or create a new one."
@@ -377,8 +377,6 @@ export const Dashboard: React.FC = () => {
             )}
             <Button
               onClick={handleCreateBrand}
-              variant="luxury"
-              glow
               className="flex items-center space-x-2 create-brand-button"
             >
               <Plus className="w-4 h-4" />
@@ -396,14 +394,14 @@ export const Dashboard: React.FC = () => {
           transition={{ delay: 0.1 }}
           className="text-center py-16"
         >
-          <Card luxury sharp className="p-12 max-w-md mx-auto">
-            <div className="flex items-center justify-center w-16 h-16 bg-sapphire-100 dark:bg-sapphire-900/30 rounded-lg mx-auto mb-6">
-              <Sparkles className="w-8 h-8 text-sapphire-600 dark:text-sapphire-400" />
+          <Card className="p-12 max-w-md mx-auto">
+            <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mx-auto mb-6">
+              <Sparkles className="w-8 h-8 text-blue-600" />
             </div>
-            <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               {showArchivedBrands ? "No Archived Brands" : "Create Your First Brand"}
             </h2>
-            <p className="text-neutral-600 dark:text-neutral-400 mb-6">
+            <p className="text-gray-600 mb-6">
               {showArchivedBrands 
                 ? "You don't have any archived brands. Archived brands will appear here."
                 : "Start building a compelling brand identity with our AI-powered platform. We'll guide you through every step of the process."
@@ -422,9 +420,7 @@ export const Dashboard: React.FC = () => {
             ) : (
               <Button
                 onClick={handleCreateBrand}
-                variant="luxury"
                 size="lg"
-                glow
                 className="flex items-center space-x-2"
               >
                 <Plus className="w-5 h-5" />
@@ -435,7 +431,7 @@ export const Dashboard: React.FC = () => {
         </motion.div>
       ) : (
         /* Brands List */
-        <div className="professional-spacing">
+        <div className="space-y-8">
           {displayedBrands.map((brand, index) => {
             const progress = brandProgress[brand.id]
             const overallProgress = progress?.overall?.percentage || 0
@@ -448,23 +444,23 @@ export const Dashboard: React.FC = () => {
                 transition={{ delay: index * 0.1 }}
                 className="brand-card"
               >
-                <Card luxury hover sharp className="p-8">
+                <Card className="p-6">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center space-x-3">
                       <button 
                         onClick={() => handleToggleFavorite(brand)}
-                        className="text-neutral-400 hover:text-gold-500 transition-colors"
+                        className="text-gray-400 hover:text-yellow-500 transition-colors"
                         title={brand.is_favorite ? "Unfavorite" : "Favorite"}
                       >
                         {brand.is_favorite ? (
-                          <Star className="w-5 h-5 text-gold-500 fill-gold-500" />
+                          <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
                         ) : (
                           <StarOff className="w-5 h-5" />
                         )}
                       </button>
                       <div>
-                        <h2 className="text-xl font-bold text-neutral-900 dark:text-white">{brand.name}</h2>
-                        <div className="flex items-center space-x-2 text-sm text-neutral-600 dark:text-neutral-400">
+                        <h2 className="text-xl font-bold text-gray-900">{brand.name}</h2>
+                        <div className="flex items-center space-x-2 text-sm text-gray-600">
                           <Factory className="w-4 h-4" />
                           <span>{getIndustryName(brand.industry)}</span>
                           <span>•</span>
@@ -474,12 +470,12 @@ export const Dashboard: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-4">
                       <div className="text-right">
-                        <div className="flex items-center space-x-2 text-sm text-neutral-600 dark:text-neutral-400">
+                        <div className="flex items-center space-x-2 text-sm text-gray-600">
                           <TrendingUp className="w-4 h-4" />
                           <span>{overallProgress}% Complete</span>
                         </div>
                         {progress && (
-                          <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                          <div className="text-xs text-gray-500 mt-1">
                             Strategy: {progress.strategy.percentage}% • 
                             Visual: {progress.visual.percentage}% • 
                             Voice: {progress.voice.percentage}%
@@ -496,17 +492,17 @@ export const Dashboard: React.FC = () => {
                         </Button>
                         
                         {/* Dropdown Menu */}
-                        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-neutral-900 rounded-lg shadow-luxury border border-neutral-200 dark:border-neutral-700 py-1 z-10 hidden group-hover:block">
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10 hidden group-hover:block">
                           <button
                             onClick={() => handleEditBrand(brand)}
-                            className="flex items-center w-full px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           >
                             <Edit className="w-4 h-4 mr-2" />
                             Edit Brand
                           </button>
                           <button
                             onClick={() => handleDuplicateBrand(brand)}
-                            className="flex items-center w-full px-4 py-2 text-sm text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           >
                             <Copy className="w-4 h-4 mr-2" />
                             Duplicate
@@ -515,14 +511,14 @@ export const Dashboard: React.FC = () => {
                             <>
                               <button
                                 onClick={() => handleRestoreBrand(brand)}
-                                className="flex items-center w-full px-4 py-2 text-sm text-green-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                                className="flex items-center w-full px-4 py-2 text-sm text-green-700 hover:bg-gray-100"
                               >
                                 <RefreshCw className="w-4 h-4 mr-2" />
                                 Restore
                               </button>
                               <button
                                 onClick={() => handleDeleteBrand(brand)}
-                                className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                                className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-gray-100"
                               >
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Delete Permanently
@@ -531,7 +527,7 @@ export const Dashboard: React.FC = () => {
                           ) : (
                             <button
                               onClick={() => handleArchiveBrand(brand)}
-                              className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                              className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-gray-100"
                             >
                               <Archive className="w-4 h-4 mr-2" />
                               Archive
@@ -545,30 +541,30 @@ export const Dashboard: React.FC = () => {
                   <ProgressBar progress={overallProgress} className="mb-6" />
 
                   {/* Brand Building Steps */}
-                  <div className="professional-grid md:grid-cols-3 lg:grid-cols-6 brand-steps">
+                  <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-4 brand-steps">
                     {getBrandSteps(brand.id).map((step) => (
                       <motion.div
                         key={step.id}
                         whileHover={{ scale: 1.02 }}
-                        className="p-6 luxury-surface rounded-lg hover:shadow-luxury-lg transition-all duration-300 cursor-pointer group"
+                        className="p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors cursor-pointer"
                         onClick={() => navigate(step.path)}
                       >
                         <div className="flex items-center space-x-3 mb-3">
-                          <div className="flex items-center justify-center w-10 h-10 bg-gradient-sapphire rounded-lg group-hover:shadow-glow transition-all duration-300">
-                            <step.icon className="w-5 h-5 text-white" />
+                          <div className="flex items-center justify-center w-8 h-8 bg-gray-100 rounded-lg">
+                            <step.icon className="w-4 h-4 text-gray-600" />
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-semibold text-neutral-900 dark:text-white text-sm">{step.title}</h3>
+                            <h3 className="font-medium text-gray-900 text-sm">{step.title}</h3>
                             <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(step.status)}`}>
                               {getStatusText(step.status)}
                             </span>
                           </div>
                         </div>
-                        <p className="text-xs text-neutral-600 dark:text-neutral-400 mb-3">{step.description}</p>
+                        <p className="text-xs text-gray-600 mb-2">{step.description}</p>
                         {step.progress > 0 && (
-                          <div className="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2">
+                          <div className="w-full bg-gray-200 rounded-full h-1">
                             <div 
-                              className="bg-gradient-sapphire h-2 rounded-full transition-all duration-300 shadow-glow"
+                              className="bg-blue-600 h-1 rounded-full transition-all duration-300"
                               style={{ width: `${step.progress}%` }}
                             />
                           </div>
@@ -588,10 +584,9 @@ export const Dashboard: React.FC = () => {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         title="Create New Brand"
-        luxury
       >
         <div className="space-y-4">
-          <p className="text-secondary-600 dark:text-secondary-400">
+          <p className="text-gray-600">
             Give your brand a name and select its industry to get started. You can always change these later.
           </p>
           
@@ -601,7 +596,6 @@ export const Dashboard: React.FC = () => {
             onChange={(e) => setNewBrandName(e.target.value)}
             placeholder="Enter brand name..."
             onKeyPress={(e) => e.key === 'Enter' && createNewBrand()}
-            luxury
             autoFocus
           />
           
@@ -622,7 +616,6 @@ export const Dashboard: React.FC = () => {
             </Button>
             <Button
               onClick={createNewBrand}
-              variant="luxury"
               loading={creating}
               disabled={!newBrandName.trim()}
               className="flex-1"

@@ -126,10 +126,10 @@ export const Home: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome back, {user?.email?.split('@')[0]}!
             </h1>
-            <p className="text-neutral-600 dark:text-neutral-400">
+            <p className="text-gray-600">
               Here's an overview of your brand building progress
             </p>
           </div>
@@ -151,52 +151,52 @@ export const Home: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="professional-grid md:grid-cols-2 lg:grid-cols-4 mb-8 stats-overview"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 stats-overview"
       >
-        <Card luxury sharp className="p-6">
+        <Card className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-sapphire rounded-lg shadow-luxury">
-              <Layers className="w-6 h-6 text-white" />
+            <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl">
+              <Layers className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">Total Brands</p>
-              <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">{stats.totalBrands}</h3>
+              <p className="text-sm text-gray-500">Total Brands</p>
+              <h3 className="text-2xl font-bold text-gray-900">{stats.totalBrands}</h3>
             </div>
           </div>
         </Card>
 
-        <Card luxury sharp className="p-6">
+        <Card className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-gold rounded-lg shadow-luxury">
-              <Activity className="w-6 h-6 text-white" />
+            <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-xl">
+              <Activity className="w-6 h-6 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">In Progress</p>
-              <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">{stats.inProgress}</h3>
+              <p className="text-sm text-gray-500">In Progress</p>
+              <h3 className="text-2xl font-bold text-gray-900">{stats.inProgress}</h3>
             </div>
           </div>
         </Card>
 
-        <Card luxury sharp className="p-6">
+        <Card className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-rose-500 to-rose-600 rounded-lg shadow-luxury">
-              <FileImage className="w-6 h-6 text-white" />
+            <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-xl">
+              <FileImage className="w-6 h-6 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">Assets Created</p>
-              <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">{stats.assetsCount}</h3>
+              <p className="text-sm text-gray-500">Assets Created</p>
+              <h3 className="text-2xl font-bold text-gray-900">{stats.assetsCount}</h3>
             </div>
           </div>
         </Card>
 
-        <Card luxury sharp className="p-6">
+        <Card className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-silver rounded-lg shadow-luxury">
-              <Users className="w-6 h-6 text-white" />
+            <div className="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-xl">
+              <Users className="w-6 h-6 text-yellow-600" />
             </div>
             <div>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">Team Members</p>
-              <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">0</h3>
+              <p className="text-sm text-gray-500">Team Members</p>
+              <h3 className="text-2xl font-bold text-gray-900">0</h3>
             </div>
           </div>
         </Card>
@@ -210,7 +210,7 @@ export const Home: React.FC = () => {
         className="mb-8 recent-brands"
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-secondary-900 dark:text-white">Recent Brands</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Recent Brands</h2>
           <Link to="/dashboard">
             <Button variant="outline" size="sm" className="flex items-center space-x-2">
               <span>View All</span>
@@ -220,13 +220,12 @@ export const Home: React.FC = () => {
         </div>
 
         {recentBrands.length === 0 ? (
-          <Card luxury className="p-8 text-center">
-            <Layers className="w-12 h-12 text-secondary-300 dark:text-secondary-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-secondary-900 dark:text-white mb-2">No brands yet</h3>
-            <p className="text-secondary-500 dark:text-secondary-400 mb-4">Create your first brand to get started</p>
+          <Card className="p-6 text-center">
+            <Layers className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No brands yet</h3>
+            <p className="text-gray-500 mb-4">Create your first brand to get started</p>
             <Button 
               onClick={() => navigate('/dashboard')}
-              variant="luxury"
               className="flex items-center space-x-2 mx-auto"
             >
               <Plus className="w-4 h-4" />
@@ -242,15 +241,15 @@ export const Home: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + (index * 0.05) }}
               >
-                <Card luxury hover className="p-6">
+                <Card className="p-6 hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-secondary-900 dark:text-white">{brand.name}</h3>
+                    <h3 className="font-semibold text-gray-900">{brand.name}</h3>
                     {brand.is_favorite && (
-                      <Star className="w-5 h-5 text-accent-gold-500 fill-accent-gold-500" />
+                      <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
                     )}
                   </div>
                   
-                  <div className="flex items-center text-sm text-secondary-500 dark:text-secondary-400 mb-4">
+                  <div className="flex items-center text-sm text-gray-500 mb-4">
                     <Clock className="w-4 h-4 mr-1" />
                     <span>Updated {new Date(brand.updated_at).toLocaleDateString()}</span>
                   </div>
@@ -258,7 +257,6 @@ export const Home: React.FC = () => {
                   <div className="flex justify-end">
                     <Button
                       size="sm"
-                      variant="luxury"
                       onClick={() => navigate(`/brand/${brand.id}/strategy`)}
                       className="flex items-center space-x-2"
                     >
@@ -280,23 +278,22 @@ export const Home: React.FC = () => {
         transition={{ delay: 0.3 }}
         className="mb-8 quick-actions"
       >
-        <h2 className="text-xl font-semibold text-secondary-900 dark:text-white mb-4">Quick Actions</h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card luxury hover className="p-6">
+          <Card className="p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="flex items-center justify-center w-12 h-12 bg-gradient-luxury rounded-xl shadow-luxury">
-                <Plus className="w-6 h-6 text-white" />
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
+                <Plus className="w-5 h-5 text-blue-600" />
               </div>
-              <h3 className="font-semibold text-secondary-900 dark:text-white">Create New Brand</h3>
+              <h3 className="font-semibold text-gray-900">Create New Brand</h3>
             </div>
-            <p className="text-secondary-600 dark:text-secondary-400 text-sm mb-4">
+            <p className="text-gray-600 text-sm mb-4">
               Start building a new brand identity from scratch
             </p>
             <div className="flex justify-end">
               <Button
                 size="sm"
-                variant="luxury"
                 onClick={() => navigate('/dashboard')}
                 className="flex items-center space-x-2"
               >
@@ -306,14 +303,14 @@ export const Home: React.FC = () => {
             </div>
           </Card>
           
-          <Card luxury hover className="p-6">
+          <Card className="p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-accent-rose-500 to-accent-rose-600 rounded-xl shadow-luxury">
-                <FileImage className="w-6 h-6 text-white" />
+              <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg">
+                <FileImage className="w-5 h-5 text-purple-600" />
               </div>
-              <h3 className="font-semibold text-secondary-900 dark:text-white">Browse Assets</h3>
+              <h3 className="font-semibold text-gray-900">Browse Assets</h3>
             </div>
-            <p className="text-secondary-600 dark:text-secondary-400 text-sm mb-4">
+            <p className="text-gray-600 text-sm mb-4">
               View and manage all your brand assets in one place
             </p>
             <div className="flex justify-end">
@@ -328,14 +325,14 @@ export const Home: React.FC = () => {
             </div>
           </Card>
           
-          <Card luxury hover className="p-6">
+          <Card className="p-6 hover:shadow-md transition-shadow">
             <div className="flex items-center space-x-4 mb-4">
-              <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-accent-gold-500 to-accent-gold-600 rounded-xl shadow-luxury">
-                <MessageSquare className="w-6 h-6 text-white" />
+              <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg">
+                <MessageSquare className="w-5 h-5 text-green-600" />
               </div>
-              <h3 className="font-semibold text-secondary-900 dark:text-white">AI Assistant</h3>
+              <h3 className="font-semibold text-gray-900">AI Assistant</h3>
             </div>
-            <p className="text-secondary-600 dark:text-secondary-400 text-sm mb-4">
+            <p className="text-gray-600 text-sm mb-4">
               Get AI-powered help with your branding questions
             </p>
             <div className="flex justify-end">
@@ -361,7 +358,7 @@ export const Home: React.FC = () => {
           className="mb-8"
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-secondary-900 dark:text-white">Favorite Brands</h2>
+            <h2 className="text-xl font-semibold text-gray-900">Favorite Brands</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -372,13 +369,13 @@ export const Home: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 + (index * 0.05) }}
               >
-                <Card luxury hover className="p-6">
+                <Card className="p-6 hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-secondary-900 dark:text-white">{brand.name}</h3>
-                    <Star className="w-5 h-5 text-accent-gold-500 fill-accent-gold-500" />
+                    <h3 className="font-semibold text-gray-900">{brand.name}</h3>
+                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
                   </div>
                   
-                  <div className="flex items-center text-sm text-secondary-500 dark:text-secondary-400 mb-4">
+                  <div className="flex items-center text-sm text-gray-500 mb-4">
                     <Clock className="w-4 h-4 mr-1" />
                     <span>Updated {new Date(brand.updated_at).toLocaleDateString()}</span>
                   </div>
@@ -407,15 +404,15 @@ export const Home: React.FC = () => {
         transition={{ delay: 0.5 }}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-secondary-900 dark:text-white">Recent Activity</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Recent Activity</h2>
         </div>
 
-        <Card luxury className="p-6">
+        <Card className="p-6">
           {recentActivity.length === 0 ? (
             <div className="text-center py-8">
-              <Activity className="w-12 h-12 text-secondary-300 dark:text-secondary-600 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-secondary-900 dark:text-white mb-2">No recent activity</h3>
-              <p className="text-secondary-500 dark:text-secondary-400">
+              <Activity className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No recent activity</h3>
+              <p className="text-gray-500">
                 Your recent brand activities will appear here
               </p>
             </div>
@@ -427,17 +424,17 @@ export const Home: React.FC = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-start space-x-3 p-4 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-xl transition-colors"
+                  className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors"
                 >
-                  <div className="flex items-center justify-center w-10 h-10 bg-gradient-luxury rounded-full flex-shrink-0 mt-1 shadow-luxury">
-                    <Activity className="w-5 h-5 text-white" />
+                  <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full flex-shrink-0 mt-1">
+                    <Activity className="w-4 h-4 text-blue-600" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center space-x-1">
-                      <span className="font-medium text-secondary-900 dark:text-white">You</span>
-                      <span className="text-secondary-600 dark:text-secondary-400">{activity.message}</span>
+                      <span className="font-medium text-gray-900">You</span>
+                      <span className="text-gray-600">{activity.message}</span>
                     </div>
-                    <div className="text-xs text-secondary-500 dark:text-secondary-400 mt-1">
+                    <div className="text-xs text-gray-500 mt-1">
                       {new Date(activity.timestamp).toLocaleString()}
                     </div>
                   </div>
@@ -445,7 +442,7 @@ export const Home: React.FC = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => navigate(`/brand/${activity.brandId}/strategy`)}
-                    className="text-primary-600 dark:text-primary-400"
+                    className="text-blue-600"
                   >
                     <ArrowRight className="w-4 h-4" />
                   </Button>

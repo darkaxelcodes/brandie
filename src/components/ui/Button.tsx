@@ -20,14 +20,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   glow = false,
   ...props
 }, ref) => {
-  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sapphire-500/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-950 disabled:opacity-50 disabled:cursor-not-allowed'
+  const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-2xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-secondary-950 disabled:opacity-50 disabled:cursor-not-allowed'
   
   const variants = {
-    primary: 'bg-gradient-to-r from-sapphire-600 to-sapphire-700 hover:from-sapphire-700 hover:to-sapphire-800 text-white shadow-luxury hover:shadow-luxury-lg transform hover:scale-[1.02] active:scale-[0.98]',
-    secondary: 'bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-neutral-900 dark:text-neutral-100 shadow-luxury hover:shadow-luxury-lg transform hover:scale-[1.02] active:scale-[0.98]',
-    outline: 'border-2 border-neutral-300 dark:border-neutral-600 hover:border-sapphire-500 dark:hover:border-sapphire-400 text-neutral-700 dark:text-neutral-300 hover:text-sapphire-600 dark:hover:text-sapphire-400 hover:bg-sapphire-50 dark:hover:bg-sapphire-900/20 transform hover:scale-[1.02] active:scale-[0.98]',
-    ghost: 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transform hover:scale-[1.02] active:scale-[0.98]',
-    luxury: 'bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white shadow-luxury-lg hover:shadow-luxury-xl transform hover:scale-[1.02] active:scale-[0.98]',
+    primary: 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white shadow-luxury hover:shadow-luxury-lg transform hover:scale-[1.02] active:scale-[0.98]',
+    secondary: 'bg-secondary-100 hover:bg-secondary-200 dark:bg-secondary-800 dark:hover:bg-secondary-700 text-secondary-900 dark:text-secondary-100 shadow-luxury hover:shadow-luxury-lg transform hover:scale-[1.02] active:scale-[0.98]',
+    outline: 'border-2 border-secondary-300 dark:border-secondary-600 hover:border-primary-500 dark:hover:border-primary-400 text-secondary-700 dark:text-secondary-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transform hover:scale-[1.02] active:scale-[0.98]',
+    ghost: 'text-secondary-600 dark:text-secondary-400 hover:text-secondary-900 dark:hover:text-secondary-100 hover:bg-secondary-100 dark:hover:bg-secondary-800 transform hover:scale-[1.02] active:scale-[0.98]',
+    luxury: 'bg-gradient-to-r from-accent-gold-500 to-accent-gold-600 hover:from-accent-gold-600 hover:to-accent-gold-700 text-white shadow-luxury-lg hover:shadow-luxury-xl transform hover:scale-[1.02] active:scale-[0.98]',
     glass: 'bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 hover:border-white/30 shadow-luxury transform hover:scale-[1.02] active:scale-[0.98]'
   }
   
