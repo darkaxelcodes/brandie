@@ -11,6 +11,8 @@ import { TokenProvider } from './contexts/TokenContext'
 
 // Lazy-loaded components
 const Landing = lazy(() => import('./pages/Landing').then(module => ({ default: module.Landing })))
+const ForStartups = lazy(() => import('./pages/ForStartups').then(module => ({ default: module.default })))
+const ForAgencies = lazy(() => import('./pages/ForAgencies').then(module => ({ default: module.default })))
 const Features = lazy(() => import('./pages/Features').then(module => ({ default: module.Features })))
 const Pricing = lazy(() => import('./pages/Pricing').then(module => ({ default: module.Pricing })))
 const Success = lazy(() => import('./pages/Success').then(module => ({ default: module.Success })))
@@ -65,6 +67,16 @@ function App() {
                   <Route path="/" element={
                     <Suspense fallback={<PageLoader />}>
                       <Landing />
+                    </Suspense>
+                  } />
+                  <Route path="/for-startups" element={
+                    <Suspense fallback={<PageLoader />}>
+                      <ForStartups />
+                    </Suspense>
+                  } />
+                  <Route path="/for-agencies" element={
+                    <Suspense fallback={<PageLoader />}>
+                      <ForAgencies />
                     </Suspense>
                   } />
                   <Route path="/features" element={

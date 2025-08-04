@@ -75,7 +75,27 @@ export const Auth: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-6">
+    <div className="min-h-screen hero-gradient flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div
+          className="absolute top-20 left-10 w-72 h-72 bg-electric-blue/5 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{ duration: 8, repeat: Infinity }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-20 w-96 h-96 bg-electric-purple/5 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1.2, 1, 1.2],
+            opacity: [0.2, 0.4, 0.2]
+          }}
+          transition={{ duration: 10, repeat: Infinity, delay: 2 }}
+        />
+      </div>
+      
       <div className="w-full max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -89,13 +109,17 @@ export const Auth: React.FC = () => {
               Back to home
             </Link>
             
-            <div className="flex items-center justify-center mb-4">
-              <div className="flex items-center justify-center w-12 h-12 bg-blue-600 rounded-xl">
+            <motion.div 
+              className="flex items-center justify-center mb-6"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <div className="flex items-center justify-center w-16 h-16 bg-gradient-luxury rounded-2xl shadow-glow">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
-            </div>
+            </motion.div>
             
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 mb-3">
               {isSignUp ? 'Create your account' : 'Welcome back'}
             </h1>
             <p className="text-gray-600">
@@ -106,15 +130,19 @@ export const Auth: React.FC = () => {
             </p>
           </div>
 
-          <Card className="p-6">
+          <Card className="p-8 luxury-card">
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 flex items-start space-x-2">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex items-start space-x-3"
+              >
                 <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-red-600">{error}</p>
-              </div>
+              </motion.div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <Input
                 type="email"
                 label="Email"
@@ -139,7 +167,7 @@ export const Auth: React.FC = () => {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="btn-primary w-full text-lg py-4 mt-8"
                 loading={loading}
                 aria-label={isSignUp ? "Create Account" : "Sign In"}
               >
@@ -147,7 +175,7 @@ export const Auth: React.FC = () => {
               </Button>
             </form>
 
-            <div className="mt-6">
+            <div className="mt-8">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300" />
@@ -158,8 +186,8 @@ export const Auth: React.FC = () => {
               </div>
 
               <Button
-                variant="outline"
-                className="w-full mt-4"
+                variant="secondary"
+                className="w-full mt-6 py-4"
                 onClick={handleGoogleSignIn}
                 loading={loading}
                 aria-label="Continue with Google"
@@ -174,11 +202,11 @@ export const Auth: React.FC = () => {
               </Button>
             </div>
 
-            <div className="mt-6 text-center">
+            <div className="mt-8 text-center">
               <button
                 type="button"
                 onClick={() => setIsSignUp(!isSignUp)}
-                className="text-sm text-blue-600 hover:text-blue-700"
+                className="text-sm text-electric-blue hover:text-electric-blue-dark font-medium transition-colors"
                 aria-label={isSignUp ? "Sign in to existing account" : "Create new account"}
               >
                 {isSignUp 

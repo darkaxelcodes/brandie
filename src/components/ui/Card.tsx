@@ -5,26 +5,37 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   className?: string
   hover?: boolean
+  luxury?: boolean
+  glass?: boolean
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(({ 
   children, 
   className = '', 
-  hover = false,
+  hover = true,
+  luxury = true,
+  glass = false,
   ...props
 }, ref) => {
+  const baseClasses = 'rounded-2xl border overflow-hidden transition-all duration-300'
+  
+  const variantClasses = glass 
+    ? 'glass border-white/20' 
+    : luxury 
+    ? 'luxury-card' 
+    : 'bg-white border-gray-200 shadow-lg'
+
+  const hoverClasses = hover 
+    ? 'hover:shadow-xl hover:-translate-y-1 hover:scale-[1.01]' 
+    : ''
+
   return (
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      whileHover={hover ? { y: -2, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' } : {}}
-      className={`
-        bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden
-        ${hover ? 'transition-all duration-200' : ''}
-        ${className}
-      `}
+      transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+      className={`${baseClasses} ${variantClasses} ${hoverClasses} ${className}`}
       {...props}
     >
       {children}
