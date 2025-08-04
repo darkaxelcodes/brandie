@@ -346,7 +346,7 @@ export const Dashboard: React.FC = () => {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome back, {user?.email?.split('@')[0]}!
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-700">
               {brands.length === 0 
                 ? "Let's create your first brand identity. Click below to get started."
                 : "Continue building your brand identities or create a new one."
@@ -394,14 +394,18 @@ export const Dashboard: React.FC = () => {
           transition={{ delay: 0.1 }}
           className="text-center py-16"
         >
-          <Card className="p-12 max-w-md mx-auto">
-            <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-2xl mx-auto mb-6">
-              <Sparkles className="w-8 h-8 text-blue-600" />
+          <Card className="p-12 max-w-md mx-auto luxury-card">
+            <div className="flex items-center justify-center w-16 h-16 bg-gradient-luxury rounded-2xl mx-auto mb-6 shadow-lg">
+              <img 
+                src="https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie/Logo.png" 
+                alt="Brandie Logo" 
+                className="w-12 h-12 object-contain"
+              />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-black mb-4">
               {showArchivedBrands ? "No Archived Brands" : "Create Your First Brand"}
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-700 mb-6">
               {showArchivedBrands 
                 ? "You don't have any archived brands. Archived brands will appear here."
                 : "Start building a compelling brand identity with our AI-powered platform. We'll guide you through every step of the process."

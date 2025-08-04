@@ -155,48 +155,48 @@ export const Home: React.FC = () => {
       >
         <Card className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl">
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-luxury rounded-xl shadow-lg">
               <Layers className="w-6 h-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Total Brands</p>
-              <h3 className="text-2xl font-bold text-gray-900">{stats.totalBrands}</h3>
+              <p className="text-sm text-gray-600">Total Brands</p>
+              <h3 className="text-2xl font-bold text-black">{stats.totalBrands}</h3>
             </div>
           </div>
         </Card>
 
         <Card className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-xl">
-              <Activity className="w-6 h-6 text-green-600" />
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-electric-green to-green-600 rounded-xl shadow-lg">
+              <Activity className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">In Progress</p>
-              <h3 className="text-2xl font-bold text-gray-900">{stats.inProgress}</h3>
+              <p className="text-sm text-gray-600">In Progress</p>
+              <h3 className="text-2xl font-bold text-black">{stats.inProgress}</h3>
             </div>
           </div>
         </Card>
 
         <Card className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-xl">
-              <FileImage className="w-6 h-6 text-purple-600" />
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-electric-purple to-purple-600 rounded-xl shadow-lg">
+              <FileImage className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Assets Created</p>
-              <h3 className="text-2xl font-bold text-gray-900">{stats.assetsCount}</h3>
+              <p className="text-sm text-gray-600">Assets Created</p>
+              <h3 className="text-2xl font-bold text-black">{stats.assetsCount}</h3>
             </div>
           </div>
         </Card>
 
         <Card className="p-6">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-xl">
-              <Users className="w-6 h-6 text-yellow-600" />
+            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-amber-500 to-yellow-500 rounded-xl shadow-lg">
+              <Users className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">Team Members</p>
-              <h3 className="text-2xl font-bold text-gray-900">0</h3>
+              <p className="text-sm text-gray-600">Team Members</p>
+              <h3 className="text-2xl font-bold text-black">0</h3>
             </div>
           </div>
         </Card>
