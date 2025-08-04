@@ -75,7 +75,7 @@ export const Auth: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-mesh-bg flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -84,21 +84,21 @@ export const Auth: React.FC = () => {
         >
           {/* Header */}
           <div className="text-center mb-8">
-            <Link to="/" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
+            <Link to="/for-startups" className="inline-flex items-center text-secondary-600 dark:text-secondary-400 hover:text-primary-600 dark:hover:text-primary-400 mb-6 transition-colors">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to home
             </Link>
             
             <div className="flex items-center justify-center mb-4">
-              <div className="flex items-center justify-center w-12 h-12 bg-blue-600 rounded-xl">
+              <div className="flex items-center justify-center w-12 h-12 bg-gradient-luxury rounded-xl shadow-luxury">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
             </div>
             
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-secondary-900 dark:text-white mb-2">
               {isSignUp ? 'Create your account' : 'Welcome back'}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-secondary-600 dark:text-secondary-400">
               {isSignUp 
                 ? 'Start building your brand identity today' 
                 : 'Sign in to continue building your brand'
@@ -106,11 +106,11 @@ export const Auth: React.FC = () => {
             </p>
           </div>
 
-          <Card className="p-6">
+          <Card luxury className="p-8">
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 flex items-start space-x-2">
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl p-4 mb-6 flex items-start space-x-3">
                 <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-red-600">{error}</p>
+                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
               </div>
             )}
 
@@ -124,6 +124,7 @@ export const Auth: React.FC = () => {
                 required
                 icon={<Mail className="w-4 h-4" />}
                 aria-label="Email"
+                luxury
               />
               
               <Input
@@ -135,12 +136,16 @@ export const Auth: React.FC = () => {
                 required
                 icon={<Lock className="w-4 h-4" />}
                 aria-label="Password"
+                luxury
               />
 
               <Button
                 type="submit"
+                variant="luxury"
+                size="lg"
                 className="w-full"
                 loading={loading}
+                glow
                 aria-label={isSignUp ? "Create Account" : "Sign In"}
               >
                 {isSignUp ? 'Create Account' : 'Sign In'}
@@ -150,16 +155,17 @@ export const Auth: React.FC = () => {
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300" />
+                  <div className="w-full border-t border-secondary-300 dark:border-secondary-600" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                  <span className="px-3 bg-white dark:bg-secondary-900 text-secondary-500 dark:text-secondary-400">Or continue with</span>
                 </div>
               </div>
 
               <Button
-                variant="outline"
-                className="w-full mt-4"
+                variant="glass"
+                size="lg"
+                className="w-full mt-6"
                 onClick={handleGoogleSignIn}
                 loading={loading}
                 aria-label="Continue with Google"
@@ -178,7 +184,7 @@ export const Auth: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsSignUp(!isSignUp)}
-                className="text-sm text-blue-600 hover:text-blue-700"
+                className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
                 aria-label={isSignUp ? "Sign in to existing account" : "Create new account"}
               >
                 {isSignUp 

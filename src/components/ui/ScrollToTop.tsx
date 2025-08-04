@@ -42,7 +42,7 @@ export const ScrollToTop: React.FC<ScrollToTopProps> = ({
           exit={{ opacity: 0, scale: 0.5 }}
           transition={{ duration: 0.3 }}
           onClick={handleClick}
-          className={`fixed bottom-8 right-8 z-50 p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${className}`}
+          className={`fixed bottom-8 right-8 z-50 p-4 rounded-full bg-gradient-luxury text-white shadow-luxury-xl hover:shadow-glow focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all duration-300 hover:scale-110 ${className}`}
           aria-label="Scroll to top"
         >
           <ArrowUp className="w-5 h-5" />

@@ -84,11 +84,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
 
   return (
     <motion.div 
-      className="h-screen bg-white border-r border-gray-200 flex flex-col w-20"
+      className="h-screen bg-white dark:bg-secondary-900 border-r border-secondary-200 dark:border-secondary-700 flex flex-col w-20 luxury-surface"
       initial={false}
     >
       {/* Logo */}
-      <div className="p-4 border-b border-gray-200 flex items-center justify-center">
+      <div className="p-4 border-b border-secondary-200 dark:border-secondary-700 flex items-center justify-center">
         <Link to="/home" className="flex items-center justify-center">
           <img 
             src="https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie/Logo.png" 
@@ -99,12 +99,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
       </div>
 
       {/* Token Display */}
-      <div className="px-3 py-4 border-b border-gray-200">
+      <div className="px-3 py-4 border-b border-secondary-200 dark:border-secondary-700">
         <TokenDisplay collapsed={true} />
         
         {/* Subscription Status */}
         {subscription && (
-          <div className="mt-3 pt-3 border-t border-gray-200">
+          <div className="mt-3 pt-3 border-t border-secondary-200 dark:border-secondary-700">
             <div 
               className="relative flex justify-center"
               onMouseEnter={() => handleMouseEnter('Subscription')}
@@ -112,13 +112,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
             >
               <div className={`flex items-center justify-center w-12 h-12 rounded-lg ${
                 subscription.subscription_status === 'active' 
-                  ? 'bg-green-100' 
-                  : 'bg-amber-100'
+                  ? 'bg-green-100 dark:bg-green-900/30' 
+                  : 'bg-amber-100 dark:bg-amber-900/30'
               }`}>
                 <Crown className={`w-6 h-6 ${
                   subscription.subscription_status === 'active' 
-                    ? 'text-green-600' 
-                    : 'text-amber-600'
+                    ? 'text-green-600 dark:text-green-400' 
+                    : 'text-amber-600 dark:text-amber-400'
                 }`} />
               </div>
               
@@ -134,7 +134,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
               {/* Tooltip */}
               {activeTooltip === 'Subscription' && (
                 <div 
-                  className="fixed z-50 bg-white text-gray-900 text-sm py-2 px-3 rounded shadow-lg whitespace-nowrap border border-gray-200" 
+                  className="fixed z-50 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white text-sm py-2 px-3 rounded-lg shadow-luxury-lg whitespace-nowrap border border-secondary-200 dark:border-secondary-600" 
                   style={{ 
                     left: '70px', 
                     top: `${getTooltipPosition(document.querySelector('.bg-green-100, .bg-amber-100')).top}px` 
@@ -143,7 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
                   <div className="font-medium">
                     {getProductByPriceId(subscription.price_id)?.name || 'Subscription'}
                   </div>
-                  <div className="text-xs text-gray-600 capitalize">
+                  <div className="text-xs text-secondary-600 dark:text-secondary-400 capitalize">
                     {subscription.subscription_status.replace('_', ' ')}
                   </div>
                 </div>
@@ -166,17 +166,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
                   to={item.path}
                   className={`flex items-center justify-center px-3 py-3 rounded-lg transition-colors ${
                     active 
-                      ? 'bg-blue-50 text-blue-700' 
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' 
+                      : 'text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800'
                   }`}
                 >
-                  <Icon className={`w-5 h-5 ${active ? 'text-blue-600' : 'text-gray-500'}`} />
+                  <Icon className={`w-5 h-5 ${active ? 'text-primary-600 dark:text-primary-400' : 'text-secondary-500 dark:text-secondary-400'}`} />
                 </Link>
                 
                 {/* Tooltip */}
                 {activeTooltip === item.label && (
                   <div 
-                    className="fixed z-50 bg-white text-gray-900 text-sm py-1 px-2 rounded shadow-lg whitespace-nowrap border border-gray-200" 
+                    className="fixed z-50 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white text-sm py-2 px-3 rounded-lg shadow-luxury-lg whitespace-nowrap border border-secondary-200 dark:border-secondary-600" 
                     style={{ 
                       left: '70px', 
                       top: `${getTooltipPosition(document.querySelector(`a[href="${item.path}"]`)).top}px` 
@@ -192,7 +192,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="px-3 py-2 border-t border-gray-200">
+      <div className="px-3 py-2 border-t border-secondary-200 dark:border-secondary-700">
         {bottomNavItems.map((item) => {
           const Icon = item.icon
           const active = isActive(item.path)
@@ -203,17 +203,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
                 to={item.path}
                 className={`flex items-center justify-center px-3 py-3 rounded-lg transition-colors ${
                   active 
-                    ? 'bg-blue-50 text-blue-700' 
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' 
+                    : 'text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-800'
                 }`}
               >
-                <Icon className={`w-5 h-5 ${active ? 'text-blue-600' : 'text-gray-500'}`} />
+                <Icon className={`w-5 h-5 ${active ? 'text-primary-600 dark:text-primary-400' : 'text-secondary-500 dark:text-secondary-400'}`} />
               </Link>
               
               {/* Tooltip */}
               {activeTooltip === item.label && (
                 <div 
-                  className="fixed z-50 bg-white text-gray-900 text-sm py-1 px-2 rounded shadow-lg whitespace-nowrap border border-gray-200" 
+                  className="fixed z-50 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white text-sm py-2 px-3 rounded-lg shadow-luxury-lg whitespace-nowrap border border-secondary-200 dark:border-secondary-600" 
                   style={{ 
                     left: '70px', 
                     top: `${getTooltipPosition(document.querySelector(`a[href="${item.path}"]`)).top}px` 
@@ -232,14 +232,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
           onMouseEnter={() => handleMouseEnter('Profile')} 
           onMouseLeave={handleMouseLeave}
         >
-          <div className="flex items-center justify-center w-8 h-8 bg-gray-200 rounded-full">
-            <User className="w-4 h-4 text-gray-600" />
+          <div className="flex items-center justify-center w-8 h-8 bg-gradient-luxury rounded-full shadow-luxury">
+            <User className="w-4 h-4 text-white" />
           </div>
           
           {/* Tooltip */}
           {activeTooltip === 'Profile' && (
             <div 
-              className="fixed z-50 bg-white text-gray-900 text-sm py-1 px-2 rounded shadow-lg whitespace-nowrap border border-gray-200" 
+              className="fixed z-50 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white text-sm py-2 px-3 rounded-lg shadow-luxury-lg whitespace-nowrap border border-secondary-200 dark:border-secondary-600" 
               style={{ 
                 left: '70px', 
                 top: `${getTooltipPosition(document.querySelector('.mt-2.px-3.py-3')).top}px` 
@@ -258,7 +258,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
         >
           <button
             onClick={onSignOut}
-            className="w-full flex items-center justify-center px-3 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors mt-2"
+            className="w-full flex items-center justify-center px-3 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors mt-2"
           >
             <LogOut className="w-5 h-5" />
           </button>
@@ -266,7 +266,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onSignOut, collapsed }) => {
           {/* Tooltip */}
           {activeTooltip === 'Sign Out' && (
             <div 
-              className="fixed z-50 bg-white text-gray-900 text-sm py-1 px-2 rounded shadow-lg whitespace-nowrap border border-gray-200" 
+              className="fixed z-50 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-white text-sm py-2 px-3 rounded-lg shadow-luxury-lg whitespace-nowrap border border-secondary-200 dark:border-secondary-600" 
               style={{ 
                 left: '70px', 
                 top: `${getTooltipPosition(document.querySelector('.text-red-600')).top}px` 
