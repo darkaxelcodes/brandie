@@ -18,19 +18,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   disabled,
   ...props
 }, ref) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2'
+  const baseClasses = 'btn-luxury inline-flex items-center justify-center font-heading font-semibold rounded-2xl focus-luxury disabled:opacity-50 disabled:cursor-not-allowed'
   
   const variants = {
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white focus:ring-blue-500 shadow-lg hover:shadow-xl',
-    secondary: 'bg-gray-100 hover:bg-gray-200 text-gray-900 focus:ring-gray-500',
-    outline: 'border-2 border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-50 focus:ring-gray-500',
-    ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:ring-gray-500'
+    primary: 'btn-primary-luxury',
+    secondary: 'btn-secondary-luxury',
+    outline: 'border-2 border-neutral-300 hover:border-primary-400 text-neutral-700 hover:bg-neutral-50 focus:ring-primary-500 hover:shadow-luxury',
+    ghost: 'btn-ghost-luxury'
   }
   
   const sizes = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg'
+    sm: 'px-4 py-2 text-sm',
+    md: 'px-6 py-3 text-base',
+    lg: 'px-8 py-4 text-lg'
   }
 
   const isDisabled = disabled || loading
@@ -38,8 +38,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   return (
     <motion.button
       ref={ref}
-      whileHover={!isDisabled ? { scale: 1.02 } : {}}
-      whileTap={!isDisabled ? { scale: 0.98 } : {}}
+      whileHover={!isDisabled ? { scale: 1.05, y: -2 } : {}}
+      whileTap={!isDisabled ? { scale: 0.95 } : {}}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
       className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''} ${className}`}
       disabled={isDisabled}
       aria-disabled={isDisabled}
