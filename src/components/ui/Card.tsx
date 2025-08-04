@@ -5,33 +5,29 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
   className?: string
   hover?: boolean
-  cyber?: boolean
+  luxury?: boolean
   glass?: boolean
-  glow?: boolean
 }
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(({ 
   children, 
   className = '', 
   hover = true,
-  cyber = true,
+  luxury = true,
   glass = false,
-  glow = false,
   ...props
 }, ref) => {
-  const baseClasses = 'rounded-lg border overflow-hidden transition-all duration-300'
+  const baseClasses = 'rounded-2xl border overflow-hidden transition-all duration-300'
   
   const variantClasses = glass 
-    ? 'glass-dark border-dark-500' 
-    : cyber 
-    ? 'cyber-card' 
-    : 'bg-dark-900 border-dark-500 shadow-cyber'
+    ? 'glass border-white/20' 
+    : luxury 
+    ? 'luxury-card' 
+    : 'bg-white border-gray-200 shadow-lg'
 
   const hoverClasses = hover 
-    ? 'hover:shadow-neon hover:-translate-y-1 hover:scale-[1.01] hover:border-neon-green/50' 
+    ? 'hover:shadow-xl hover:-translate-y-1 hover:scale-[1.01]' 
     : ''
-
-  const glowClasses = glow ? 'neon-glow' : ''
 
   return (
     <motion.div
@@ -39,7 +35,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-      className={`${baseClasses} ${variantClasses} ${hoverClasses} ${glowClasses} ${className}`}
+      className={`${baseClasses} ${variantClasses} ${hoverClasses} ${className}`}
       {...props}
     >
       {children}

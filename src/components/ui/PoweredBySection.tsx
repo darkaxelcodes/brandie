@@ -40,7 +40,7 @@ export const PoweredBySection: React.FC<PoweredBySectionProps> = ({ className = 
 
   return (
     <div className={`${className}`}>
-      <h3 className="text-center text-dark-400 text-sm mb-6 font-terminal">// POWERED_BY</h3>
+      <h3 className="text-center text-gray-400 text-sm mb-6">Powered By</h3>
       <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
         {logos.map((logo, index) => (
           <a 
@@ -48,12 +48,12 @@ export const PoweredBySection: React.FC<PoweredBySectionProps> = ({ className = 
             href={logo.url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="flex items-center justify-center transition-all hover:scale-110 hover:brightness-125 opacity-60 hover:opacity-100"
+            className="flex items-center justify-center transition-transform hover:scale-110"
           >
             <img 
               src={logo.src} 
               alt={logo.alt} 
-              className="h-8 md:h-10 object-contain filter brightness-0 invert"
+              className="h-8 md:h-10 object-contain opacity-70 hover:opacity-100 transition-opacity"
               style={{ maxWidth: logo.width }}
             />
           </a>
