@@ -165,10 +165,10 @@ export const ForAgencies: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center space-x-2 bg-electric-purple/10 border border-electric-purple/20 rounded-full px-6 py-3 mb-8"
+              className="inline-flex items-center space-x-2 bg-electric-purple/10 border border-electric-purple/30 rounded-full px-6 py-3 mb-8"
             >
               <Building2 className="w-4 h-4 text-electric-purple" />
-              <span className="text-sm font-semibold text-electric-purple">Built for Agencies</span>
+              <span className="text-sm font-semibold text-purple-700">Built for Agencies</span>
             </motion.div>
             
             {/* Main Headline */}
@@ -270,15 +270,15 @@ export const ForAgencies: React.FC = () => {
                 className="luxury-card p-8 group"
               >
                 <div className="flex items-start space-x-6">
-                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-luxury rounded-2xl group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-luxury rounded-2xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
                     <benefit.icon className="w-8 h-8 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">{benefit.title}</h3>
-                    <p className="text-gray-600 mb-4 leading-relaxed">{benefit.description}</p>
+                    <h3 className="text-xl font-bold text-black mb-3">{benefit.title}</h3>
+                    <p className="text-gray-700 mb-4 leading-relaxed">{benefit.description}</p>
                     <div className="flex items-center space-x-4">
                       <div className="text-2xl font-bold gradient-text">{benefit.stat}</div>
-                      <div className="text-sm text-gray-500">{benefit.statLabel}</div>
+                      <div className="text-sm text-gray-600">{benefit.statLabel}</div>
                     </div>
                   </div>
                 </div>

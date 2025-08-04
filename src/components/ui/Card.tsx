@@ -22,8 +22,8 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(({
   const variantClasses = glass 
     ? 'glass border-white/20' 
     : luxury 
-    ? 'luxury-card' 
-    : 'bg-white border-gray-200 shadow-lg'
+    ? 'bg-white border border-gray-200 rounded-2xl shadow-xl backdrop-blur-sm' 
+    : 'bg-white border border-gray-200 shadow-lg'
 
   const hoverClasses = hover 
     ? 'hover:shadow-xl hover:-translate-y-1 hover:scale-[1.01]' 

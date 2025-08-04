@@ -23,11 +23,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
   const baseClasses = 'inline-flex items-center justify-center font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group'
   
   const variants = {
-    primary: 'bg-gradient-luxury text-white hover:shadow-xl focus:ring-electric-blue shadow-lg hover:scale-[1.02] active:scale-[0.98]',
-    secondary: 'bg-white text-gray-900 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 focus:ring-gray-500 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]',
+    primary: 'bg-gradient-luxury text-white hover:shadow-xl focus:ring-electric-blue shadow-lg hover:scale-[1.02] active:scale-[0.98] font-semibold',
+    secondary: 'bg-white text-gray-900 border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 focus:ring-gray-500 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] font-semibold',
     outline: 'border-2 border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-white focus:ring-electric-blue hover:scale-[1.02] active:scale-[0.98]',
-    ghost: 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:ring-gray-500 hover:scale-[1.02] active:scale-[0.98]',
-    luxury: 'bg-gradient-to-r from-gray-900 to-black text-white hover:from-black hover:to-gray-900 shadow-luxury focus:ring-gray-800 hover:scale-[1.02] active:scale-[0.98]'
+    ghost: 'text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:ring-gray-500 hover:scale-[1.02] active:scale-[0.98]',
+    luxury: 'bg-gradient-to-r from-gray-900 to-black text-white hover:from-black hover:to-gray-900 shadow-luxury focus:ring-gray-800 hover:scale-[1.02] active:scale-[0.98] font-semibold'
   }
   
   const sizes = {

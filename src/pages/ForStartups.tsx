@@ -155,10 +155,10 @@ export const ForStartups: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center space-x-2 bg-electric-green/10 border border-electric-green/20 rounded-full px-6 py-3 mb-8"
+              className="inline-flex items-center space-x-2 bg-electric-green/10 border border-electric-green/30 rounded-full px-6 py-3 mb-8"
             >
               <Rocket className="w-4 h-4 text-electric-green" />
-              <span className="text-sm font-semibold text-electric-green">Built for Startups</span>
+              <span className="text-sm font-semibold text-green-700">Built for Startups</span>
             </motion.div>
             
             {/* Main Headline */}
@@ -259,15 +259,15 @@ export const ForStartups: React.FC = () => {
                 className="luxury-card p-8 group"
               >
                 <div className="flex items-start space-x-6">
-                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-luxury rounded-2xl group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex items-center justify-center w-16 h-16 bg-gradient-luxury rounded-2xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
                     <benefit.icon className="w-8 h-8 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-3">{benefit.title}</h3>
-                    <p className="text-gray-600 mb-4 leading-relaxed">{benefit.description}</p>
+                    <h3 className="text-xl font-bold text-black mb-3">{benefit.title}</h3>
+                    <p className="text-gray-700 mb-4 leading-relaxed">{benefit.description}</p>
                     <div className="flex items-center space-x-4">
                       <div className="text-2xl font-bold gradient-text">{benefit.stat}</div>
-                      <div className="text-sm text-gray-500">{benefit.statLabel}</div>
+                      <div className="text-sm text-gray-600">{benefit.statLabel}</div>
                     </div>
                   </div>
                 </div>
@@ -307,17 +307,17 @@ export const ForStartups: React.FC = () => {
                 className="luxury-card p-8 group"
               >
                 <div className="flex items-center space-x-4 mb-6">
-                  <div className="flex items-center justify-center w-14 h-14 bg-gradient-luxury rounded-xl group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex items-center justify-center w-14 h-14 bg-gradient-luxury rounded-xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
                     <feature.icon className="w-7 h-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">{feature.title}</h3>
+                  <h3 className="text-xl font-bold text-black">{feature.title}</h3>
                 </div>
-                <p className="text-gray-600 mb-6 leading-relaxed">{feature.description}</p>
+                <p className="text-gray-700 mb-6 leading-relaxed">{feature.description}</p>
                 <ul className="space-y-3">
                   {feature.benefits.map((benefit, i) => (
                     <li key={i} className="flex items-center space-x-3">
                       <Check className="w-4 h-4 text-electric-green flex-shrink-0" />
-                      <span className="text-gray-700">{benefit}</span>
+                      <span className="text-gray-800">{benefit}</span>
                     </li>
                   ))}
                 </ul>

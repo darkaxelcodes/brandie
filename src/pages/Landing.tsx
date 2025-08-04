@@ -131,10 +131,10 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3 mb-8 shadow-lg"
+              className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full px-6 py-3 mb-8 shadow-lg"
             >
               <div className="w-2 h-2 bg-electric-green rounded-full animate-pulse"></div>
-              <span className="text-sm font-semibold text-gray-700">AI-Powered Brand Building</span>
+              <span className="text-sm font-semibold text-gray-800">AI-Powered Brand Building</span>
               <Sparkles className="w-4 h-4 text-electric-blue" />
             </motion.div>
             
@@ -197,11 +197,11 @@ export const Landing: React.FC = () => {
                   transition={{ duration: 0.5, delay: 1 + index * 0.1 }}
                   className="text-center group"
                 >
-                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-luxury rounded-xl mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-luxury rounded-xl mx-auto mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                     <stat.icon className="w-6 h-6 text-white" />
                   </div>
-                  <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{stat.number}</div>
-                  <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
+                  <div className="text-2xl md:text-3xl font-bold text-black mb-1">{stat.number}</div>
+                  <div className="text-sm text-gray-700 font-medium">{stat.label}</div>
                 </motion.div>
               ))}
             </motion.div>
@@ -219,7 +219,7 @@ export const Landing: React.FC = () => {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            <p className="text-lg text-gray-600 mb-12 font-medium">Trusted by innovative companies worldwide</p>
+            <p className="text-lg text-gray-700 mb-12 font-medium">Trusted by innovative companies worldwide</p>
             <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 opacity-60">
               {['ACME', 'TechFlow', 'Innovate', 'FutureBrand', 'Elevate', 'Pixel Studios'].map((brand, index) => (
                 <motion.div
@@ -228,7 +228,7 @@ export const Landing: React.FC = () => {
                   whileInView={{ opacity: 0.6, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="text-2xl font-bold text-gray-400 hover:text-gray-600 transition-colors cursor-default"
+                  className="text-2xl font-bold text-gray-500 hover:text-gray-700 transition-colors cursor-default"
                 >
                   {brand}
                 </motion.div>
@@ -268,11 +268,11 @@ export const Landing: React.FC = () => {
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className="luxury-card p-8 group hover:electric-glow"
               >
-                <div className="flex items-center justify-center w-16 h-16 bg-gradient-luxury rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                <div className="flex items-center justify-center w-16 h-16 bg-gradient-luxury rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                <h3 className="text-xl font-bold text-black mb-4">{feature.title}</h3>
+                <p className="text-gray-700 leading-relaxed">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -487,15 +487,19 @@ export const Landing: React.FC = () => {
           <div className="grid md:grid-cols-4 gap-12">
             <div className="md:col-span-2">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-luxury rounded-xl flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-white" />
+                <div className="w-10 h-10 bg-gradient-luxury rounded-xl flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie/Logo.png" 
+                    alt="Brandie Logo" 
+                    className="w-8 h-8 object-contain"
+                  />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">Brandie</h3>
-                  <div className="text-xs text-gray-400 font-medium tracking-wide">AI BRAND BUILDER</div>
+                  <div className="text-xs text-gray-500 font-medium tracking-wide">AI BRAND BUILDER</div>
                 </div>
               </div>
-              <p className="text-gray-400 mb-8 text-lg leading-relaxed max-w-md">
+              <p className="text-gray-300 mb-8 text-lg leading-relaxed max-w-md">
                 Build every brand overnight with the world's most advanced AI-powered branding platform.
               </p>
               <div className="flex space-x-6">
@@ -503,10 +507,10 @@ export const Landing: React.FC = () => {
                   <a 
                     key={social}
                     href="#" 
-                    className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors"
+                    className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-gray-700 transition-colors shadow-lg"
                   >
                     <span className="sr-only">{social}</span>
-                    <div className="w-5 h-5 bg-gray-400 rounded"></div>
+                    <div className="w-5 h-5 bg-gray-300 rounded"></div>
                   </a>
                 ))}
               </div>
