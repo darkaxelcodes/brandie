@@ -209,12 +209,12 @@ export const Features: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold text-secondary-900 dark:text-white mb-6">
               Powerful Features for
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Complete Branding</span>
+              <span className="luxury-gradient-text"> Complete Branding</span>
             </h1>
             
-            <p className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
+            <p className="text-xl text-secondary-600 dark:text-secondary-400 mb-10 max-w-3xl mx-auto">
               Everything you need to build a professional brand identity from strategy to guidelines,
               powered by advanced AI technology.
             </p>
@@ -224,7 +224,7 @@ export const Features: React.FC = () => {
 
       {/* Features Sections */}
       {features.map((category, index) => (
-        <div key={category.category} className={`py-20 ${index % 2 === 0 ? 'bg-white' : 'bg-gradient-to-r from-blue-50 to-purple-50'}`}>
+        <div key={category.category} className={`py-20 ${index % 2 === 0 ? 'bg-white dark:bg-secondary-950' : 'bg-gradient-to-r from-primary-50 to-accent-gold-50 dark:from-secondary-900 dark:to-secondary-800'}`}>
           <div className="max-w-7xl mx-auto px-6">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -234,12 +234,12 @@ export const Features: React.FC = () => {
               className="mb-16"
             >
               <div className="flex items-center justify-center md:justify-start space-x-3 mb-6">
-                <div className={`flex items-center justify-center w-12 h-12 bg-${category.color}-100 rounded-xl`}>
-                  <category.icon className={`w-6 h-6 text-${category.color}-600`} />
+                <div className={`flex items-center justify-center w-12 h-12 bg-gradient-luxury rounded-xl`}>
+                  <category.icon className={`w-6 h-6 text-white`} />
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900">{category.category}</h2>
+                <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white">{category.category}</h2>
               </div>
-              <p className="text-xl text-gray-600 max-w-3xl">
+              <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl">
                 {category.category === 'Brand Strategy' && 'Define your brand\'s foundation with AI-powered strategic tools.'}
                 {category.category === 'Visual Identity' && 'Create stunning visual elements that represent your brand perfectly.'}
                 {category.category === 'Brand Voice' && 'Establish a consistent communication style that resonates with your audience.'}
@@ -257,15 +257,15 @@ export const Features: React.FC = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: featureIndex * 0.1 }}
                   viewport={{ once: true }}
-                  className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-all duration-300"
+                  className="bg-white dark:bg-secondary-900 rounded-2xl shadow-luxury border border-secondary-200 dark:border-secondary-700 p-8 hover:shadow-luxury-xl transition-all duration-300"
                 >
                   <div className="flex items-center space-x-4 mb-4">
-                    <div className={`flex items-center justify-center w-12 h-12 bg-${category.color}-100 rounded-xl`}>
-                      <feature.icon className={`w-6 h-6 text-${category.color}-600`} />
+                    <div className={`flex items-center justify-center w-12 h-12 bg-gradient-luxury rounded-xl`}>
+                      <feature.icon className={`w-6 h-6 text-white`} />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">{feature.title}</h3>
+                    <h3 className="text-xl font-bold text-secondary-900 dark:text-white">{feature.title}</h3>
                   </div>
-                  <p className="text-gray-600 mb-6">{feature.description}</p>
+                  <p className="text-secondary-600 dark:text-secondary-400 mb-6">{feature.description}</p>
                 </motion.div>
               ))}
             </div>
@@ -274,7 +274,7 @@ export const Features: React.FC = () => {
       ))}
 
       {/* Advanced AI Features */}
-      <div className="py-24 bg-gradient-to-br from-blue-900 to-purple-900 text-white">
+      <div className="py-24 bg-gradient-luxury text-white">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -286,7 +286,7 @@ export const Features: React.FC = () => {
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
               Advanced AI Technology
             </h2>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+            <p className="text-xl text-primary-100 max-w-3xl mx-auto">
               Our platform leverages cutting-edge AI models to deliver professional branding results
               that would normally require an entire agency team.
             </p>
@@ -331,7 +331,7 @@ export const Features: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 hover:bg-white/15 transition-all duration-300"
+                className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 hover:bg-white/15 transition-all duration-300"
               >
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-xl">
@@ -339,7 +339,7 @@ export const Features: React.FC = () => {
                   </div>
                   <h3 className="text-xl font-bold">{item.title}</h3>
                 </div>
-                <p className="text-blue-100">{item.description}</p>
+                <p className="text-primary-100">{item.description}</p>
               </motion.div>
             ))}
           </div>

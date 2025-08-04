@@ -67,10 +67,10 @@ export const Pricing: React.FC = () => {
           >
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               Simple, Transparent
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Pricing</span>
+              <span className="luxury-gradient-text"> Pricing</span>
             </h1>
             
-            <p className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
+            <p className="text-xl text-secondary-600 dark:text-secondary-400 mb-10 max-w-3xl mx-auto">
               Choose the perfect plan for your branding needs. All plans include a 14-day free trial.
             </p>
 
@@ -81,12 +81,12 @@ export const Pricing: React.FC = () => {
               </span>
               <button 
                 onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'annual' : 'monthly')}
-                className="relative inline-flex h-6 w-11 items-center rounded-full"
+                className="flex items-center text-primary-600 dark:text-primary-400 font-medium"
               >
                 <span className="sr-only">Toggle billing cycle</span>
                 <span 
                   className={`inline-block h-6 w-11 rounded-full transition ${
-                    billingCycle === 'annual' ? 'bg-blue-600' : 'bg-gray-300'
+                    billingCycle === 'annual' ? 'bg-primary-600' : 'bg-secondary-300'
                   }`}
                 />
                 <span 
@@ -95,7 +95,7 @@ export const Pricing: React.FC = () => {
                   }`}
                 />
               </button>
-              <span className={`text-sm font-medium flex items-center ${billingCycle === 'annual' ? 'text-gray-900' : 'text-gray-500'}`}>
+              <span className={`text-sm font-medium flex items-center ${billingCycle === 'annual' ? 'text-secondary-900 dark:text-white' : 'text-secondary-500'}`}>
                 Annual
                 <span className="ml-2 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
                   Save 30%
@@ -124,7 +124,7 @@ export const Pricing: React.FC = () => {
           
           {!user && (
             <div className="text-center mt-8">
-              <p className="text-gray-600 mb-4">
+              <p className="text-secondary-600 dark:text-secondary-400 mb-4">
                 Sign up to get started with your subscription
               </p>
               <Link to="/auth">
@@ -138,7 +138,7 @@ export const Pricing: React.FC = () => {
       </div>
 
       {/* Enterprise Section */}
-      <div className="py-20 bg-white">
+      <div className="py-20 bg-white dark:bg-secondary-950">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -147,34 +147,35 @@ export const Pricing: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-6">
               Enterprise Solutions
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
               Custom solutions for large organizations with complex branding needs
             </p>
           </motion.div>
 
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl shadow-xl overflow-hidden border border-blue-100">
+          <Card luxury className="overflow-hidden">
             <div className="p-8 md:p-12">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="mb-6 md:mb-0">
                   <div className="flex items-center space-x-3 mb-4">
-                    <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl">
-                      <Shield className="w-6 h-6 text-blue-600" />
+                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-luxury rounded-xl">
+                      <Shield className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900">Enterprise</h3>
+                    <h3 className="text-2xl font-bold text-secondary-900 dark:text-white">Enterprise</h3>
                   </div>
-                  <p className="text-gray-600 mb-6 md:mb-0 md:max-w-xl">
+                  <p className="text-secondary-700 dark:text-secondary-300 mb-6 md:mb-0 md:max-w-xl">
                     Custom branding solutions for organizations with complex needs, multiple brands, 
                     and advanced security requirements.
                   </p>
                 </div>
                 <div className="flex flex-col items-start md:items-end">
-                  <span className="text-gray-600 mb-2">Custom pricing</span>
+                  <span className="text-secondary-600 dark:text-secondary-400 mb-2">Custom pricing</span>
                   <Button 
                     size="lg"
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    variant="luxury"
+                    glow
                   >
                     Contact Sales
                   </Button>
@@ -216,20 +217,20 @@ export const Pricing: React.FC = () => {
                         transition={{ delay: index * 0.05 }}
                         className="flex items-start space-x-3"
                       >
-                        <feature.icon className="w-5 h-5 text-blue-600 mt-0.5" />
-                        <span className="text-gray-700">{feature.title}</span>
+                        <feature.icon className="w-5 h-5 text-primary-600 dark:text-primary-400 mt-0.5" />
+                        <span className="text-secondary-700 dark:text-secondary-300">{feature.title}</span>
                       </motion.div>
                     ))}
                   </motion.div>
                 )}
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
 
       {/* FAQs */}
-      <div className="py-24 bg-gradient-to-r from-blue-50 to-purple-50">
+      <div className="py-24 bg-gradient-to-r from-primary-50 to-accent-gold-50 dark:from-secondary-900 dark:to-secondary-800">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -238,10 +239,10 @@ export const Pricing: React.FC = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-secondary-900 dark:text-white mb-6">
               Frequently Asked Questions
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-3xl mx-auto">
               Everything you need to know about our pricing and plans
             </p>
           </motion.div>
@@ -254,13 +255,13 @@ export const Pricing: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-xl shadow-md p-6 border border-gray-100"
+                className="bg-white dark:bg-secondary-900 rounded-xl shadow-luxury p-6 border border-secondary-200 dark:border-secondary-700"
               >
-                <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-start">
-                  <HelpCircle className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
+                <h3 className="text-lg font-semibold text-secondary-900 dark:text-white mb-3 flex items-start">
+                  <HelpCircle className="w-5 h-5 text-primary-600 dark:text-primary-400 mr-2 flex-shrink-0 mt-0.5" />
                   {faq.question}
                 </h3>
-                <p className="text-gray-600">{faq.answer}</p>
+                <p className="text-secondary-600 dark:text-secondary-400">{faq.answer}</p>
               </motion.div>
             ))}
           </div>
@@ -268,7 +269,7 @@ export const Pricing: React.FC = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="py-24 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <div className="py-24 bg-gradient-luxury text-white">
         <div className="max-w-7xl mx-auto px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -280,14 +281,14 @@ export const Pricing: React.FC = () => {
             <h2 className="text-3xl md:text-5xl font-bold mb-6">
               Start building your brand today
             </h2>
-            <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
+            <p className="text-xl text-primary-100 mb-10 max-w-2xl mx-auto">
               14-day free trial. No credit card required. Cancel anytime.
             </p>
             <Link to="/auth">
               <Button 
                 variant="secondary" 
                 size="lg"
-                className="bg-white text-blue-600 hover:bg-gray-100 shadow-lg"
+                className="bg-white text-primary-700 hover:bg-primary-50 shadow-luxury-xl"
               >
                 Get Started Free
               </Button>
@@ -297,17 +298,17 @@ export const Pricing: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
+      <footer className="bg-secondary-950 text-white py-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-xl">
+                <div className="flex items-center justify-center w-10 h-10 bg-primary-600 rounded-xl">
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="text-xl font-bold">Brandie</h3>
               </div>
-              <p className="text-gray-400 mb-6">
+              <p className="text-secondary-400 mb-6">
                 Build every brand overnight with AI-powered branding tools.
               </p>
             </div>
@@ -315,47 +316,47 @@ export const Pricing: React.FC = () => {
             <div>
               <h3 className="font-semibold text-lg mb-4">Product</h3>
               <ul className="space-y-3">
-                <li><Link to="/features" className="text-gray-400 hover:text-white">Features</Link></li>
-                <li><Link to="/pricing" className="text-gray-400 hover:text-white">Pricing</Link></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Case Studies</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Reviews</a></li>
+                <li><Link to="/features" className="text-secondary-400 hover:text-white transition-colors">Features</Link></li>
+                <li><Link to="/pricing" className="text-secondary-400 hover:text-white transition-colors">Pricing</Link></li>
+                <li><a href="#" className="text-secondary-400 hover:text-white transition-colors">Case Studies</a></li>
+                <li><a href="#" className="text-secondary-400 hover:text-white transition-colors">Reviews</a></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold text-lg mb-4">Company</h3>
               <ul className="space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-white">About</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Team</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Careers</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Contact</a></li>
+                <li><a href="#" className="text-secondary-400 hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="text-secondary-400 hover:text-white transition-colors">Team</a></li>
+                <li><a href="#" className="text-secondary-400 hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="text-secondary-400 hover:text-white transition-colors">Contact</a></li>
               </ul>
             </div>
             
             <div>
               <h3 className="font-semibold text-lg mb-4">Resources</h3>
               <ul className="space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-white">Blog</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Help Center</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Guides</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Community</a></li>
+                <li><a href="#" className="text-secondary-400 hover:text-white transition-colors">Blog</a></li>
+                <li><a href="#" className="text-secondary-400 hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="#" className="text-secondary-400 hover:text-white transition-colors">Guides</a></li>
+                <li><a href="#" className="text-secondary-400 hover:text-white transition-colors">Community</a></li>
               </ul>
             </div>
           </div>
           
           {/* Powered By Section */}
-          <div className="mt-16 pt-8 border-t border-gray-800">
+          <div className="mt-16 pt-8 border-t border-secondary-800">
             <PoweredBySection />
           </div>
           
-          <div className="mt-8 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">
+          <div className="mt-8 pt-8 border-t border-secondary-800 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-secondary-400 text-sm">
               © {new Date().getFullYear()} Brandie. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm">Terms of Service</a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm">Cookies</a>
+              <a href="#" className="text-secondary-400 hover:text-white text-sm transition-colors">Privacy Policy</a>
+              <a href="#" className="text-secondary-400 hover:text-white text-sm transition-colors">Terms of Service</a>
+              <a href="#" className="text-secondary-400 hover:text-white text-sm transition-colors">Cookies</a>
             </div>
           </div>
         </div>

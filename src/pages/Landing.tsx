@@ -88,17 +88,6 @@ export const Landing: React.FC = () => {
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 py-24 md:py-32 pt-32">
-          {/* Bolt Logo */}
-          <div className="absolute top-20 right-10 md:right-20 z-10">
-            <a href="https://bolt.new" target="_blank" rel="noopener noreferrer">
-              <img 
-                src="https://bpwrjziidqhrsdivfizn.supabase.co/storage/v1/object/public/brandie//bolt_logo_dark.svg" 
-                alt="Bolt Logo" 
-                className="w-16 h-16 md:w-20 md:h-20 object-contain"
-              />
-            </a>
-          </div>
-          
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -115,7 +104,7 @@ export const Landing: React.FC = () => {
             
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
               Build any brand
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> overnight</span>
+              <span className="luxury-gradient-text"> overnight</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
@@ -131,7 +120,7 @@ export const Landing: React.FC = () => {
                 </Button>
               </Link>
               <Link to="/pricing">
-                <Button variant="outline" size="lg" className="border-2">
+                <Button variant="glass" size="lg">
                   View Pricing
                 </Button>
               </Link>
