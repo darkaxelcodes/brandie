@@ -42,6 +42,7 @@ export const generateStrategySuggestions = async (
     industry_analysis: `Provide a detailed industry analysis for ${context.industry || 'this business'} including: key trends, major players, typical customer expectations, common challenges, and opportunities for differentiation. Focus on actionable insights that can inform brand strategy.`,
     
     competitive_analysis: `Based on this business context: ${JSON.stringify(context)}, provide a detailed competitive analysis ${industryContext} including: key competitors' strengths and weaknesses, market positioning, typical messaging approaches, visual identity patterns, and opportunities for differentiation.`
+    ,
     
     landing_page: `Based on this brand context: ${JSON.stringify(context)}, generate compelling landing page content ${industryContext} including: hero headlines, value propositions, feature descriptions, benefit statements, and call-to-action copy. Focus on conversion-optimized copy that resonates with the target audience and reflects the brand voice.`
   }
