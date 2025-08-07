@@ -31,6 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Get initial session
     const getInitialSession = async () => {
       try {
+        setLoading(true)
         const { data: { session } } = await supabase.auth.getSession()
         setUser(session?.user ?? null)
         
@@ -55,11 +56,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
           } catch (tokenError) {
             console.error('Error setting up user tokens:', tokenError);
+            // Don't let token errors block authentication
           }
         }
       } catch (error) {
         console.error('Error getting session:', error)
-        showToast('error', 'Failed to authenticate. Please try again.')
+        // Don't show error toast on initial load, just log it
+        console.warn('Authentication check failed, user will need to sign in')
       } finally {
         setLoading(false)
       }
@@ -95,15 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         } catch (tokenError) {
           console.error('Error setting up user tokens:', tokenError);
-        }
-        
-        // Initialize Stripe customer for new sign-ins
-        if (_event === 'SIGNED_IN') {
-          try {
-            await stripeService.getUserSubscription();
-          } catch (stripeError) {
-            console.error('Error initializing Stripe customer:', stripeError);
-          }
+          // Don't let token errors block authentication
         }
         
         // Initialize Stripe customer if needed
@@ -111,6 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await stripeService.getUserSubscription();
         } catch (stripeError) {
           console.error('Error initializing Stripe customer:', stripeError);
+          // Don't let Stripe errors block authentication
         }
       }
       
@@ -118,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     })
 
     return () => subscription.unsubscribe()
-  }, [showToast])
+  }, [])
 
   const signOut = async () => {
     try {
