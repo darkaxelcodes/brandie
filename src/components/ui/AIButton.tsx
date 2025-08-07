@@ -35,9 +35,9 @@ export const AIButton: React.FC<AIButtonProps> = ({
     setLoading(true)
     try {
       await onClick()
+      setShowModal(false)
     } finally {
       setLoading(false)
-      setShowModal(false)
     }
   }
 

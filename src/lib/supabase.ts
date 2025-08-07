@@ -79,6 +79,40 @@ export const getCurrentUser = async () => {
   })
 }
 
+// Try to parse a JSON string safely
+export const safeJsonParse = <T>(json: string, fallback: T): T => {
+  try {
+    return JSON.parse(json) as T
+  } catch (error) {
+    console.warn('JSON parse failed:', error)
+    return fallback
+  }
+}
+
+// Safely access nested object properties
+export const safeGet = <T>(
+  obj: any,
+  path: string,
+  fallback: T
+): T => {
+  try {
+    const keys = path.split('.')
+    let result = obj
+    
+    for (const key of keys) {
+      if (result === undefined || result === null) {
+        return fallback
+      }
+      result = result[key]
+    }
+    
+    return (result === undefined || result === null) ? fallback : result as T
+  } catch (error) {
+    console.warn('Safe get failed:', error)
+    return fallback
+  }
+}
+
 // Create a hook to get a Supabase client with error handling
 export const useSupabase = () => {
   const { showToast } = useToast()
