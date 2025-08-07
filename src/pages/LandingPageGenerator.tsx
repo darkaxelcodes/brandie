@@ -85,6 +85,39 @@ export const LandingPageGenerator: React.FC = () => {
       return
     }
 
+    // Handle 'new' brandId case - don't fetch from database
+    if (brandId === 'new') {
+      setLoading(false)
+      setBrand({
+        id: 'new',
+        name: 'New Brand',
+        user_id: '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        is_favorite: false,
+        archived: false,
+        industry: null,
+        industry_details: {}
+      })
+      setBrandData({
+        brand: {
+          id: 'new',
+          name: 'New Brand',
+          user_id: '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          is_favorite: false,
+          archived: false,
+          industry: null,
+          industry_details: {}
+        },
+        strategy: {},
+        visual: {},
+        voice: null
+      })
+      return
+    }
+
     loadBrandData()
   }, [brandId])
 
