@@ -1,4 +1,18 @@
-import { v0 } from 'v0-sdk'
+// Lazy import v0 to prevent initialization issues
+let v0: any = null
+
+const getV0Client = async () => {
+  if (!v0) {
+    try {
+      const { v0: v0Client } = await import('v0-sdk')
+      v0 = v0Client
+    } catch (error) {
+      console.error('Failed to load v0 SDK:', error)
+      throw new Error('v0 SDK not available')
+    }
+  }
+  return v0
+}
 
 export interface V0LandingPageRequest {
   brandData: any
@@ -22,11 +36,13 @@ export const v0Service = {
   // Generate landing page using v0 AI
   async generateLandingPage(request: V0LandingPageRequest): Promise<V0LandingPageResponse> {
     try {
+      const v0Client = await getV0Client()
+      
       const prompt = this.buildV0Prompt(request)
       const systemContext = this.buildSystemContext(request)
       
       // Create a new chat with v0
-      const chat = await v0.chats.create({
+      const chat = await v0Client.chats.create({
         message: prompt,
         system: systemContext,
         chatPrivacy: 'private',
@@ -40,7 +56,7 @@ export const v0Service = {
       await new Promise(resolve => setTimeout(resolve, 3000))
 
       // Get the chat details with files
-      const chatDetails = await v0.chats.getById({ chatId: chat.id })
+      const chatDetails = await v0Client.chats.getById({ chatId: chat.id })
       
       return {
         chatId: chat.id,
@@ -222,13 +238,15 @@ Create landing pages that not only look professional but also convert visitors i
   // Continue conversation with v0
   async refineGeneration(chatId: string, refinementMessage: string): Promise<V0LandingPageResponse> {
     try {
-      const response = await v0.chats.sendMessage({
+      const v0Client = await getV0Client()
+      
+      const response = await v0Client.chats.sendMessage({
         chatId,
         message: refinementMessage
       })
 
       // Get updated chat details
-      const chatDetails = await v0.chats.getById({ chatId })
+      const chatDetails = await v0Client.chats.getById({ chatId })
       
       return {
         chatId,
@@ -245,7 +263,8 @@ Create landing pages that not only look professional but also convert visitors i
   // Get chat versions for iteration
   async getChatVersions(chatId: string) {
     try {
-      const versions = await v0.chats.findVersions({ chatId })
+      const v0Client = await getV0Client()
+      const versions = await v0Client.chats.findVersions({ chatId })
       return versions
     } catch (error) {
       console.error('Error getting chat versions:', error)
@@ -256,7 +275,8 @@ Create landing pages that not only look professional but also convert visitors i
   // Export generated files
   async exportFiles(chatId: string): Promise<{ name: string; content: string; type: string }[]> {
     try {
-      const chat = await v0.chats.getById({ chatId })
+      const v0Client = await getV0Client()
+      const chat = await v0Client.chats.getById({ chatId })
       return chat.files || []
     } catch (error) {
       console.error('Error exporting files:', error)

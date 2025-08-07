@@ -86,24 +86,22 @@ export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
       // Use the tokenService to handle token usage
       const success = await tokenService.useToken(user.id, actionType, description);
       
-      // Refresh the token balance after usage
-      // Use setTimeout to prevent blocking the main thread
-      setTimeout(() => {
-        refreshTokenBalance().catch(err => {
-          console.warn('Token balance refresh failed after usage:', err);
-        });
-      }, 100);
+      // Only refresh if token usage was successful
+      if (success) {
+        // Use setTimeout to prevent blocking the main thread
+        setTimeout(() => {
+          refreshTokenBalance().catch(err => {
+            console.warn('Token balance refresh failed after usage:', err);
+          });
+        }, 500);
+      }
       
       return success;
     } catch (error: any) {
       console.error('Error using token:', error);
       
-      if (error.message?.includes('insufficient tokens')) {
-        // Don't show toast that could break auth state
-        console.warn('Insufficient tokens for action:', actionType);
-      } else {
-        console.warn('Token usage failed:', error.message);
-      }
+      // Log error but don't break the flow
+      console.warn('Token usage failed for action:', actionType, error.message);
       
       return false;
     }
