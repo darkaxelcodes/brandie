@@ -76,7 +76,8 @@ export const tokenService = {
       return true;
     } catch (error) {
       console.error('Error using token:', error);
-      throw error;
+      // Don't re-throw errors that could break auth state
+      return false;
     }
   },
 
