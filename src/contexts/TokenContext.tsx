@@ -72,7 +72,8 @@ export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error('Error fetching token balance:', error);
-      showToast('error', 'Failed to load token balance');
+      // Don't show toast errors that could break auth state
+      console.warn('Token balance refresh failed, using cached value');
     } finally {
       setIsLoading(false);
     }
@@ -86,16 +87,22 @@ export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
       const success = await tokenService.useToken(user.id, actionType, description);
       
       // Refresh the token balance after usage
-      await refreshTokenBalance();
+      // Use setTimeout to prevent blocking the main thread
+      setTimeout(() => {
+        refreshTokenBalance().catch(err => {
+          console.warn('Token balance refresh failed after usage:', err);
+        });
+      }, 100);
       
       return success;
     } catch (error: any) {
       console.error('Error using token:', error);
       
       if (error.message?.includes('insufficient tokens')) {
-        showToast('error', 'Insufficient tokens. Please purchase more tokens to continue.');
+        // Don't show toast that could break auth state
+        console.warn('Insufficient tokens for action:', actionType);
       } else {
-        showToast('error', 'Failed to use token');
+        console.warn('Token usage failed:', error.message);
       }
       
       return false;

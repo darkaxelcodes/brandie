@@ -25,7 +25,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const { showToast } = useToast()
+  // Remove showToast dependency to prevent circular issues
 
   useEffect(() => {
     // Get initial session
@@ -114,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, []) // Remove showToast dependency
 
   const signOut = async () => {
     try {
