@@ -24,7 +24,8 @@
     "react-error-boundary": "^4.0.12",
     "react-markdown": "^9.0.1",
     "react-router-dom": "^6.20.1",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "v0-sdk": "^0.6.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
