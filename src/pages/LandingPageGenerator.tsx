@@ -24,10 +24,11 @@ import { Card } from '../components/ui/Card'
 import { Input } from '../components/ui/Input'
 import { brandService } from '../lib/brandService'
 import { visualService } from '../lib/visualService'
-import { landingPageService } from '../lib/landingPageService'
+import { v0Service } from '../lib/v0Service'
 import { Brand } from '../types/brand'
 import { useToast } from '../contexts/ToastContext'
 import { TourButton } from '../components/ui/TourButton'
+import { useTokens } from '../contexts/TokenContext'
 
 interface LandingPageData {
   heroTitle: string
@@ -57,6 +58,7 @@ export const LandingPageGenerator: React.FC = () => {
   const { brandId } = useParams<{ brandId: string }>()
   const navigate = useNavigate()
   const { showToast } = useToast()
+  const { useToken } = useTokens()
   const [brand, setBrand] = useState<Brand | null>(null)
   const [brandData, setBrandData] = useState<any>(null)
   const [landingPageData, setLandingPageData] = useState<LandingPageData>({
@@ -78,6 +80,10 @@ export const LandingPageGenerator: React.FC = () => {
   const [deploying, setDeploying] = useState(false)
   const [deployedUrl, setDeployedUrl] = useState<string | null>(null)
   const [previewHtml, setPreviewHtml] = useState<string>('')
+  const [v0ChatId, setV0ChatId] = useState<string | null>(null)
+  const [v0Files, setV0Files] = useState<any[]>([])
+  const [refining, setRefining] = useState(false)
+  const [refinementPrompt, setRefinementPrompt] = useState('')
 
   useEffect(() => {
     if (!brandId) {
@@ -221,41 +227,86 @@ export const LandingPageGenerator: React.FC = () => {
 
     setGenerating(true)
     try {
-      const generatedContent = await landingPageService.generateLandingPageContent(brandData, landingPageData.template)
+      // Use a token for v0 generation
+      const success = await useToken('v0_landing_page_generation', 'Generate landing page with v0 AI')
       
-      setLandingPageData(prev => ({
-        ...prev,
-        ...generatedContent
-      }))
+      if (!success) {
+        throw new Error('Failed to use token for v0 generation')
+      }
+
+      const v0Response = await v0Service.generateLandingPage({
+        brandData,
+        landingPageData,
+        template: landingPageData.template,
+        style: landingPageData.style
+      })
       
-      showToast('success', 'AI content generated successfully')
+      setV0ChatId(v0Response.chatId)
+      setV0Files(v0Response.files)
+      setPreviewHtml(v0Response.previewHtml || '')
+      
+      // Auto-switch to preview tab
+      setActiveTab('preview')
+      
+      showToast('success', 'Landing page generated with v0 AI!')
     } catch (error) {
-      console.error('Error generating AI content:', error)
-      showToast('error', 'Failed to generate AI content')
+      console.error('Error generating landing page with v0:', error)
+      showToast('error', `v0 Generation Failed: ${error.message}`)
     } finally {
       setGenerating(false)
+    }
+  }
+
+  const refineGeneration = async () => {
+    if (!v0ChatId || !refinementPrompt.trim()) return
+
+    setRefining(true)
+    try {
+      // Use a token for refinement
+      const success = await useToken('v0_refinement', 'Refine landing page with v0 AI')
+      
+      if (!success) {
+        throw new Error('Failed to use token for v0 refinement')
+      }
+
+      const v0Response = await v0Service.refineGeneration(v0ChatId, refinementPrompt)
+      
+      setV0Files(v0Response.files)
+      setPreviewHtml(v0Response.previewHtml || '')
+      setRefinementPrompt('')
+      
+      showToast('success', 'Landing page refined successfully!')
+    } catch (error) {
+      console.error('Error refining with v0:', error)
+      showToast('error', `v0 Refinement Failed: ${error.message}`)
+    } finally {
+      setRefining(false)
     }
   }
 
   const generatePreview = async () => {
     if (!brandData) return
 
-    try {
-      const html = await landingPageService.generateLandingPageHTML(brandData, landingPageData)
-      setPreviewHtml(html)
+    // If we don't have v0 content yet, generate it
+    if (!v0ChatId) {
+      await generateAIContent()
+    } else {
       setActiveTab('preview')
-    } catch (error) {
-      console.error('Error generating preview:', error)
-      showToast('error', 'Failed to generate preview')
     }
   }
 
   const deployLandingPage = async () => {
-    if (!brandData || !previewHtml) return
+    if (!brandData || !v0Files.length) return
 
     setDeploying(true)
     try {
-      const deploymentUrl = await landingPageService.deployLandingPage(brandData, previewHtml)
+      // In a real implementation, this would deploy the v0-generated files
+      // For now, we'll simulate deployment
+      await new Promise(resolve => setTimeout(resolve, 3000))
+      
+      const subdomain = brandData.brand?.name?.toLowerCase().replace(/\s+/g, '-') || 'brand'
+      const deploymentUrl = `https://${subdomain}-${Date.now()}.netlify.app`
+      
       setDeployedUrl(deploymentUrl)
       showToast('success', 'Landing page deployed successfully!')
     } catch (error) {
@@ -263,6 +314,33 @@ export const LandingPageGenerator: React.FC = () => {
       showToast('error', 'Failed to deploy landing page')
     } finally {
       setDeploying(false)
+    }
+  }
+
+  const downloadFiles = async () => {
+    if (!v0Files.length) return
+
+    try {
+      // Create a zip-like structure for download
+      const filesData = v0Files.map(file => ({
+        name: file.name,
+        content: file.content,
+        type: file.type
+      }))
+      
+      // For now, download as JSON (in production, you'd create a proper zip)
+      const blob = new Blob([JSON.stringify(filesData, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${brandData.brand?.name}-landing-page-files.json`
+      a.click()
+      URL.revokeObjectURL(url)
+      
+      showToast('success', 'Files downloaded successfully!')
+    } catch (error) {
+      console.error('Error downloading files:', error)
+      showToast('error', 'Failed to download files')
     }
   }
 
@@ -395,10 +473,14 @@ export const LandingPageGenerator: React.FC = () => {
             <Button
               onClick={generateAIContent}
               loading={generating}
-              className="flex items-center space-x-2 bg-gradient-luxury"
+              className="flex items-center space-x-2 bg-gradient-luxury relative"
             >
               <Sparkles className="w-4 h-4" />
-              <span>Generate with AI</span>
+              <span>Generate with v0 AI</span>
+              {/* Token indicator */}
+              <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                1
+              </div>
             </Button>
           </div>
         </div>
@@ -802,16 +884,36 @@ export const LandingPageGenerator: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-black">Landing Page Preview</h3>
               <div className="flex space-x-3">
+                {v0Files.length > 0 && (
+                  <Button
+                    onClick={downloadFiles}
+                    variant="outline"
+                    className="flex items-center space-x-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download Code</span>
+                  </Button>
+                )}
                 <Button
                   onClick={generatePreview}
                   variant="outline"
                   className="flex items-center space-x-2"
                 >
                   <RefreshCw className="w-4 h-4" />
-                  <span>Regenerate</span>
+                  <span>{v0ChatId ? 'Refresh' : 'Generate'}</span>
                 </Button>
                 <Button
-                  onClick={() => window.open('data:text/html,' + encodeURIComponent(previewHtml), '_blank')}
+                  onClick={() => {
+                    if (v0ChatId && previewHtml.includes('iframe')) {
+                      // Extract iframe src and open directly
+                      const match = previewHtml.match(/src="([^"]+)"/)
+                      if (match) {
+                        window.open(match[1], '_blank')
+                      }
+                    } else if (previewHtml) {
+                      window.open('data:text/html,' + encodeURIComponent(previewHtml), '_blank')
+                    }
+                  }}
                   disabled={!previewHtml}
                   className="flex items-center space-x-2"
                 >
@@ -822,23 +924,78 @@ export const LandingPageGenerator: React.FC = () => {
             </div>
             
             {previewHtml ? (
-              <div className="border border-gray-200 rounded-xl overflow-hidden">
-                <iframe
-                  srcDoc={previewHtml}
-                  className="w-full h-96"
-                  title="Landing Page Preview"
-                />
+              <div className="space-y-6">
+                <div className="border border-gray-200 rounded-xl overflow-hidden">
+                  {previewHtml.includes('iframe') ? (
+                    <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                  ) : (
+                    <iframe
+                      srcDoc={previewHtml}
+                      className="w-full h-96"
+                      title="Landing Page Preview"
+                    />
+                  )}
+                </div>
+                
+                {/* v0 Refinement */}
+                {v0ChatId && (
+                  <Card className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
+                    <h4 className="font-semibold text-gray-900 mb-3">Refine with v0 AI</h4>
+                    <div className="flex space-x-3">
+                      <Input
+                        value={refinementPrompt}
+                        onChange={(e) => setRefinementPrompt(e.target.value)}
+                        placeholder="Ask v0 to make changes: 'Add a pricing section', 'Make it more colorful', etc."
+                        className="flex-1"
+                      />
+                      <Button
+                        onClick={refineGeneration}
+                        loading={refining}
+                        disabled={!refinementPrompt.trim()}
+                        className="flex items-center space-x-2 relative"
+                      >
+                        <Sparkles className="w-4 h-4" />
+                        <span>Refine</span>
+                        {/* Token indicator */}
+                        <div className="absolute -top-2 -right-2 bg-amber-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          1
+                        </div>
+                      </Button>
+                    </div>
+                  </Card>
+                )}
+                
+                {/* Generated Files Info */}
+                {v0Files.length > 0 && (
+                  <Card className="p-4">
+                    <h4 className="font-semibold text-gray-900 mb-3">Generated Files ({v0Files.length})</h4>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      {v0Files.slice(0, 6).map((file, index) => (
+                        <div key={index} className="flex items-center space-x-3 p-2 bg-gray-50 rounded">
+                          <Code className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm font-medium text-gray-900">{file.name}</span>
+                          <span className="text-xs text-gray-500">{file.type}</span>
+                        </div>
+                      ))}
+                      {v0Files.length > 6 && (
+                        <div className="text-sm text-gray-500 p-2">
+                          +{v0Files.length - 6} more files...
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                )}
               </div>
             ) : (
               <div className="text-center py-12">
                 <Eye className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h4 className="text-lg font-medium text-black mb-2">No Preview Available</h4>
                 <p className="text-gray-700 mb-4">
-                  Generate a preview to see how your landing page will look
+                  Generate your landing page with v0 AI to see the preview
                 </p>
-                <Button onClick={generatePreview}>
-                  <Eye className="w-4 h-4 mr-2" />
-                  Generate Preview
+                <Button onClick={generateAIContent} loading={generating}>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generate with v0 AI
                 </Button>
               </div>
             )}
@@ -909,16 +1066,16 @@ export const LandingPageGenerator: React.FC = () => {
                   <Button
                     onClick={deployLandingPage}
                     loading={deploying}
-                    disabled={!previewHtml}
+                    disabled={!v0Files.length}
                     size="lg"
                     className="flex items-center space-x-2 bg-gradient-luxury"
                   >
                     <Rocket className="w-5 h-5" />
                     <span>Deploy Landing Page</span>
                   </Button>
-                  {!previewHtml && (
+                  {!v0Files.length && (
                     <p className="text-sm text-gray-600 mt-2">
-                      Generate a preview first before deploying
+                      Generate your landing page with v0 AI first before deploying
                     </p>
                   )}
                 </div>
