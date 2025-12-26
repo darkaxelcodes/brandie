@@ -8,7 +8,7 @@ import { ToastProvider } from './contexts/ToastContext.tsx';
 import { TourProvider } from './contexts/TourContext.tsx';
 import { analyticsService } from './lib/analytics';
 
-analyticsService.init().catch(console.error);
+analyticsService.init();
 
 // Add error handling for better error reporting
 const handleError = (event: ErrorEvent) => {
