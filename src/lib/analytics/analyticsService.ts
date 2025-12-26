@@ -65,8 +65,8 @@ async function storeEventInDatabase(
 }
 
 export const analyticsService = {
-  async init(): Promise<void> {
-    await initMixpanel()
+  init(): void {
+    initMixpanel()
   },
 
   async identify(userId: string, userProperties?: Record<string, unknown>): Promise<void> {
