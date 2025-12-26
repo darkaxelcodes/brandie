@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from './supabase';
 
-const ELEVENLABS_API_KEY = import.meta.env.VITE_ELEVENLABS_API_KEY;
-const ELEVENLABS_VOICE_ID = import.meta.env.VITE_ELEVENLABS_VOICE_ID || 'pNInz6obpgDQGcFmaJgB'; // Default voice ID
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 interface TextToSpeechOptions {
   voiceId?: string;
@@ -28,45 +28,40 @@ interface Message {
 }
 
 export const elevenlabsService = {
-  // Text to speech conversion
   async textToSpeech(
     text: string,
     options: TextToSpeechOptions = {}
   ): Promise<ArrayBuffer> {
-    if (!ELEVENLABS_API_KEY) {
-      throw new Error('Eleven Labs API key not configured');
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      throw new Error('Supabase configuration not found');
     }
 
     const {
-      voiceId = ELEVENLABS_VOICE_ID,
+      voiceId,
       modelId = 'eleven_monolingual_v1',
       stability = 0.5,
       similarityBoost = 0.75
     } = options;
 
     try {
-      const response = await fetch(
-        `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'xi-api-key': ELEVENLABS_API_KEY
-          },
-          body: JSON.stringify({
-            text,
-            model_id: modelId,
-            voice_settings: {
-              stability,
-              similarity_boost: similarityBoost
-            }
-          })
-        }
-      );
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/elevenlabs-tts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          text,
+          voiceId,
+          modelId,
+          stability,
+          similarityBoost
+        })
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(`Eleven Labs API error: ${errorData.detail || response.statusText}`);
+        throw new Error(`Text-to-speech error: ${errorData.error || response.statusText}`);
       }
 
       return await response.arrayBuffer();
