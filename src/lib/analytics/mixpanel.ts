@@ -2,6 +2,10 @@ import type { EventNameType, EventProperties } from './events'
 
 const MIXPANEL_TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN
 
+if (import.meta.env.DEV) {
+  console.log('Mixpanel token present:', !!MIXPANEL_TOKEN)
+}
+
 interface MixpanelInstance {
   init: (token: string, config?: Record<string, unknown>) => void
   track: (event: string, properties?: Record<string, unknown>) => void
