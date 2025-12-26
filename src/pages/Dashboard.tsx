@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { 
+import { motion, AnimatePresence } from 'framer-motion'
+import {
   Target, Palette, MessageSquare, FileText, Plus, TrendingUp, Sparkles, CheckCircle,
   Star, StarOff, MoreHorizontal, Archive, Trash2, Copy, Edit, RefreshCw, Factory, Activity,
   HelpCircle, Globe
@@ -19,6 +19,10 @@ import { Brand } from '../types/brand'
 import { useToast } from '../contexts/ToastContext'
 import { useTour } from '../contexts/TourContext'
 import { TourButton } from '../components/ui/TourButton'
+import { OnboardingFlow } from '../components/onboarding/OnboardingFlow'
+import { ProfileCompletionBanner } from '../components/onboarding/ProfileCompletionBanner'
+import { userProfileService, UserProfile } from '../lib/userProfileService'
+import { analyticsService, EventName } from '../lib/analytics'
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth()
@@ -41,10 +45,14 @@ export const Dashboard: React.FC = () => {
   const [editBrandIndustry, setEditBrandIndustry] = useState<string>('technology')
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showProfileBanner, setShowProfileBanner] = useState(true)
 
   useEffect(() => {
     loadBrands()
-  }, [])
+    loadUserProfile()
+  }, [user])
 
   // Show tour automatically for first-time users
   useEffect(() => {
@@ -84,6 +92,38 @@ export const Dashboard: React.FC = () => {
     }
   }
 
+  const loadUserProfile = async () => {
+    if (!user) return
+
+    try {
+      const profile = await userProfileService.getOrCreateProfile(user.id)
+      setUserProfile(profile)
+
+      if (profile && userProfileService.needsOnboarding(profile)) {
+        setShowOnboarding(true)
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error)
+    }
+  }
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false)
+    loadUserProfile()
+  }
+
+  const handleOnboardingSkip = () => {
+    setShowOnboarding(false)
+  }
+
+  const handleOpenOnboarding = () => {
+    setShowOnboarding(true)
+  }
+
+  const handleDismissBanner = () => {
+    setShowProfileBanner(false)
+  }
+
   const handleCreateBrand = () => {
     setNewBrandName('')
     setNewBrandIndustry('technology')
@@ -108,6 +148,12 @@ export const Dashboard: React.FC = () => {
       setBrands([newBrand, ...brands])
       setShowCreateModal(false)
       showToast('success', 'Brand created successfully')
+
+      analyticsService.trackBrand(EventName.BRAND_CREATED, {
+        brandId: newBrand.id,
+        brandName: newBrand.name,
+      })
+
       navigate(`/brand/${newBrand.id}/strategy`)
     } catch (error) {
       console.error('Error creating brand:', error)
@@ -385,6 +431,14 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </motion.div>
+
+      {showProfileBanner && userProfileService.canEarnReward(userProfile) && (
+        <ProfileCompletionBanner
+          profile={userProfile}
+          onCompleteProfile={handleOpenOnboarding}
+          onDismiss={handleDismissBanner}
+        />
+      )}
 
       {displayedBrands.length === 0 ? (
         /* Empty State */
@@ -760,6 +814,16 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+      <AnimatePresence>
+        {showOnboarding && (
+          <OnboardingFlow
+            onComplete={handleOnboardingComplete}
+            onSkip={handleOnboardingSkip}
+            initialProfile={userProfile}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

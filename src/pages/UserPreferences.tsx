@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { 
-  ArrowLeft, Settings, Moon, Sun, Keyboard, Eye, 
-  Save, Check, AlertCircle, RefreshCw, Coins, Plus, Minus
+import {
+  ArrowLeft, Settings, Moon, Sun, Keyboard, Eye,
+  Save, AlertCircle, RefreshCw, Coins, Plus, Minus,
+  User, Building2, Briefcase, Target, Gift, Check
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
+import { Input } from '../components/ui/Input'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
 import { supabase } from '../lib/supabase'
@@ -14,6 +16,14 @@ import { SubscriptionStatus } from '../components/subscription/SubscriptionStatu
 import { TourButton } from '../components/ui/TourButton'
 import { useTokens } from '../contexts/TokenContext'
 import { tokenService, TokenTransaction } from '../lib/tokenService'
+import {
+  userProfileService,
+  UserProfile,
+  ROLE_OPTIONS,
+  COMPANY_SIZE_OPTIONS,
+  GOAL_OPTIONS,
+  PROFILE_COMPLETION_REWARD,
+} from '../lib/userProfileService'
 
 interface UserPreference {
   id?: string
@@ -38,12 +48,23 @@ export const UserPreferences: React.FC = () => {
   const [transactions, setTransactions] = useState<TokenTransaction[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [savingProfile, setSavingProfile] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [profileForm, setProfileForm] = useState({
+    full_name: '',
+    company_name: '',
+    company_website: '',
+    role: '',
+    company_size: '',
+    goals: [] as string[],
+  })
 
   useEffect(() => {
     if (user) {
       loadPreferences()
       loadTransactions()
+      loadProfile()
     }
   }, [user])
 
@@ -88,14 +109,78 @@ export const UserPreferences: React.FC = () => {
 
   const loadTransactions = async () => {
     if (!user) return;
-    
+
     try {
       const history = await tokenService.getTransactionHistory(user.id);
-      setTransactions(history.slice(0, 5)); // Just get the 5 most recent
+      setTransactions(history.slice(0, 5));
     } catch (error) {
       console.error('Error loading token transactions:', error);
     }
   };
+
+  const loadProfile = async () => {
+    if (!user) return
+
+    try {
+      const profile = await userProfileService.getOrCreateProfile(user.id)
+      setUserProfile(profile)
+
+      if (profile) {
+        setProfileForm({
+          full_name: profile.full_name || '',
+          company_name: profile.company_name || '',
+          company_website: profile.company_website || '',
+          role: profile.role || '',
+          company_size: profile.company_size || '',
+          goals: profile.goals || [],
+        })
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error)
+    }
+  }
+
+  const saveProfile = async () => {
+    if (!user) return
+
+    try {
+      setSavingProfile(true)
+      const canEarnReward = userProfileService.canEarnReward(userProfile)
+      const { percentage } = userProfileService.calculateProfileCompletion({
+        ...userProfile,
+        ...profileForm,
+      } as UserProfile)
+
+      if (canEarnReward && percentage === 100) {
+        const { tokensRewarded } = await userProfileService.completeOnboarding(user.id, profileForm)
+        if (tokensRewarded > 0) {
+          await refreshTokenBalance()
+          showToast('success', `Profile saved! You earned ${tokensRewarded} tokens`)
+        } else {
+          showToast('success', 'Profile saved successfully')
+        }
+      } else {
+        await userProfileService.updateUserProfile(user.id, profileForm)
+        showToast('success', 'Profile saved successfully')
+      }
+
+      await loadProfile()
+    } catch (error) {
+      console.error('Error saving profile:', error)
+      showToast('error', 'Failed to save profile')
+    } finally {
+      setSavingProfile(false)
+    }
+  }
+
+  const toggleGoal = (goal: string) => {
+    setProfileForm(prev => ({
+      ...prev,
+      goals: prev.goals.includes(goal)
+        ? prev.goals.filter(g => g !== goal)
+        : [...prev.goals, goal],
+    }))
+  }
 
   const savePreferences = async () => {
     try {
@@ -321,6 +406,165 @@ export const UserPreferences: React.FC = () => {
             >
               View Complete History
             </Button>
+          </div>
+        </Card>
+      </motion.div>
+
+      {/* Profile Information */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="mb-6"
+      >
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
+                <User className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
+                {userProfileService.canEarnReward(userProfile) && (
+                  <div className="flex items-center space-x-1 text-sm text-amber-600">
+                    <Gift className="w-4 h-4" />
+                    <span>Complete profile to earn {PROFILE_COMPLETION_REWARD} tokens</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            <Button
+              onClick={saveProfile}
+              loading={savingProfile}
+              size="sm"
+            >
+              <Save className="w-4 h-4 mr-1" />
+              Save Profile
+            </Button>
+          </div>
+
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Full Name"
+                value={profileForm.full_name}
+                onChange={(e) => setProfileForm({ ...profileForm, full_name: e.target.value })}
+                placeholder="Enter your full name"
+              />
+              <Input
+                label="Company Name"
+                value={profileForm.company_name}
+                onChange={(e) => setProfileForm({ ...profileForm, company_name: e.target.value })}
+                placeholder="Enter company name"
+              />
+            </div>
+
+            <Input
+              label="Company Website"
+              value={profileForm.company_website}
+              onChange={(e) => setProfileForm({ ...profileForm, company_website: e.target.value })}
+              placeholder="https://example.com"
+              type="url"
+            />
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Your Role
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {ROLE_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setProfileForm({ ...profileForm, role: option.value })}
+                    className={`
+                      p-3 rounded-lg border-2 text-left transition-all text-sm
+                      ${profileForm.role === option.value
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-gray-300'
+                      }
+                    `}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Company Size
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {COMPANY_SIZE_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setProfileForm({ ...profileForm, company_size: option.value })}
+                    className={`
+                      p-3 rounded-lg border-2 text-left transition-all text-sm
+                      ${profileForm.company_size === option.value
+                        ? 'border-blue-500 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 hover:border-gray-300'
+                      }
+                    `}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Goals (select all that apply)
+              </label>
+              <div className="space-y-2">
+                {GOAL_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => toggleGoal(option.value)}
+                    className={`
+                      w-full p-3 rounded-lg border-2 text-left transition-all flex items-center justify-between
+                      ${profileForm.goals.includes(option.value)
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                      }
+                    `}
+                  >
+                    <span className={profileForm.goals.includes(option.value) ? 'text-blue-700' : 'text-gray-700'}>
+                      {option.label}
+                    </span>
+                    {profileForm.goals.includes(option.value) && (
+                      <Check className="w-5 h-5 text-blue-600" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {userProfile && (
+              <div className="pt-4 border-t border-gray-200">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-500">Profile Completion</span>
+                  <span className="font-medium text-gray-900">
+                    {userProfileService.calculateProfileCompletion({
+                      ...userProfile,
+                      ...profileForm,
+                    } as UserProfile).percentage}%
+                  </span>
+                </div>
+                <div className="mt-2 h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-300"
+                    style={{
+                      width: `${userProfileService.calculateProfileCompletion({
+                        ...userProfile,
+                        ...profileForm,
+                      } as UserProfile).percentage}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </Card>
       </motion.div>

@@ -2,6 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
+import { analyticsService, EventName } from '../lib/analytics'
+import { userProfileService } from '../lib/userProfileService'
 
 interface AuthContextType {
   user: User | null
@@ -54,9 +56,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const currentUser = session?.user ?? null
       setUser(currentUser)
       
-      // Initialize services in background for signed in users
       if (currentUser && _event === 'SIGNED_IN') {
-        initializeUserServices(currentUser.id).catch(err => {
+        initializeUserServices(currentUser.id, currentUser.email).catch(err => {
           console.warn('Service initialization failed (non-blocking):', err)
         })
       }
@@ -90,12 +91,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  const initializeUserServices = async (userId: string) => {
+  const initializeUserServices = async (userId: string, email?: string) => {
     try {
-      // Initialize tokens
       await initializeUserTokens(userId)
-      
-      // Initialize Stripe customer
+
+      await userProfileService.getOrCreateProfile(userId)
+
+      await analyticsService.identify(userId, {
+        email: email,
+        $email: email,
+      })
+
+      await analyticsService.trackAuth(EventName.AUTH_LOGGED_IN)
+
       const { stripeService } = await import('../lib/stripe')
       await stripeService.getUserSubscription()
     } catch (error) {
@@ -106,6 +114,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      await analyticsService.trackAuth(EventName.AUTH_LOGGED_OUT)
+      analyticsService.reset()
       await supabase.auth.signOut()
     } catch (error) {
       console.error('Error signing out:', error)

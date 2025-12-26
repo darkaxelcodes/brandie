@@ -6,6 +6,9 @@ import { AuthProvider } from './contexts/AuthContext.tsx';
 import { PreferencesProvider } from './contexts/PreferencesContext.tsx';
 import { ToastProvider } from './contexts/ToastContext.tsx';
 import { TourProvider } from './contexts/TourContext.tsx';
+import { analyticsService } from './lib/analytics';
+
+analyticsService.init().catch(console.error);
 
 // Add error handling for better error reporting
 const handleError = (event: ErrorEvent) => {
