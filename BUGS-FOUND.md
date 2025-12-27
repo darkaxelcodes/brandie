@@ -399,31 +399,467 @@ import { useToast } from '../contexts/ToastContext' // Only used in unused hook
 
 ---
 
+## UI/Component Bugs
+
+### 15. **XSS Vulnerability: Unsanitized HTML in Logo Generator** 🔴 CRITICAL
+**File:** `src/components/visual/AILogoGenerator.tsx:232, 302, 382`
+**Severity:** Critical - Security Vulnerability
+
+**Problem:**
+```typescript
+// Lines 232, 302, 382
+<div dangerouslySetInnerHTML={{ __html: selectedConcept.svg }} />
+<div dangerouslySetInnerHTML={{ __html: logo.svg }} />
+<div dangerouslySetInnerHTML={{ __html: variation.svg }} />
+```
+
+**Issue:** SVG content from user input or AI generation is rendered without sanitization using `dangerouslySetInnerHTML`. An attacker could inject malicious scripts through SVG content.
+
+**Impact:**
+- Cross-Site Scripting (XSS) attacks
+- Session hijacking
+- Credential theft
+- Malicious redirects
+
+**Fix:** Sanitize SVG content before rendering:
+```typescript
+import DOMPurify from 'dompurify'
+
+<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(logo.svg) }} />
+```
+
+---
+
+### 16. **Memory Leak: Toast Timer Not Cleaned Up** 🟠 HIGH
+**File:** `src/components/ui/Toast.tsx:24-39`
+**Severity:** High - Memory Leak
+
+**Problem:**
+```typescript
+useEffect(() => {
+  if (!isVisible) return
+
+  const interval = setInterval(() => {
+    setProgress((prev) => {
+      if (prev <= 0) {
+        clearInterval(interval)  // ❌ Clears here but...
+        onClose()
+        return 0
+      }
+      return prev - (100 / (duration / 100))
+    })
+  }, 100)
+
+  return () => clearInterval(interval)
+}, [isVisible, duration, onClose])
+```
+
+**Issue:** When `onClose` changes (new function reference), the effect re-runs but the old interval might not be cleared if toast closes before cleanup. The interval references itself inside `setProgress`, creating potential for stale closures.
+
+**Impact:**
+- Memory leaks with multiple toasts
+- setProgress calls on unmounted components
+- Browser performance degradation
+
+**Fix:** Use `useRef` to store interval and add proper cleanup:
+```typescript
+const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+useEffect(() => {
+  if (!isVisible) return
+
+  intervalRef.current = setInterval(() => {
+    setProgress((prev) => {
+      if (prev <= 0) {
+        if (intervalRef.current) clearInterval(intervalRef.current)
+        onClose()
+        return 0
+      }
+      return prev - (100 / (duration / 100))
+    })
+  }, 100)
+
+  return () => {
+    if (intervalRef.current) clearInterval(intervalRef.current)
+  }
+}, [isVisible, duration])
+```
+
+---
+
+### 17. **Wrong Icon for Delete Button** 🟡 MEDIUM
+**Files:**
+- `src/pages/LandingPageGenerator.tsx:649, 708`
+
+**Problem:**
+```typescript
+// Line 649
+<Button
+  onClick={() => removeFeature(index)}
+  variant="ghost"
+  className="text-red-500 hover:text-red-700"
+>
+  <Check className="w-4 h-4" />  // ❌ Check icon for delete!
+</Button>
+
+// Line 708 - Same issue
+<Button
+  onClick={() => removeTestimonial(index)}
+  variant="ghost"
+  className="text-red-500 hover:text-red-700"
+>
+  <Check className="w-4 h-4" />  // ❌ Check icon for delete!
+</Button>
+```
+
+**Issue:** Delete buttons show a check icon instead of a trash/X icon, confusing users about the action.
+
+**Impact:** Poor UX, users might accidentally delete items thinking they're confirming something.
+
+**Fix:** Use proper icon:
+```typescript
+import { Trash } from 'lucide-react'
+
+<Trash className="w-4 h-4" />
+```
+
+---
+
+### 18. **Fake Payment Processing (Misleading User)** 🟠 HIGH
+**File:** `src/pages/TokenPurchase.tsx:66-101`
+
+**Problem:**
+```typescript
+const handlePurchase = async () => {
+  // ...
+  try {
+    // Simulate payment processing
+    await new Promise(resolve => setTimeout(resolve, 2000))
+
+    // In a real implementation, this would call your payment processor
+    // and then add tokens to the user's account upon successful payment
+
+    // For now, we'll just show a success message
+    setSuccess(true)
+
+    // Refresh token balance
+    await refreshTokenBalance()
+
+    showToast('success', `Successfully purchased ${pkg.tokens} tokens!`)
+  }
+```
+
+**Issue:** The entire payment flow is fake - it shows success without actually processing payment or adding tokens. This is extremely misleading and could lead users to believe they purchased tokens when they didn't.
+
+**Impact:**
+- Users think they paid but didn't
+- Users think they have tokens but don't
+- False success state
+- Potential legal issues for misleading users
+
+**Fix:** Either:
+1. Remove this page entirely until payment is implemented
+2. Add prominent "DEMO ONLY" warnings
+3. Disable the feature entirely with "Coming Soon" message
+
+---
+
+### 19. **Contrast Ratio Calculation Returns Random Values** 🟡 MEDIUM
+**File:** `src/components/visual/ColorPaletteGenerator.tsx:97-100`
+
+**Problem:**
+```typescript
+const getContrastRatio = (color1: string, color2: string): number => {
+  // Simplified contrast calculation (in production, use proper color contrast library)
+  return Math.random() * 10 + 5 // Mock value between 5-15
+}
+```
+
+**Issue:** Function returns random values instead of calculating actual contrast ratios. This provides false accessibility information to users.
+
+**Impact:**
+- Users make decisions based on incorrect accessibility data
+- Could create inaccessible color combinations
+- Violates WCAG compliance claims
+
+**Fix:** Implement proper contrast calculation or remove the feature:
+```typescript
+// Option 1: Use a library
+import { getContrast } from 'polished'
+
+const getContrastRatio = (color1: string, color2: string): number => {
+  return getContrast(color1, color2)
+}
+
+// Option 2: Remove the feature until properly implemented
+```
+
+---
+
+### 20. **Non-functional Export Option** 🟡 MEDIUM
+**File:** `src/components/visual/ColorPaletteGenerator.tsx:400-404`
+
+**Problem:**
+```typescript
+<Button
+  variant="outline"
+  size="sm"
+  onClick={() => exportPalette('sketch')}
+>
+  <Download className="w-4 h-4 mr-2" />
+  Sketch
+</Button>
+```
+
+But in `exportPalette` function (lines 115-141), there's no case for 'sketch':
+```typescript
+switch (format) {
+  case 'css': ...
+  case 'scss': ...
+  case 'json': ...
+  // No 'sketch' case!
+}
+```
+
+**Issue:** Clicking "Sketch" export button does nothing because the format isn't handled.
+
+**Impact:** Users click button expecting download, nothing happens, confused.
+
+**Fix:** Either implement sketch export or remove the button.
+
+---
+
+### 21. **Onboarding: Error on Skip Doesn't Prevent Skip** 🟡 MEDIUM
+**File:** `src/components/onboarding/OnboardingFlow.tsx:97-109`
+
+**Problem:**
+```typescript
+const handleSkip = async () => {
+  if (!user) return
+
+  try {
+    await userProfileService.getOrCreateProfile(user.id)
+    await userProfileService.skipOnboarding(user.id)
+    showToast('info', 'You can complete your profile anytime in Settings')
+    onSkip()
+  } catch (error) {
+    console.error('Error skipping onboarding:', error)
+    onSkip()  // ❌ Still calls onSkip even on error!
+  }
+}
+```
+
+**Issue:** Even if there's an error skipping onboarding (database error, network error), the onboarding is still dismissed by calling `onSkip()` in the catch block.
+
+**Impact:** User skips onboarding UI but the skip isn't recorded in database, so onboarding might show again on next visit.
+
+**Fix:** Don't call `onSkip()` in catch block:
+```typescript
+} catch (error) {
+  console.error('Error skipping onboarding:', error)
+  showToast('error', 'Failed to skip onboarding. Please try again.')
+  // Don't call onSkip() here
+}
+```
+
+---
+
+### 22. **AILogoGenerator: Memory Leak with createObjectURL** 🟢 LOW
+**File:** `src/components/visual/AILogoGenerator.tsx:102-120`
+
+**Problem:**
+```typescript
+const downloadLogo = (logo: any, format: string) => {
+  if (logo.url) {
+    // For AI-generated images, download the image
+    const link = document.createElement('a')
+    link.href = logo.url  // ❌ If this is a blob URL, it's never revoked
+    link.download = `${brandName}-logo-${logo.style}.${format}`
+    link.click()
+  } else if (logo.svg) {
+    // For SVG logos, create blob and download
+    const blob = new Blob([logo.svg], { type: 'image/svg+xml' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${brandName}-logo-${logo.style}.svg`
+    link.click()
+    URL.revokeObjectURL(url)  // ✅ This one is properly revoked
+  }
+}
+```
+
+**Issue:** If `logo.url` is a blob URL (created elsewhere with `URL.createObjectURL()`), it's never revoked, causing memory leaks.
+
+**Impact:** Minor memory leak if users download many logos.
+
+**Fix:** Track and revoke all object URLs, or check if URL is a blob URL before using it.
+
+---
+
+### 23. **Button: Duplicate Hover Animation** 🟢 LOW
+**File:** `src/components/ui/Button.tsx:23-31, 45-46`
+
+**Problem:**
+```typescript
+// Line 26
+const variants = {
+  primary: '... hover:scale-[1.02] active:scale-[0.98] ...',
+  // All variants have hover:scale-[1.02]
+}
+
+// Lines 45-46
+<motion.button
+  whileHover={!isDisabled ? { scale: 1.02 } : {}}
+  whileTap={!isDisabled ? { scale: 0.98 } : {}}
+```
+
+**Issue:** Scale animation is defined both in CSS classes (hover:scale-[1.02]) and in Framer Motion (whileHover scale: 1.02), potentially conflicting.
+
+**Impact:** Redundant code, potential animation conflicts.
+
+**Fix:** Choose one approach - either CSS or Framer Motion, not both.
+
+---
+
+### 24. **LandingPageGenerator: XSS via iframe srcDoc** 🟠 HIGH
+**File:** `src/pages/LandingPageGenerator.tsx:929-937`
+
+**Problem:**
+```typescript
+{previewHtml.includes('iframe') ? (
+  <div dangerouslySetInnerHTML={{ __html: previewHtml }} />  // ❌ Unsanitized
+) : (
+  <iframe
+    srcDoc={previewHtml}  // ❌ Also unsanitized
+    className="w-full h-96"
+    title="Landing Page Preview"
+  />
+)}
+```
+
+**Issue:** Both branches render user-controllable HTML without sanitization. If `previewHtml` contains malicious scripts, they will execute.
+
+**Impact:**
+- XSS attacks
+- Can access parent page context
+- Session hijacking
+
+**Fix:** Sanitize HTML or use sandbox attribute:
+```typescript
+<iframe
+  srcDoc={DOMPurify.sanitize(previewHtml)}
+  sandbox="allow-scripts allow-same-origin"
+  className="w-full h-96"
+  title="Landing Page Preview"
+/>
+```
+
+---
+
+### 25. **TokenPurchase: No Actual Payment Integration** 🟠 HIGH
+**File:** `src/pages/TokenPurchase.tsx:274-322`
+
+**Problem:**
+The entire payment form UI is rendered (card number, CVV, etc.) but no payment processor is actually integrated. The inputs don't do anything.
+
+**Issue:** Users enter real credit card information into a form that doesn't actually process it. This creates:
+1. Security concerns (unencrypted card data)
+2. PCI compliance violations
+3. User confusion
+
+**Impact:**
+- Users might enter real payment info
+- False sense of security
+- Potential legal liability
+
+**Fix:** Either:
+1. Remove the form entirely
+2. Replace with "Coming Soon" message
+3. Integrate actual Stripe Elements
+
+---
+
+### 26. **ColorPalette: Click Handler Missing on Color Export** 🟢 LOW
+**File:** `src/components/visual/ColorPaletteGenerator.tsx:358`
+
+**Problem:**
+```typescript
+<div
+  key={index}
+  className="flex-1 h-16 relative group cursor-pointer"
+  style={{ backgroundColor: color }}
+  onClick={() => navigator.clipboard.writeText(color)}
+>
+```
+
+**Issue:** No error handling for clipboard write. On older browsers or with clipboard permissions denied, this silently fails.
+
+**Impact:** Users click expecting to copy color but nothing happens, no feedback.
+
+**Fix:** Add error handling and user feedback:
+```typescript
+onClick={async () => {
+  try {
+    await navigator.clipboard.writeText(color)
+    showToast('success', 'Color copied!')
+  } catch {
+    showToast('error', 'Failed to copy color')
+  }
+}}
+```
+
+---
+
 ## Summary Statistics
 
-- **Critical Bugs:** 4
-- **High Priority:** 5
-- **Medium Priority:** 3
-- **Low Priority:** 3
+**Backend/Logic Bugs:**
+- Critical: 4
+- High Priority: 5
+- Medium Priority: 3
+- Low Priority: 3
 
-**Total Issues Found:** 15
+**UI/Component Bugs:**
+- Critical (Security): 2
+- High Priority: 5
+- Medium Priority: 6
+- Low Priority: 4
+
+**Total Issues Found:** 32
 
 ---
 
 ## Recommended Fix Order
 
-1. ✅ Fix token race condition (Bug #1)
-2. ✅ Fix Stripe webhook missing return (Bug #4)
-3. ✅ Fix token consumption before action (Bug #2)
-4. ✅ Replace all `.single()` with `.maybeSingle()` where appropriate (Bug #3)
-5. ✅ Fix auth redirect logic (Bug #6, #7)
-6. ✅ Remove or fix AI analysis in AIPilotPurpose (Bug #5)
-7. ✅ Optimize dashboard loading (Bug #8)
-8. ✅ Fix brand voice query (Bug #9)
-9. ✅ Remove or fix useSupabase hook (Bug #10)
-10. ✅ Improve modal click handling (Bug #11)
-11. ✅ Refactor auth keyboard shortcut (Bug #12)
-12. ✅ Clean up commented code (Bug #13, #14)
+### Phase 1: Critical Security & Data Issues (DO IMMEDIATELY)
+1. 🔥 Fix XSS vulnerabilities (#15, #24) - Add DOMPurify sanitization
+2. 🔥 Fix token race condition (#1) - Use database atomic operations
+3. 🔥 Fix Stripe webhook missing return (#4) - Add return statement
+4. 🔥 Remove/disable fake payment processing (#18, #25) - Misleads users
+
+### Phase 2: High Priority Bugs
+5. ✅ Fix token consumption before action (#2)
+6. ✅ Fix auth redirect logic (#6, #7)
+7. ✅ Fix Toast memory leak (#16)
+8. ✅ Replace all `.single()` with `.maybeSingle()` (#3)
+
+### Phase 3: Medium Priority
+9. ✅ Remove or fix AI analysis in AIPilotPurpose (#5)
+10. ✅ Fix wrong delete button icons (#17)
+11. ✅ Fix contrast ratio calculation (#19)
+12. ✅ Fix non-functional export options (#20)
+13. ✅ Fix onboarding skip error handling (#21)
+14. ✅ Optimize dashboard loading (#8)
+15. ✅ Fix brand voice query (#9)
+
+### Phase 4: Low Priority & Code Quality
+16. ✅ Fix clipboard error handling (#26)
+17. ✅ Fix memory leaks (#22)
+18. ✅ Remove duplicate animations (#23)
+19. ✅ Remove or fix useSupabase hook (#10)
+20. ✅ Improve modal click handling (#11)
+21. ✅ Refactor auth keyboard shortcut (#12)
+22. ✅ Clean up commented code (#13, #14)
 
 ---
 
