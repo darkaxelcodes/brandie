@@ -25,6 +25,10 @@ export function initMixpanel(): void {
       debug: import.meta.env.DEV,
       persistence: 'localStorage',
       ignore_dnt: false,
+      track_pageview: true,
+      track_links: true,
+      track_forms: true,
+      property_blacklist: ['$password', 'password', 'token', 'api_key'],
     })
 
     if (import.meta.env.DEV) {
