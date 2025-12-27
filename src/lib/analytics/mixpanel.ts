@@ -19,6 +19,8 @@ interface MixpanelInstance {
   register_once: (properties: Record<string, unknown>) => void
   reset: () => void
   get_distinct_id: () => string
+  push?: (item: unknown[]) => void
+  __loaded?: boolean
 }
 
 declare global {
@@ -28,45 +30,54 @@ declare global {
 }
 
 let initialized = false
-let isReady = false
-let readyCallbacks: (() => void)[] = []
 
-function notifyReady(): void {
-  isReady = true
-  readyCallbacks.forEach(callback => callback())
-  readyCallbacks = []
-}
+function createMixpanelStub(): void {
+  if (window.mixpanel) return
 
-function onMixpanelReady(callback: () => void): void {
-  if (isReady) {
-    callback()
-  } else {
-    readyCallbacks.push(callback)
-  }
-}
+  const mixpanel = {
+    __loaded: false,
+    queue: [] as unknown[][],
+    track: function(event: string, properties?: Record<string, unknown>) {
+      this.queue.push(['track', event, properties])
+    },
+    identify: function(userId: string) {
+      this.queue.push(['identify', userId])
+    },
+    people: {
+      set: function(properties: Record<string, unknown>) {
+        mixpanel.queue.push(['people.set', properties])
+      },
+      set_once: function(properties: Record<string, unknown>) {
+        mixpanel.queue.push(['people.set_once', properties])
+      },
+      increment: function(property: string, value?: number) {
+        mixpanel.queue.push(['people.increment', property, value])
+      },
+    },
+    register: function(properties: Record<string, unknown>) {
+      this.queue.push(['register', properties])
+    },
+    register_once: function(properties: Record<string, unknown>) {
+      this.queue.push(['register_once', properties])
+    },
+    reset: function() {
+      this.queue.push(['reset'])
+    },
+    get_distinct_id: function() {
+      return 'stub-id'
+    },
+    init: function() {
+      this.queue.push(['init', ...arguments])
+    },
+  } as MixpanelInstance & { queue: unknown[][] }
 
-function isMixpanelReady(): boolean {
-  return isReady && window.mixpanel !== undefined
+  window.mixpanel = mixpanel
 }
 
 function loadMixpanelScript(): void {
-  if (window.mixpanel || document.getElementById('mixpanel-script')) {
-    if (window.mixpanel && MIXPANEL_TOKEN) {
-      try {
-        window.mixpanel.init(MIXPANEL_TOKEN, {
-          debug: import.meta.env.DEV,
-          persistence: 'localStorage',
-          ignore_dnt: false,
-          autocapture: false,
-          record_sessions_percent: 0,
-        })
-        notifyReady()
-      } catch (error) {
-        console.error('Mixpanel init error:', error)
-      }
-    }
-    return
-  }
+  if (document.getElementById('mixpanel-script')) return
+
+  createMixpanelStub()
 
   const script = document.createElement('script')
   script.id = 'mixpanel-script'
@@ -75,19 +86,59 @@ function loadMixpanelScript(): void {
   script.src = 'https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js'
 
   script.onload = () => {
-    if (window.mixpanel && MIXPANEL_TOKEN) {
-      try {
-        window.mixpanel.init(MIXPANEL_TOKEN, {
-          debug: import.meta.env.DEV,
-          persistence: 'localStorage',
-          ignore_dnt: false,
-          autocapture: false,
-          record_sessions_percent: 0,
-        })
-        notifyReady()
-      } catch (error) {
-        console.error('Mixpanel init error:', error)
+    if (!window.mixpanel || !MIXPANEL_TOKEN) return
+
+    try {
+      const stub = window.mixpanel as MixpanelInstance & { queue?: unknown[][] }
+      const queue = stub.queue || []
+
+      window.mixpanel.init(MIXPANEL_TOKEN, {
+        debug: import.meta.env.DEV,
+        persistence: 'localStorage',
+        ignore_dnt: false,
+        loaded: function(mixpanel: MixpanelInstance) {
+          if (import.meta.env.DEV) {
+            console.log('Mixpanel loaded, replaying', queue.length, 'queued events')
+          }
+
+          queue.forEach((item: unknown[]) => {
+            const method = item[0] as string
+            const args = item.slice(1)
+
+            try {
+              if (method === 'track') {
+                mixpanel.track(args[0] as string, args[1] as Record<string, unknown>)
+              } else if (method === 'identify') {
+                mixpanel.identify(args[0] as string)
+              } else if (method === 'people.set') {
+                mixpanel.people.set(args[0] as Record<string, unknown>)
+              } else if (method === 'people.set_once') {
+                mixpanel.people.set_once(args[0] as Record<string, unknown>)
+              } else if (method === 'people.increment') {
+                mixpanel.people.increment(args[0] as string, args[1] as number)
+              } else if (method === 'register') {
+                mixpanel.register(args[0] as Record<string, unknown>)
+              } else if (method === 'register_once') {
+                mixpanel.register_once(args[0] as Record<string, unknown>)
+              } else if (method === 'reset') {
+                mixpanel.reset()
+              }
+            } catch (err) {
+              console.error('Error replaying Mixpanel queue item:', err)
+            }
+          })
+
+          if (import.meta.env.DEV) {
+            console.log('Mixpanel initialization complete')
+          }
+        },
+      })
+
+      if (window.mixpanel) {
+        window.mixpanel.__loaded = true
       }
+    } catch (error) {
+      console.error('Mixpanel init error:', error)
     }
   }
 
@@ -116,25 +167,15 @@ export function trackMixpanelEvent(
   eventName: EventNameType | string,
   properties?: EventProperties & Record<string, unknown>
 ): void {
-  if (!MIXPANEL_TOKEN) return
+  if (!MIXPANEL_TOKEN || !window.mixpanel) return
 
-  const performTrack = () => {
-    if (!isMixpanelReady()) return
-
-    try {
-      window.mixpanel!.track(eventName, {
-        ...properties,
-        timestamp: new Date().toISOString(),
-      })
-    } catch (error) {
-      console.error('Mixpanel tracking error:', error)
-    }
-  }
-
-  if (isMixpanelReady()) {
-    performTrack()
-  } else {
-    onMixpanelReady(performTrack)
+  try {
+    window.mixpanel.track(eventName, {
+      ...properties,
+      timestamp: new Date().toISOString(),
+    })
+  } catch (error) {
+    console.error('Mixpanel tracking error:', error)
   }
 }
 
@@ -142,126 +183,74 @@ export function identifyMixpanelUser(
   userId: string,
   properties?: Record<string, unknown>
 ): void {
-  if (!MIXPANEL_TOKEN) return
+  if (!MIXPANEL_TOKEN || !window.mixpanel) return
 
-  const performIdentify = () => {
-    if (!isMixpanelReady()) return
+  try {
+    window.mixpanel.identify(userId)
 
-    try {
-      window.mixpanel!.identify(userId)
-
-      if (properties) {
-        window.mixpanel!.people.set(properties)
-      }
-    } catch (error) {
-      console.error('Mixpanel identify error:', error)
+    if (properties) {
+      window.mixpanel.people.set(properties)
     }
-  }
-
-  if (isMixpanelReady()) {
-    performIdentify()
-  } else {
-    onMixpanelReady(performIdentify)
+  } catch (error) {
+    console.error('Mixpanel identify error:', error)
   }
 }
 
 export function setMixpanelUserProperties(properties: Record<string, unknown>): void {
-  if (!MIXPANEL_TOKEN) return
+  if (!MIXPANEL_TOKEN || !window.mixpanel) return
 
-  const performSet = () => {
-    if (!isMixpanelReady()) return
-
-    try {
-      window.mixpanel!.people.set(properties)
-    } catch (error) {
-      console.error('Mixpanel set user properties error:', error)
-    }
-  }
-
-  if (isMixpanelReady()) {
-    performSet()
-  } else {
-    onMixpanelReady(performSet)
+  try {
+    window.mixpanel.people.set(properties)
+  } catch (error) {
+    console.error('Mixpanel set user properties error:', error)
   }
 }
 
 export function setMixpanelUserPropertiesOnce(properties: Record<string, unknown>): void {
-  if (!MIXPANEL_TOKEN) return
+  if (!MIXPANEL_TOKEN || !window.mixpanel) return
 
-  const performSetOnce = () => {
-    if (!isMixpanelReady()) return
-
-    try {
-      window.mixpanel!.people.set_once(properties)
-    } catch (error) {
-      console.error('Mixpanel set_once error:', error)
-    }
-  }
-
-  if (isMixpanelReady()) {
-    performSetOnce()
-  } else {
-    onMixpanelReady(performSetOnce)
+  try {
+    window.mixpanel.people.set_once(properties)
+  } catch (error) {
+    console.error('Mixpanel set_once error:', error)
   }
 }
 
 export function incrementMixpanelProperty(property: string, value: number = 1): void {
-  if (!MIXPANEL_TOKEN) return
+  if (!MIXPANEL_TOKEN || !window.mixpanel) return
 
-  const performIncrement = () => {
-    if (!isMixpanelReady()) return
-
-    try {
-      window.mixpanel!.people.increment(property, value)
-    } catch (error) {
-      console.error('Mixpanel increment error:', error)
-    }
-  }
-
-  if (isMixpanelReady()) {
-    performIncrement()
-  } else {
-    onMixpanelReady(performIncrement)
+  try {
+    window.mixpanel.people.increment(property, value)
+  } catch (error) {
+    console.error('Mixpanel increment error:', error)
   }
 }
 
 export function registerMixpanelSuperProperties(properties: Record<string, unknown>): void {
-  if (!MIXPANEL_TOKEN) return
+  if (!MIXPANEL_TOKEN || !window.mixpanel) return
 
-  const performRegister = () => {
-    if (!isMixpanelReady()) return
-
-    try {
-      window.mixpanel!.register(properties)
-    } catch (error) {
-      console.error('Mixpanel register error:', error)
-    }
-  }
-
-  if (isMixpanelReady()) {
-    performRegister()
-  } else {
-    onMixpanelReady(performRegister)
+  try {
+    window.mixpanel.register(properties)
+  } catch (error) {
+    console.error('Mixpanel register error:', error)
   }
 }
 
 export function resetMixpanel(): void {
-  if (!MIXPANEL_TOKEN) return
-
-  if (!isMixpanelReady()) return
+  if (!MIXPANEL_TOKEN || !window.mixpanel) return
 
   try {
-    window.mixpanel!.reset()
+    window.mixpanel.reset()
   } catch (error) {
     console.error('Mixpanel reset error:', error)
   }
 }
 
 export function getMixpanelDistinctId(): string | null {
-  if (!MIXPANEL_TOKEN || !isMixpanelReady()) return null
+  if (!MIXPANEL_TOKEN || !window.mixpanel) return null
 
   try {
-    return window.mixpanel!.get_distinct_id()
+    return window.mixpanel.get_distinct_id()
   } catch (error) {
     console.error('Mixpanel get_distinct_id error:', error)
     return null
