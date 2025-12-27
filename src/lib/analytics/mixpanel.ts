@@ -29,6 +29,11 @@ export function initMixpanel(): void {
       track_links: true,
       track_forms: true,
       property_blacklist: ['$password', 'password', 'token', 'api_key'],
+      record_sessions_percent: 100,
+      record_block_class: 'no-replay',
+      record_block_selector: '[data-private]',
+      record_mask_text_selector: '[data-mask]',
+      record_collect_fonts: true,
     })
 
     if (import.meta.env.DEV) {
