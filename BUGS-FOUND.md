@@ -1,10 +1,21 @@
 # Logical Bugs Found in Brandie Codebase
 
+**Last Updated:** 2025-12-29
+
+## Status Legend
+- ✅ **FIXED** - Bug has been resolved
+- 🔧 **IN PROGRESS** - Currently being worked on
+- ⏳ **PENDING** - Not yet started
+- 🚫 **SKIPPED** - Intentionally not fixed (e.g., payment features)
+
+---
+
 ## Critical Bugs (Must Fix Immediately)
 
-### 1. **Race Condition in Token Usage** 🔴 CRITICAL
+### 1. **Race Condition in Token Usage** 🔴 CRITICAL ✅ **FIXED**
 **File:** `src/lib/tokenService.ts:45-82`
 **Severity:** High - Data Integrity Issue
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -30,11 +41,19 @@ WHERE user_id = ? AND balance >= 1
 RETURNING balance;
 ```
 
+**Resolution:** Created PostgreSQL functions `use_token_atomic` and `add_tokens_atomic` that handle token operations atomically at the database level. Updated `tokenService.ts` to use these functions via Supabase RPC calls.
+
+**Files Changed:**
+- `supabase/migrations/add_atomic_token_usage_function.sql` (new)
+- `supabase/migrations/add_atomic_token_addition_function.sql` (new)
+- `src/lib/tokenService.ts` (updated)
+
 ---
 
-### 2. **Token Consumed Even When Action Fails** 🔴 CRITICAL
+### 2. **Token Consumed Even When Action Fails** 🔴 CRITICAL ✅ **FIXED**
 **File:** `src/hooks/useTokenAction.ts:29-52`
 **Severity:** High - User Experience & Billing
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -52,14 +71,20 @@ if (success) {
 
 **Fix:** Execute callback first, only consume token if successful, or implement refunds.
 
+**Resolution:** Reversed the order - now executes the callback first, only consumes token if action succeeds. If action fails, token is NOT consumed and user sees appropriate error message.
+
+**Files Changed:**
+- `src/hooks/useTokenAction.ts` (updated)
+
 ---
 
-### 3. **Incorrect Use of `.single()` Instead of `.maybeSingle()`** 🟠 HIGH
+### 3. **Incorrect Use of `.single()` Instead of `.maybeSingle()`** 🟠 HIGH ✅ **FIXED**
 **Files:** Multiple files
 - `src/contexts/TokenContext.tsx:54`
 - `src/lib/tokenService.ts:20`
-- `src/lib/brandService.ts:24, 67, 85, 100, 115, 130`
+- `src/lib/brandService.ts:67`
 - `src/lib/visualService.ts:94, 112`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 `.single()` throws an error if 0 rows or >1 rows are returned. The code expects to handle "no rows" case with error code checking, but `.single()` throws before that.
@@ -89,9 +114,17 @@ if (!tokenData) {
 }
 ```
 
+**Resolution:** Replaced `.single()` with `.maybeSingle()` in all SELECT queries where no rows is a valid scenario. Updated error handling to check for `!data` instead of error codes.
+
+**Files Changed:**
+- `src/contexts/TokenContext.tsx` (updated)
+- `src/lib/tokenService.ts` (updated)
+- `src/lib/brandService.ts` (updated)
+- `src/lib/visualService.ts` (updated)
+
 ---
 
-### 4. **Stripe Webhook: Missing Return After No Subscriptions** 🔴 CRITICAL
+### 4. **Stripe Webhook: Missing Return After No Subscriptions** 🔴 CRITICAL 🚫 **SKIPPED**
 **File:** `supabase/functions/stripe-webhook/index.ts:139-158`
 **Severity:** Critical - Runtime Error
 
@@ -401,9 +434,10 @@ import { useToast } from '../contexts/ToastContext' // Only used in unused hook
 
 ## UI/Component Bugs
 
-### 15. **XSS Vulnerability: Unsanitized HTML in Logo Generator** 🔴 CRITICAL
+### 15. **XSS Vulnerability: Unsanitized HTML in Logo Generator** 🔴 CRITICAL ✅ **FIXED**
 **File:** `src/components/visual/AILogoGenerator.tsx:232, 302, 382`
 **Severity:** Critical - Security Vulnerability
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -428,11 +462,18 @@ import DOMPurify from 'dompurify'
 <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(logo.svg) }} />
 ```
 
+**Resolution:** Installed DOMPurify library and sanitized all SVG content before rendering using `dangerouslySetInnerHTML`. This prevents script injection through malicious SVG content.
+
+**Files Changed:**
+- `package.json` (added dompurify and @types/dompurify)
+- `src/components/visual/AILogoGenerator.tsx` (updated - 3 locations)
+
 ---
 
-### 16. **Memory Leak: Toast Timer Not Cleaned Up** 🟠 HIGH
+### 16. **Memory Leak: Toast Timer Not Cleaned Up** 🟠 HIGH ✅ **FIXED**
 **File:** `src/components/ui/Toast.tsx:24-39`
 **Severity:** High - Memory Leak
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -485,9 +526,14 @@ useEffect(() => {
 }, [isVisible, duration])
 ```
 
+**Resolution:** Used `useRef` to store interval reference and updated cleanup logic to prevent stale closures. Removed `onClose` from dependencies and stored it in a ref to avoid unnecessary re-renders.
+
+**Files Changed:**
+- `src/components/ui/Toast.tsx` (updated)
+
 ---
 
-### 17. **Wrong Icon for Delete Button** 🟡 MEDIUM
+### 17. **Wrong Icon for Delete Button** 🟡 MEDIUM ⏳ **PENDING**
 **Files:**
 - `src/pages/LandingPageGenerator.tsx:649, 708`
 
@@ -525,8 +571,9 @@ import { Trash } from 'lucide-react'
 
 ---
 
-### 18. **Fake Payment Processing (Misleading User)** 🟠 HIGH
+### 18. **Fake Payment Processing (Misleading User)** 🟠 HIGH 🚫 **SKIPPED**
 **File:** `src/pages/TokenPurchase.tsx:66-101`
+**Status:** SKIPPED - Payment features to be implemented later
 
 **Problem:**
 ```typescript
@@ -722,8 +769,9 @@ const variants = {
 
 ---
 
-### 24. **LandingPageGenerator: XSS via iframe srcDoc** 🟠 HIGH
+### 24. **LandingPageGenerator: XSS via iframe srcDoc** 🟠 HIGH ✅ **FIXED**
 **File:** `src/pages/LandingPageGenerator.tsx:929-937`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -755,9 +803,14 @@ const variants = {
 />
 ```
 
+**Resolution:** Applied DOMPurify sanitization to both branches and added iframe sandbox attribute for defense in depth.
+
+**Files Changed:**
+- `src/pages/LandingPageGenerator.tsx` (updated)
+
 ---
 
-### 25. **TokenPurchase: No Actual Payment Integration** 🟠 HIGH
+### 25. **TokenPurchase: No Actual Payment Integration** 🟠 HIGH 🚫 **SKIPPED**
 **File:** `src/pages/TokenPurchase.tsx:274-322`
 
 **Problem:**

@@ -64,10 +64,9 @@ export const brandService = {
         .from('brands')
         .select('*')
         .eq('id', id)
-        .single()
+        .maybeSingle()
 
       if (error) {
-        if (error.code === 'PGRST116') return null // Not found
         throw error
       }
       return data

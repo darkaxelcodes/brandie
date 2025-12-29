@@ -91,7 +91,7 @@ export const visualService = {
         .from('visual_assets')
         .select('version_history')
         .eq('id', assetId)
-        .single()
+        .maybeSingle()
 
       if (error) throw error
       return data?.version_history || []
@@ -109,9 +109,10 @@ export const visualService = {
         .from('visual_assets')
         .select('*')
         .eq('id', assetId)
-        .single()
+        .maybeSingle()
 
       if (assetError) throw assetError
+      if (!asset) throw new Error('Asset not found')
       
       // Find the version to restore
       const versionToRestore = asset.version_history.find((v: any) => v.version === version)

@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { 
-  ArrowLeft, 
-  Globe, 
-  Eye, 
-  Download, 
-  Sparkles, 
-  Rocket, 
-  Code, 
+import DOMPurify from 'dompurify'
+import {
+  ArrowLeft,
+  Globe,
+  Eye,
+  Download,
+  Sparkles,
+  Rocket,
+  Code,
   Palette,
   Type,
   MessageSquare,
@@ -927,10 +928,11 @@ export const LandingPageGenerator: React.FC = () => {
               <div className="space-y-6">
                 <div className="border border-gray-200 rounded-xl overflow-hidden">
                   {previewHtml.includes('iframe') ? (
-                    <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(previewHtml) }} />
                   ) : (
                     <iframe
-                      srcDoc={previewHtml}
+                      srcDoc={DOMPurify.sanitize(previewHtml)}
+                      sandbox="allow-scripts allow-same-origin"
                       className="w-full h-96"
                       title="Landing Page Preview"
                     />

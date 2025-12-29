@@ -51,22 +51,22 @@ export const TokenProvider: React.FC<TokenProviderProps> = ({ children }) => {
         .from('user_tokens')
         .select('balance')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (tokenError) {
-        // If no record exists, create one with default balance
-        if (tokenError.code === 'PGRST116') {
-          const { data: newTokenData, error: createError } = await supabase
-            .from('user_tokens')
-            .insert([{ user_id: user.id, balance: 15 }])
-            .select()
-            .single();
+        throw tokenError;
+      }
 
-          if (createError) throw createError;
-          setTokenBalance(newTokenData?.balance || 0);
-        } else {
-          throw tokenError;
-        }
+      if (!tokenData) {
+        // If no record exists, create one with default balance
+        const { data: newTokenData, error: createError } = await supabase
+          .from('user_tokens')
+          .insert([{ user_id: user.id, balance: 15 }])
+          .select()
+          .maybeSingle();
+
+        if (createError) throw createError;
+        setTokenBalance(newTokenData?.balance || 0);
       } else {
         setTokenBalance(tokenData?.balance || 0);
       }

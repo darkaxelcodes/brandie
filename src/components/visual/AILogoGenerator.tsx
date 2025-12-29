@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Download, RefreshCw, Eye, Wand2, Palette, Zap, Check } from 'lucide-react'
+import DOMPurify from 'dompurify'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { AIButton } from '../ui/AIButton'
@@ -229,7 +230,7 @@ export const AILogoGenerator: React.FC<AILogoGeneratorProps> = ({
                   className="max-w-full max-h-full object-contain"
                 />
               ) : selectedConcept.svg ? (
-                <div dangerouslySetInnerHTML={{ __html: selectedConcept.svg }} />
+                <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedConcept.svg) }} />
               ) : (
                 <div className="text-purple-600 font-bold text-lg">
                   {brandName.charAt(0)}
@@ -297,9 +298,9 @@ export const AILogoGenerator: React.FC<AILogoGeneratorProps> = ({
                       className="max-w-full max-h-full object-contain"
                     />
                   ) : (
-                    <div 
+                    <div
                       className="w-full h-full flex items-center justify-center"
-                      dangerouslySetInnerHTML={{ __html: logo.svg }}
+                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(logo.svg) }}
                     />
                   )}
                 </div>
@@ -377,9 +378,9 @@ export const AILogoGenerator: React.FC<AILogoGeneratorProps> = ({
                 className="border border-gray-200 rounded-lg overflow-hidden hover:border-gray-300 transition-colors"
               >
                 <div className="aspect-square bg-gray-50 flex items-center justify-center p-4">
-                  <div 
+                  <div
                     className="w-full h-full flex items-center justify-center"
-                    dangerouslySetInnerHTML={{ __html: variation.svg }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(variation.svg) }}
                   />
                 </div>
                 <div className="p-3">

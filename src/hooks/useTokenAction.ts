@@ -28,23 +28,25 @@ export const useTokenAction = () => {
 
   const confirmTokenAction = async () => {
     if (!currentAction) return;
-    
+
     setIsProcessing(true);
     try {
-      // First use the token
+      // First execute the callback
+      await currentAction.callback();
+
+      // Only consume the token if the action was successful
       const success = await useToken(currentAction.type, currentAction.description);
-      
+
       if (success) {
-        // If token usage was successful, execute the callback
-        await currentAction.callback();
         showToast('success', 'Action completed successfully');
       } else {
-        // Token usage failed
-        showToast('error', 'Failed to use token for this action');
+        // Token usage failed (shouldn't happen normally, but handle it)
+        showToast('warning', 'Action completed but failed to record token usage');
       }
     } catch (error) {
       console.error('Error executing token action:', error);
-      showToast('error', 'An error occurred while performing this action');
+      showToast('error', 'Action failed - no tokens were consumed');
+      // Token is NOT consumed when action fails
     } finally {
       setIsProcessing(false);
       setIsModalOpen(false);

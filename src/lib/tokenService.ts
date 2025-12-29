@@ -17,21 +17,22 @@ export const tokenService = {
         .from('user_tokens')
         .select('balance')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       if (error) {
-        // If no record exists, create one with default balance
-        if (error.code === 'PGRST116') {
-          const { data: newData, error: createError } = await supabase
-            .from('user_tokens')
-            .insert([{ user_id: userId, balance: 15 }])
-            .select()
-            .single();
-
-          if (createError) throw createError;
-          return newData?.balance || 0;
-        }
         throw error;
+      }
+
+      if (!data) {
+        // If no record exists, create one with default balance
+        const { data: newData, error: createError } = await supabase
+          .from('user_tokens')
+          .insert([{ user_id: userId, balance: 15 }])
+          .select()
+          .maybeSingle();
+
+        if (createError) throw createError;
+        return newData?.balance || 0;
       }
 
       return data?.balance || 0;
@@ -41,42 +42,36 @@ export const tokenService = {
     }
   },
 
-  // Use a token for an AI action
+  // Use a token for an AI action (atomic operation to prevent race conditions)
   async useToken(userId: string, actionType: string, description?: string): Promise<boolean> {
     try {
-      // First, get current balance
-      const currentBalance = await this.getTokenBalance(userId);
-      
-      // Check if user has enough tokens
-      if (currentBalance < 1) {
-        throw new Error('User has insufficient tokens');
+      // Use atomic database function to prevent race conditions
+      const { data, error } = await supabase.rpc('use_token_atomic', {
+        p_user_id: userId,
+        p_action_type: actionType,
+        p_description: description || actionType
+      });
+
+      if (error) {
+        console.error('Error calling use_token_atomic:', error);
+        return false;
       }
-      
-      // Update balance
-      const { data: updateData, error: updateError } = await supabase
-        .from('user_tokens')
-        .update({ balance: currentBalance - 1 })
-        .eq('user_id', userId)
-        .select();
-        
-      if (updateError) throw updateError;
-      
-      // Record the transaction
-      const { error: transactionError } = await supabase
-        .from('token_transactions')
-        .insert([{
-          user_id: userId,
-          amount: -1,
-          action_type: actionType,
-          description: description || actionType
-        }]);
-        
-      if (transactionError) throw transactionError;
-      
+
+      // Check if the operation was successful
+      if (!data || data.length === 0) {
+        console.error('No data returned from use_token_atomic');
+        return false;
+      }
+
+      const result = data[0];
+      if (!result.success) {
+        console.error('Token usage failed:', result.error_message);
+        return false;
+      }
+
       return true;
     } catch (error) {
       console.error('Error using token:', error);
-      // Don't re-throw errors that could break auth state
       return false;
     }
   },
@@ -98,34 +93,32 @@ export const tokenService = {
     }
   },
 
-  // Add tokens to user's balance (e.g., after purchase)
+  // Add tokens to user's balance (e.g., after purchase) - atomic operation
   async addTokens(userId: string, amount: number, description: string): Promise<number> {
     try {
-      // First, get current balance
-      const currentBalance = await this.getTokenBalance(userId);
-      
-      // Update the user's balance
-      const { data: updateData, error: updateError } = await supabase
-        .from('user_tokens')
-        .update({ balance: currentBalance + amount })
-        .eq('user_id', userId)
-        .select();
+      // Use atomic database function to prevent race conditions
+      const { data, error } = await supabase.rpc('add_tokens_atomic', {
+        p_user_id: userId,
+        p_amount: amount,
+        p_action_type: 'purchase',
+        p_description: description
+      });
 
-      if (updateError) throw updateError;
-      
-      // Record the transaction
-      const { error: transactionError } = await supabase
-        .from('token_transactions')
-        .insert([{
-          user_id: userId,
-          amount: amount,
-          action_type: 'purchase',
-          description
-        }]);
-        
-      if (transactionError) throw transactionError;
+      if (error) {
+        console.error('Error calling add_tokens_atomic:', error);
+        throw error;
+      }
 
-      return (updateData && updateData[0]?.balance) || (currentBalance + amount);
+      if (!data || data.length === 0) {
+        throw new Error('No data returned from add_tokens_atomic');
+      }
+
+      const result = data[0];
+      if (!result.success) {
+        throw new Error(result.error_message || 'Failed to add tokens');
+      }
+
+      return result.new_balance;
     } catch (error) {
       console.error('Error adding tokens:', error);
       throw error;

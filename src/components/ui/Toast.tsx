@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
 
@@ -20,23 +20,38 @@ export const Toast: React.FC<ToastProps> = ({
   isVisible
 }) => {
   const [progress, setProgress] = useState(100)
-  
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const onCloseRef = useRef(onClose)
+
+  // Update ref when onClose changes
   useEffect(() => {
-    if (!isVisible) return
-    
-    const interval = setInterval(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
+
+  useEffect(() => {
+    if (!isVisible) {
+      setProgress(100)
+      return
+    }
+
+    intervalRef.current = setInterval(() => {
       setProgress((prev) => {
         if (prev <= 0) {
-          clearInterval(interval)
-          onClose()
+          if (intervalRef.current) clearInterval(intervalRef.current)
+          onCloseRef.current()
           return 0
         }
         return prev - (100 / (duration / 100))
       })
     }, 100)
-    
-    return () => clearInterval(interval)
-  }, [isVisible, duration, onClose])
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+    }
+  }, [isVisible, duration])
   
   const getIcon = () => {
     switch (type) {
