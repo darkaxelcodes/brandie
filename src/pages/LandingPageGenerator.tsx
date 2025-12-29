@@ -18,7 +18,8 @@ import {
   Check,
   ExternalLink,
   Copy,
-  RefreshCw
+  RefreshCw,
+  Trash2
 } from 'lucide-react'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
@@ -647,7 +648,7 @@ export const LandingPageGenerator: React.FC = () => {
                         variant="ghost"
                         className="text-red-500 hover:text-red-700"
                       >
-                        <Check className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                     <div className="grid md:grid-cols-3 gap-4">
@@ -706,7 +707,7 @@ export const LandingPageGenerator: React.FC = () => {
                         variant="ghost"
                         className="text-red-500 hover:text-red-700"
                       >
-                        <Check className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                     <div className="space-y-3">

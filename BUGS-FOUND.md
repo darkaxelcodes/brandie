@@ -168,9 +168,10 @@ if (subscriptions.data.length === 0) {
 
 ## High Priority Bugs
 
-### 5. **AI Analysis Result Ignored** 🟠 HIGH
+### 5. **AI Analysis Result Ignored** 🟠 HIGH ✅ **FIXED**
 **File:** `src/components/strategy/AIPilotPurpose.tsx:68-121`
 **Severity:** Medium - Misleading Feature
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -195,12 +196,18 @@ const options = [
 
 **Fix:** Actually use the AI analysis results or remove the AI call.
 
+**Resolution:** Updated analyzeResponses function to parse and use AI-generated suggestions. Now groups suggestions by type (mission/vision/why) and uses them when available. Falls back to templates only if AI response is empty.
+
+**Files Changed:**
+- `src/components/strategy/AIPilotPurpose.tsx` (updated)
+
 ---
 
-### 6. **Auth Redirect Logic Split Across Components** 🟡 MEDIUM
+### 6. **Auth Redirect Logic Split Across Components** 🟡 MEDIUM ✅ **FIXED**
 **Files:**
 - `src/components/ProtectedRoute.tsx:14-19`
 - `src/pages/Auth.tsx:21-28, 48-53`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -235,10 +242,20 @@ navigate('/home') // ❌ Always goes to /home, ignores saved redirect
 
 **Fix:** Consolidate redirect logic and check sessionStorage after successful login.
 
+**Resolution:** Fixed both issues:
+1. ProtectedRoute now saves redirect path only once using useRef
+2. Auth.tsx now has handleSuccessfulLogin() that checks sessionStorage and cleans it up
+3. Redirect properly works after successful login
+
+**Files Changed:**
+- `src/components/ProtectedRoute.tsx` (updated)
+- `src/pages/Auth.tsx` (updated)
+
 ---
 
-### 7. **sessionStorage Never Cleaned Up** 🟡 MEDIUM
+### 7. **sessionStorage Never Cleaned Up** 🟡 MEDIUM ✅ **FIXED**
 **File:** `src/components/ProtectedRoute.tsx:17`
+**Status:** FIXED - 2025-12-29 (Fixed together with Bug #6)
 
 **Problem:**
 ```typescript
@@ -281,8 +298,9 @@ const progressResults = await Promise.all(progressPromises);
 
 ---
 
-### 9. **Brand Voice Query Could Return Multiple Rows** 🟡 MEDIUM
+### 9. **Brand Voice Query Could Return Multiple Rows** 🟡 MEDIUM ✅ **FIXED**
 **File:** `src/lib/visualService.ts:152-167`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -306,6 +324,11 @@ const { data, error } = await supabase
   .eq('brand_id', brandId)
   .maybeSingle()
 ```
+
+**Resolution:** Added `.maybeSingle()` to getBrandVoice query and simplified return logic. Now properly enforces single row expectation.
+
+**Files Changed:**
+- `src/lib/visualService.ts` (updated)
 
 ---
 
@@ -533,9 +556,10 @@ useEffect(() => {
 
 ---
 
-### 17. **Wrong Icon for Delete Button** 🟡 MEDIUM ⏳ **PENDING**
+### 17. **Wrong Icon for Delete Button** 🟡 MEDIUM ✅ **FIXED**
 **Files:**
 - `src/pages/LandingPageGenerator.tsx:649, 708`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -568,6 +592,11 @@ import { Trash } from 'lucide-react'
 
 <Trash className="w-4 h-4" />
 ```
+
+**Resolution:** Imported Trash2 icon and replaced Check icons with Trash2 for both removeFeature and removeTestimonial delete buttons. Now uses the appropriate trash icon to clearly communicate the delete action.
+
+**Files Changed:**
+- `src/pages/LandingPageGenerator.tsx` (updated - 2 locations)
 
 ---
 

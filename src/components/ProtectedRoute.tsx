@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { LoadingSpinner } from './ui/LoadingSpinner'
@@ -10,13 +10,18 @@ interface ProtectedRouteProps {
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth()
   const location = useLocation()
+  const redirectSaved = useRef(false)
 
-  // Save the attempted URL for redirecting after login
+  // Save the attempted URL for redirecting after login (only once)
   useEffect(() => {
-    if (!user && !loading) {
-      sessionStorage.setItem('redirectAfterLogin', location.pathname);
+    if (!user && !loading && !redirectSaved.current) {
+      // Only save if not already on auth page
+      if (location.pathname !== '/auth') {
+        sessionStorage.setItem('redirectAfterLogin', location.pathname)
+        redirectSaved.current = true
+      }
     }
-  }, [user, loading, location]);
+  }, [user, loading, location])
 
   if (loading) {
     return (

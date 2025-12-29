@@ -18,21 +18,23 @@ export const Auth: React.FC = () => {
   const navigate = useNavigate()
   const { showToast } = useToast()
 
-  // Check for redirect after login
-  useEffect(() => {
-    const redirectPath = sessionStorage.getItem('redirectAfterLogin')
-    if (redirectPath) {
-      sessionStorage.removeItem('redirectAfterLogin')
-      navigate(redirectPath)
-    }
-  }, [navigate])
-
   // Keyboard shortcut for form submission
   useKeyboardShortcut('Enter', () => {
     if (email && password) {
       handleSubmit(new Event('submit') as any)
     }
   }, { enabled: !loading })
+
+  const handleSuccessfulLogin = () => {
+    // Check for saved redirect path
+    const redirectPath = sessionStorage.getItem('redirectAfterLogin')
+    if (redirectPath) {
+      sessionStorage.removeItem('redirectAfterLogin')
+      navigate(redirectPath)
+    } else {
+      navigate('/home')
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +51,7 @@ export const Auth: React.FC = () => {
         const { error } = await signIn(email, password)
         if (error) throw error
         showToast('success', 'Signed in successfully!')
-        navigate('/home')
+        handleSuccessfulLogin()
       }
     } catch (err: any) {
       setError(err.message)

@@ -156,11 +156,11 @@ export const visualService = {
         .from('brand_voice')
         .select('*')
         .eq('brand_id', brandId)
+        .maybeSingle()
 
       if (error) throw error
-      
-      // Return null if no data found, otherwise return the first record
-      return data && data.length > 0 ? data[0] : null
+
+      return data
     } catch (error) {
       console.error('Error fetching brand voice:', error)
       return null

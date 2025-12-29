@@ -79,42 +79,102 @@ export const AIPilotPurpose: React.FC<AIPilotPurposeProps> = ({
       }
 
       const analysis = await generateStrategySuggestions('purpose', context)
-      
-      // Parse AI suggestions into structured options
-      const options = [
-        {
-          type: 'mission',
-          title: 'Mission Statement',
-          options: [
-            `We exist to ${extractKeyPhrase(allResponses[0], 'help')} by ${extractKeyPhrase(allResponses[1], 'solving')}.`,
-            `Our mission is to ${extractKeyPhrase(allResponses[2], 'impact')} through ${extractKeyPhrase(allResponses[0], 'service')}.`,
-            `We are dedicated to ${extractKeyPhrase(allResponses[3], 'value')} for ${extractKeyPhrase(allResponses[0], 'audience')}.`
-          ]
-        },
-        {
-          type: 'vision',
-          title: 'Vision Statement',
-          options: [
-            `We envision a world where ${extractKeyPhrase(allResponses[2], 'future')}.`,
-            `Our vision is to become ${extractKeyPhrase(allResponses[3], 'position')} in ${extractKeyPhrase(allResponses[0], 'industry')}.`,
-            `We see a future where ${extractKeyPhrase(allResponses[1], 'change')} is the norm.`
-          ]
-        },
-        {
-          type: 'why',
-          title: 'Why Statement',
-          options: [
-            `We believe that ${extractKeyPhrase(allResponses[1], 'belief')}.`,
-            `Our purpose is driven by the conviction that ${extractKeyPhrase(allResponses[2], 'conviction')}.`,
-            `We exist because ${extractKeyPhrase(allResponses[3], 'reason')}.`
-          ]
-        }
-      ]
 
-      setAiOptions(options)
+      // Use AI-generated suggestions if available
+      if (analysis.suggestions && analysis.suggestions.length > 0) {
+        // Parse AI suggestions - expected format: "TYPE: statement"
+        const groupedSuggestions: Record<string, string[]> = {
+          mission: [],
+          vision: [],
+          why: []
+        }
+
+        analysis.suggestions.forEach(suggestion => {
+          const lower = suggestion.toLowerCase()
+          if (lower.includes('mission')) {
+            groupedSuggestions.mission.push(suggestion.replace(/^mission:\s*/i, '').trim())
+          } else if (lower.includes('vision')) {
+            groupedSuggestions.vision.push(suggestion.replace(/^vision:\s*/i, '').trim())
+          } else if (lower.includes('why') || lower.includes('purpose')) {
+            groupedSuggestions.why.push(suggestion.replace(/^(why|purpose):\s*/i, '').trim())
+          } else {
+            // Default to mission if no type specified
+            groupedSuggestions.mission.push(suggestion)
+          }
+        })
+
+        const options = [
+          {
+            type: 'mission',
+            title: 'Mission Statement',
+            options: groupedSuggestions.mission.length > 0
+              ? groupedSuggestions.mission
+              : [
+                  `We exist to ${extractKeyPhrase(allResponses[0], 'help')} by ${extractKeyPhrase(allResponses[1], 'solving')}.`,
+                  `Our mission is to ${extractKeyPhrase(allResponses[2], 'impact')} through ${extractKeyPhrase(allResponses[0], 'service')}.`
+                ]
+          },
+          {
+            type: 'vision',
+            title: 'Vision Statement',
+            options: groupedSuggestions.vision.length > 0
+              ? groupedSuggestions.vision
+              : [
+                  `We envision a world where ${extractKeyPhrase(allResponses[2], 'future')}.`,
+                  `Our vision is to become ${extractKeyPhrase(allResponses[3], 'position')} in ${extractKeyPhrase(allResponses[0], 'industry')}.`
+                ]
+          },
+          {
+            type: 'why',
+            title: 'Why Statement',
+            options: groupedSuggestions.why.length > 0
+              ? groupedSuggestions.why
+              : [
+                  `We believe that ${extractKeyPhrase(allResponses[1], 'belief')}.`,
+                  `Our purpose is driven by the conviction that ${extractKeyPhrase(allResponses[2], 'conviction')}.`
+                ]
+          }
+        ]
+
+        setAiOptions(options)
+      } else {
+        // Fallback to template-based generation if AI fails
+        const options = [
+          {
+            type: 'mission',
+            title: 'Mission Statement',
+            options: [
+              `We exist to ${extractKeyPhrase(allResponses[0], 'help')} by ${extractKeyPhrase(allResponses[1], 'solving')}.`,
+              `Our mission is to ${extractKeyPhrase(allResponses[2], 'impact')} through ${extractKeyPhrase(allResponses[0], 'service')}.`,
+              `We are dedicated to ${extractKeyPhrase(allResponses[3], 'value')} for ${extractKeyPhrase(allResponses[0], 'audience')}.`
+            ]
+          },
+          {
+            type: 'vision',
+            title: 'Vision Statement',
+            options: [
+              `We envision a world where ${extractKeyPhrase(allResponses[2], 'future')}.`,
+              `Our vision is to become ${extractKeyPhrase(allResponses[3], 'position')} in ${extractKeyPhrase(allResponses[0], 'industry')}.`,
+              `We see a future where ${extractKeyPhrase(allResponses[1], 'change')} is the norm.`
+            ]
+          },
+          {
+            type: 'why',
+            title: 'Why Statement',
+            options: [
+              `We believe that ${extractKeyPhrase(allResponses[1], 'belief')}.`,
+              `Our purpose is driven by the conviction that ${extractKeyPhrase(allResponses[2], 'conviction')}.`,
+              `We exist because ${extractKeyPhrase(allResponses[3], 'reason')}.`
+            ]
+          }
+        ]
+        setAiOptions(options)
+      }
+
       setShowOptions(true)
     } catch (error) {
       console.error('Error analyzing responses:', error)
+      // Show toast error to user
     } finally {
       setAnalyzing(false)
     }
