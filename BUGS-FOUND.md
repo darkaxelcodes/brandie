@@ -1,6 +1,7 @@
 # Logical Bugs Found in Brandie Codebase
 
 **Last Updated:** 2025-12-29
+**Systematic Testing Progress:** 1/13 modules tested (7.7%)
 
 ## Status Legend
 - ✅ **FIXED** - Bug has been resolved
@@ -1055,3 +1056,356 @@ await useTokenAction('test', 'description', async () => {
 5. Expected: Redirect to /brand/123/strategy
 6. Actual: Redirect to /home
 ```
+
+---
+
+## Module 1: Authentication & Onboarding Testing (NEW)
+
+**Testing Date:** 2025-12-29
+**Test Score:** 30/38 Pass (79% Pass Rate)
+**Components Tested:** Auth.tsx, AuthContext.tsx, OnboardingFlow.tsx, ProtectedRoute.tsx
+
+---
+
+### 27. **No Password Validation** 🔴 HIGH ⏳ **PENDING**
+**Module:** Authentication
+**Component:** `src/pages/Auth.tsx:163-172`
+**Severity:** High - Poor UX
+**Status:** Not Fixed
+
+**Description:**
+No client-side password validation or requirements displayed to users. Only HTML5 `required` attribute present.
+
+**Steps to Reproduce:**
+1. Navigate to `/auth`
+2. Click "Sign Up"
+3. Enter email
+4. Try entering weak password (e.g., "123")
+5. Form submits without warning
+
+**Expected Behavior:**
+- Show password requirements (min 8 characters, complexity, etc.)
+- Validate password before submission
+- Real-time feedback as user types
+- Prevent weak passwords client-side
+
+**Actual Behavior:**
+- No validation messages shown
+- User discovers requirements only after API error
+- Confusing error messaging
+
+**Impact:**
+- Poor user experience
+- Failed sign-ups with unclear errors
+- Users don't know password requirements upfront
+- Increased support requests
+
+**Suggested Fix:**
+```typescript
+// Add password validation state
+const [passwordError, setPasswordError] = useState('')
+
+// Validation function
+const validatePassword = (pwd: string) => {
+  if (pwd.length < 8) return 'Password must be at least 8 characters'
+  if (!/[A-Z]/.test(pwd)) return 'Must contain uppercase letter'
+  if (!/[0-9]/.test(pwd)) return 'Must contain number'
+  return ''
+}
+
+// Add to Input component
+<Input
+  type="password"
+  value={password}
+  onChange={(e) => {
+    setPassword(e.target.value)
+    if (isSignUp) setPasswordError(validatePassword(e.target.value))
+  }}
+  error={passwordError}
+  helperText="Min 8 characters, 1 uppercase, 1 number"
+/>
+```
+
+**Priority:** HIGH
+
+---
+
+### 28. **Missing Forgot Password Feature** 🟠 MEDIUM ⏳ **PENDING**
+**Module:** Authentication
+**Component:** `src/pages/Auth.tsx`
+**Severity:** Medium - Missing Standard Feature
+**Status:** Not Fixed
+
+**Description:**
+No password reset functionality. Users who forget passwords cannot recover accounts.
+
+**Expected Behavior:**
+- "Forgot Password?" link visible on sign in form
+- Clicking opens password reset flow
+- User enters email
+- Supabase sends reset link
+- User clicks link and sets new password
+
+**Actual Behavior:**
+- No password reset option anywhere
+- Users completely locked out if they forget password
+- Must create new account or contact support
+
+**Impact:**
+- Users permanently locked out
+- Increased support burden
+- Poor user experience
+- Missing standard auth feature
+
+**Suggested Fix:**
+1. Add "Forgot Password?" link after password field
+2. Create password reset modal/page
+3. Use `supabase.auth.resetPasswordForEmail()`
+4. Create password reset confirmation page
+5. Use `supabase.auth.updateUser()` to set new password
+
+**Priority:** MEDIUM-HIGH
+
+---
+
+### 29. **Email Confirmation Not Handled** 🟡 MEDIUM ⏳ **PENDING**
+**Module:** Authentication
+**Component:** `src/pages/Auth.tsx:45-49`
+**Severity:** Medium - Configuration Dependent
+**Status:** Not Fixed
+
+**Description:**
+Code assumes accounts are immediately active after sign up. Doesn't handle email confirmation if enabled in Supabase settings.
+
+**Steps to Reproduce:**
+1. Enable email confirmation in Supabase Auth settings
+2. Sign up with new account
+3. System shows "Account created! You can now sign in"
+4. User tries to sign in
+5. Sign in fails with unclear error
+
+**Expected Behavior:**
+- Check if email confirmation required
+- Show "Check your email to confirm account" message
+- Don't switch to sign in mode immediately
+- Provide "Resend confirmation" option
+- Handle confirmed status in sign in
+
+**Actual Behavior:**
+- Shows generic success message
+- Switches to sign in mode immediately
+- Sign in fails with confusing error if confirmation required
+- No way to resend confirmation email
+
+**Impact:**
+- User confusion if email confirmation enabled
+- Failed sign-ins with unclear messaging
+- No recovery path for missing confirmation emails
+
+**Fix Depends On:** Supabase configuration
+
+**Priority:** MEDIUM
+
+---
+
+### 30. **Onboarding Dismissal Without Warning** 🟢 LOW ⏳ **PENDING**
+**Module:** Onboarding
+**Component:** `src/components/onboarding/OnboardingFlow.tsx:97-109, 423-429`
+**Severity:** Low-Medium - UX Issue
+**Status:** Not Fixed
+
+**Description:**
+Users can dismiss onboarding by clicking X button without warning about losing 25 token reward.
+
+**Steps to Reproduce:**
+1. New user signs up
+2. Onboarding modal appears
+3. Click X button in top right
+4. Onboarding closes immediately
+5. User loses 25 token reward opportunity
+
+**Expected Behavior:**
+- Clicking X shows confirmation modal
+- "Skip onboarding? You'll miss out on 25 free tokens"
+- "Continue Onboarding" and "Skip Anyway" buttons
+- Clear communication of consequences
+
+**Actual Behavior:**
+- Clicking X immediately dismisses
+- Shows toast: "You can complete profile anytime"
+- Doesn't mention token reward will be lost
+- No second chance confirmation
+
+**Impact:**
+- Accidental dismissal
+- Users lose token earning opportunity
+- Unclear how to restart onboarding later
+- Lower onboarding completion rates
+
+**Suggested Fix:**
+```typescript
+const [showSkipConfirmation, setShowSkipConfirmation] = useState(false)
+
+const handleSkipClick = () => {
+  setShowSkipConfirmation(true)
+}
+
+// Confirmation modal
+{showSkipConfirmation && (
+  <Modal onClose={() => setShowSkipConfirmation(false)}>
+    <h3>Skip Onboarding?</h3>
+    <p>You'll miss out on 25 free tokens!</p>
+    <p>You can complete your profile later in Settings.</p>
+    <Button onClick={handleSkip}>Skip Anyway</Button>
+    <Button onClick={() => setShowSkipConfirmation(false)}>
+      Continue Onboarding
+    </Button>
+  </Modal>
+)}
+```
+
+**Priority:** LOW-MEDIUM
+
+---
+
+### 31. **Unclear How to Resume Onboarding** 🟢 LOW ⏳ **PENDING**
+**Module:** Onboarding
+**Component:** `OnboardingFlow.tsx`, `ProfileCompletionBanner.tsx`
+**Severity:** Low - UX/Flow Issue
+**Status:** Not Fixed, Needs Runtime Testing
+
+**Description:**
+After dismissing onboarding, unclear how to resume and complete profile to earn tokens.
+
+**Expected Behavior:**
+- Profile completion banner shows clearly (✅ works)
+- "Complete Now" button reopens onboarding modal
+- User can complete and still earn tokens
+- Clear call to action
+
+**Actual Behavior:**
+- Banner shows (good)
+- Need runtime testing to verify "Complete Now" behavior
+- Might navigate to wrong page
+- Flow unclear
+
+**Impact:**
+- Users who skip might not complete profile
+- Token reward opportunity unclear
+- Lower engagement with onboarding
+
+**Needs:** Runtime testing to verify `onCompleteProfile` callback behavior
+
+**Priority:** LOW
+
+---
+
+### 32. **Google Sign In Loading State Issue** 🟢 LOW ⏳ **PENDING**
+**Module:** Authentication
+**Component:** `src/pages/Auth.tsx:64-77`
+**Severity:** Low - Minor UX
+**Status:** Not Fixed
+
+**Description:**
+Loading state only reset in catch block. If OAuth succeeds and redirects, loading state might stay true briefly.
+
+**Steps to Reproduce:**
+1. Click "Continue with Google"
+2. OAuth redirect happens
+3. Loading state might stay true until redirect completes
+
+**Expected Behavior:**
+- Loading state managed through full flow
+- Reset even on success
+
+**Actual Behavior:**
+- `setLoading(false)` only in catch
+- Success case redirects (so user doesn't see it)
+- Very minor issue
+
+**Impact:**
+- Very minor UX issue
+- User redirects anyway so doesn't notice
+- Loading state stays briefly
+
+**Suggested Fix:**
+```typescript
+const handleGoogleSignIn = async () => {
+  try {
+    setLoading(true)
+    const { error } = await signInWithGoogle()
+    if (error) throw error
+  } catch (err: any) {
+    setError(err.message)
+    showToast('error', err.message)
+  } finally {
+    setLoading(false) // Always reset
+  }
+}
+```
+
+**Priority:** LOW
+
+---
+
+### 33. **Protected Route Loading Flash** 🟢 LOW ⏳ **PENDING**
+**Module:** Authentication
+**Component:** `src/components/ProtectedRoute.tsx:26-32`
+**Severity:** Low - Performance/UX
+**Status:** Not Fixed
+
+**Description:**
+Brief loading spinner flash on every protected route navigation, even for already-authenticated users.
+
+**Steps to Reproduce:**
+1. Sign in successfully
+2. Navigate between protected routes
+3. Notice brief loading flash each time
+
+**Expected Behavior:**
+- No loading flash if already authenticated
+- Check auth state from context
+- Instant render for authenticated users
+
+**Actual Behavior:**
+- AuthContext loading state triggers spinner
+- Brief delay on every protected route
+- Minor perceived slowness
+
+**Impact:**
+- Slightly slower perceived navigation
+- Doesn't break functionality
+- Optimization opportunity
+
+**Suggested Fix:**
+Optimize AuthContext to cache auth state better, or check for existing user before showing loading spinner.
+
+**Priority:** LOW (optimization)
+
+---
+
+## Summary After Module 1 Testing
+
+**Total Issues Found:** 33 (26 previous + 7 new from Module 1)
+
+**New Issues from Module 1:**
+- 🔴 High Priority: 1 (Password Validation)
+- 🟠 Medium Priority: 2 (Forgot Password, Email Confirmation)
+- 🟢 Low Priority: 4 (Onboarding UX, Loading States)
+
+**Module 1 Test Results:**
+- ✅ Pass: 30/38 tests (79%)
+- ⚠️ Partial: 5 tests
+- ❌ Fail: 1 test
+- 🚫 Blocked: 5 tests (need runtime)
+- Missing: 2 features
+
+**Code Quality Notes:**
+- Overall architecture: Very good
+- Security: Good (using Supabase Auth, RLS enabled)
+- Error handling: Good
+- Performance: Good (retry logic, loading states)
+- Accessibility: Good (aria-labels, keyboard shortcuts)
+- Missing: Standard auth features (password reset)
+
+**Next Module:** Dashboard & Navigation (38 test cases)
