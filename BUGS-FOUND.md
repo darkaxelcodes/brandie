@@ -272,8 +272,9 @@ sessionStorage.setItem('redirectAfterLogin', location.pathname);
 
 ---
 
-### 8. **Inefficient Sequential Brand Progress Loading** 🟡 MEDIUM
+### 8. **Inefficient Sequential Brand Progress Loading** 🟡 MEDIUM ✅ **FIXED**
 **File:** `src/pages/Dashboard.tsx:82-86`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -295,6 +296,11 @@ const progressPromises = [...userBrands, ...archived].map(brand =>
 );
 const progressResults = await Promise.all(progressPromises);
 ```
+
+**Resolution:** Replaced sequential for loop with Promise.all() to load all brand progress data in parallel. This significantly reduces dashboard load time for users with multiple brands.
+
+**Files Changed:**
+- `src/pages/Dashboard.tsx` (updated)
 
 ---
 
@@ -334,8 +340,9 @@ const { data, error } = await supabase
 
 ## Medium Priority Bugs
 
-### 10. **useSupabase Hook Cannot Be Used** 🟡 MEDIUM
+### 10. **useSupabase Hook Cannot Be Used** 🟡 MEDIUM ✅ **FIXED**
 **File:** `src/lib/supabase.ts:117-129`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -361,10 +368,16 @@ export const useSupabase = () => {
 2. Move to a proper hooks file
 3. Make it a regular function that accepts toast as parameter
 
+**Resolution:** Removed the unused useSupabase hook entirely. It was never imported or used anywhere in the codebase.
+
+**Files Changed:**
+- `src/lib/supabase.ts` (updated - removed useSupabase hook and useToast import)
+
 ---
 
-### 11. **Modal Backdrop Click Handling Fragile** 🟢 LOW
+### 11. **Modal Backdrop Click Handling Fragile** 🟢 LOW ✅ **FIXED**
 **File:** `src/components/ui/Modal.tsx:93-105`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -393,10 +406,16 @@ export const useSupabase = () => {
   }}
 ```
 
+**Resolution:** Changed backdrop onClick handler to check if e.target === e.currentTarget before closing modal. This prevents modal from closing when clicking on child elements.
+
+**Files Changed:**
+- `src/components/ui/Modal.tsx` (updated)
+
 ---
 
-### 12. **Keyboard Shortcut in Auth Creates Synthetic Event** 🟢 LOW
+### 12. **Keyboard Shortcut in Auth Creates Synthetic Event** 🟢 LOW ✅ **FIXED**
 **File:** `src/pages/Auth.tsx:30-35`
+**Status:** FIXED - 2025-12-29 (Already fixed by user/linter)
 
 **Problem:**
 ```typescript
@@ -433,8 +452,9 @@ useKeyboardShortcut('Enter', () => {
 
 ## Low Priority / Code Quality Issues
 
-### 13. **Commented Out Code in Modal.tsx** 🟢 LOW
+### 13. **Commented Out Code in Modal.tsx** 🟢 LOW ✅ **FIXED**
 **File:** `src/components/ui/Modal.tsx:1-64`
+**Status:** FIXED - 2025-12-29
 
 **Issue:** Entire old implementation is commented out instead of deleted.
 
@@ -442,16 +462,27 @@ useKeyboardShortcut('Enter', () => {
 
 **Fix:** Remove commented code.
 
+**Resolution:** Removed all 64 lines of commented out code from the beginning of Modal.tsx.
+
+**Files Changed:**
+- `src/components/ui/Modal.tsx` (updated)
+
 ---
 
-### 14. **Unused Import in supabase.ts** 🟢 LOW
+### 14. **Unused Import in supabase.ts** 🟢 LOW ✅ **FIXED**
 **File:** `src/lib/supabase.ts:2`
+**Status:** FIXED - 2025-12-29 (Fixed together with Bug #10)
 
 ```typescript
 import { useToast } from '../contexts/ToastContext' // Only used in unused hook
 ```
 
 **Fix:** Remove if `useSupabase` hook is removed.
+
+**Resolution:** Removed useToast import when removing the useSupabase hook.
+
+**Files Changed:**
+- `src/lib/supabase.ts` (updated)
 
 ---
 
@@ -640,8 +671,9 @@ const handlePurchase = async () => {
 
 ---
 
-### 19. **Contrast Ratio Calculation Returns Random Values** 🟡 MEDIUM
+### 19. **Contrast Ratio Calculation Returns Random Values** 🟡 MEDIUM ✅ **FIXED**
 **File:** `src/components/visual/ColorPaletteGenerator.tsx:97-100`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -670,10 +702,16 @@ const getContrastRatio = (color1: string, color2: string): number => {
 // Option 2: Remove the feature until properly implemented
 ```
 
+**Resolution:** Implemented proper WCAG 2.1 contrast ratio calculation using the relative luminance formula. The function now correctly calculates contrast ratios for accessibility compliance checking.
+
+**Files Changed:**
+- `src/components/visual/ColorPaletteGenerator.tsx` (updated)
+
 ---
 
-### 20. **Non-functional Export Option** 🟡 MEDIUM
+### 20. **Non-functional Export Option** 🟡 MEDIUM ✅ **FIXED**
 **File:** `src/components/visual/ColorPaletteGenerator.tsx:400-404`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -703,10 +741,16 @@ switch (format) {
 
 **Fix:** Either implement sketch export or remove the button.
 
+**Resolution:** Removed the non-functional Sketch export button. Only CSS, SCSS, and JSON export options are now available.
+
+**Files Changed:**
+- `src/components/visual/ColorPaletteGenerator.tsx` (updated)
+
 ---
 
-### 21. **Onboarding: Error on Skip Doesn't Prevent Skip** 🟡 MEDIUM
+### 21. **Onboarding: Error on Skip Doesn't Prevent Skip** 🟡 MEDIUM ✅ **FIXED**
 **File:** `src/components/onboarding/OnboardingFlow.tsx:97-109`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -738,10 +782,16 @@ const handleSkip = async () => {
 }
 ```
 
+**Resolution:** Removed onSkip() call from catch block and added error toast. Now when skip fails, the onboarding stays visible and user sees an error message.
+
+**Files Changed:**
+- `src/components/onboarding/OnboardingFlow.tsx` (updated)
+
 ---
 
-### 22. **AILogoGenerator: Memory Leak with createObjectURL** 🟢 LOW
+### 22. **AILogoGenerator: Memory Leak with createObjectURL** 🟢 LOW ✅ **FIXED**
 **File:** `src/components/visual/AILogoGenerator.tsx:102-120`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -771,10 +821,16 @@ const downloadLogo = (logo: any, format: string) => {
 
 **Fix:** Track and revoke all object URLs, or check if URL is a blob URL before using it.
 
+**Resolution:** Added check for blob URLs and revoke them after download starts using setTimeout. This prevents memory leaks from unreleased blob URLs.
+
+**Files Changed:**
+- `src/components/visual/AILogoGenerator.tsx` (updated)
+
 ---
 
-### 23. **Button: Duplicate Hover Animation** 🟢 LOW
+### 23. **Button: Duplicate Hover Animation** 🟢 LOW ✅ **FIXED**
 **File:** `src/components/ui/Button.tsx:23-31, 45-46`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -795,6 +851,11 @@ const variants = {
 **Impact:** Redundant code, potential animation conflicts.
 
 **Fix:** Choose one approach - either CSS or Framer Motion, not both.
+
+**Resolution:** Removed hover:scale and active:scale CSS classes from all button variants. Now using only Framer Motion animations (whileHover and whileTap) for consistent and controllable animations.
+
+**Files Changed:**
+- `src/components/ui/Button.tsx` (updated)
 
 ---
 
@@ -862,8 +923,9 @@ The entire payment form UI is rendered (card number, CVV, etc.) but no payment p
 
 ---
 
-### 26. **ColorPalette: Click Handler Missing on Color Export** 🟢 LOW
+### 26. **ColorPalette: Click Handler Missing Error Handling** 🟢 LOW ✅ **FIXED**
 **File:** `src/components/visual/ColorPaletteGenerator.tsx:358`
+**Status:** FIXED - 2025-12-29
 
 **Problem:**
 ```typescript
@@ -890,6 +952,11 @@ onClick={async () => {
   }
 }}
 ```
+
+**Resolution:** Created copyToClipboard function with proper error handling and user feedback via toast notifications. Users now receive success confirmation or error message when copying colors.
+
+**Files Changed:**
+- `src/components/visual/ColorPaletteGenerator.tsx` (updated)
 
 ---
 

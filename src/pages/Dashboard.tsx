@@ -77,12 +77,17 @@ export const Dashboard: React.FC = () => {
       setBrands(userBrands)
       setArchivedBrands(archived)
 
-      // Load detailed progress for each brand
+      // Load detailed progress for each brand in parallel
+      const allBrands = [...userBrands, ...archived]
+      const progressPromises = allBrands.map(brand =>
+        brandService.getBrandProgress(brand.id)
+      )
+      const progressResults = await Promise.all(progressPromises)
+
       const progressData: Record<string, any> = {}
-      for (const brand of [...userBrands, ...archived]) {
-        const progress = await brandService.getBrandProgress(brand.id)
-        progressData[brand.id] = progress
-      }
+      allBrands.forEach((brand, index) => {
+        progressData[brand.id] = progressResults[index]
+      })
       setBrandProgress(progressData)
     } catch (error) {
       console.error('Error loading brands:', error)

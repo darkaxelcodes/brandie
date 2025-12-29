@@ -104,7 +104,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
       onSkip()
     } catch (error) {
       console.error('Error skipping onboarding:', error)
-      onSkip()
+      showToast('error', 'Failed to skip onboarding. Please try again.')
     }
   }
 

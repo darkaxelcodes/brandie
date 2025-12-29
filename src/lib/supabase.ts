@@ -1,5 +1,4 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import { useToast } from '../contexts/ToastContext'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
@@ -110,20 +109,5 @@ export const safeGet = <T>(
   } catch (error) {
     console.warn('Safe get failed:', error)
     return fallback
-  }
-}
-
-// Create a hook to get a Supabase client with error handling
-export const useSupabase = () => {
-  const { showToast } = useToast()
-  
-  const handleError = (error: any) => {
-    console.error('Supabase error:', error)
-    showToast('error', error.message || 'An error occurred')
-  }
-  
-  return {
-    supabase,
-    handleError
   }
 }

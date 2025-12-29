@@ -108,6 +108,11 @@ export const AILogoGenerator: React.FC<AILogoGeneratorProps> = ({
       link.href = logo.url
       link.download = `${brandName}-logo-${logo.style}.${format}`
       link.click()
+
+      // If it's a blob URL, revoke it after download starts
+      if (logo.url.startsWith('blob:')) {
+        setTimeout(() => URL.revokeObjectURL(logo.url), 100)
+      }
     } else if (logo.svg) {
       // For SVG logos, create blob and download
       const blob = new Blob([logo.svg], { type: 'image/svg+xml' })

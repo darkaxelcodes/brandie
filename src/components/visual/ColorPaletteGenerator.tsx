@@ -4,6 +4,7 @@ import { Palette, RefreshCw, Eye, Download, Check, AlertCircle } from 'lucide-re
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { AIButton } from '../ui/AIButton'
+import { useToast } from '../../contexts/ToastContext'
 
 interface ColorPaletteGeneratorProps {
   brandName: string
@@ -30,6 +31,7 @@ export const ColorPaletteGenerator: React.FC<ColorPaletteGeneratorProps> = ({
   const [generating, setGenerating] = useState(false)
   const [selectedHarmony, setSelectedHarmony] = useState<ColorHarmony | null>(null)
   const [showAccessibility, setShowAccessibility] = useState(false)
+  const { showToast } = useToast()
 
   const generatePalettes = async () => {
     setGenerating(true)
@@ -95,8 +97,41 @@ export const ColorPaletteGenerator: React.FC<ColorPaletteGeneratorProps> = ({
   }
 
   const getContrastRatio = (color1: string, color2: string): number => {
-    // Simplified contrast calculation (in production, use proper color contrast library)
-    return Math.random() * 10 + 5 // Mock value between 5-15
+    // Convert hex to RGB
+    const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null
+    }
+
+    // Calculate relative luminance
+    const getLuminance = (rgb: { r: number; g: number; b: number }): number => {
+      const rsRGB = rgb.r / 255
+      const gsRGB = rgb.g / 255
+      const bsRGB = rgb.b / 255
+
+      const r = rsRGB <= 0.03928 ? rsRGB / 12.92 : Math.pow((rsRGB + 0.055) / 1.055, 2.4)
+      const g = gsRGB <= 0.03928 ? gsRGB / 12.92 : Math.pow((gsRGB + 0.055) / 1.055, 2.4)
+      const b = bsRGB <= 0.03928 ? bsRGB / 12.92 : Math.pow((bsRGB + 0.055) / 1.055, 2.4)
+
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b
+    }
+
+    const rgb1 = hexToRgb(color1)
+    const rgb2 = hexToRgb(color2)
+
+    if (!rgb1 || !rgb2) return 1
+
+    const lum1 = getLuminance(rgb1)
+    const lum2 = getLuminance(rgb2)
+
+    const lighter = Math.max(lum1, lum2)
+    const darker = Math.min(lum1, lum2)
+
+    return (lighter + 0.05) / (darker + 0.05)
   }
 
   const getAccessibilityLevel = (ratio: number): string => {
@@ -104,6 +139,16 @@ export const ColorPaletteGenerator: React.FC<ColorPaletteGeneratorProps> = ({
     if (ratio >= 4.5) return 'AA'
     if (ratio >= 3) return 'A'
     return 'Fail'
+  }
+
+  const copyToClipboard = async (color: string) => {
+    try {
+      await navigator.clipboard.writeText(color)
+      showToast('success', `Copied ${color} to clipboard`)
+    } catch (error) {
+      console.error('Failed to copy to clipboard:', error)
+      showToast('error', 'Failed to copy color to clipboard')
+    }
   }
 
   const exportPalette = (format: string) => {
@@ -355,7 +400,7 @@ $warning: ${colors[4]};`
                     key={index}
                     className="flex-1 h-16 relative group cursor-pointer"
                     style={{ backgroundColor: color }}
-                    onClick={() => navigator.clipboard.writeText(color)}
+                    onClick={() => copyToClipboard(color)}
                   >
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center">
                       <span className="text-white text-xs font-mono opacity-0 group-hover:opacity-100">
@@ -386,21 +431,13 @@ $warning: ${colors[4]};`
                   <Download className="w-4 h-4 mr-2" />
                   SCSS
                 </Button>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => exportPalette('json')}
                 >
                   <Download className="w-4 h-4 mr-2" />
                   JSON
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => exportPalette('sketch')}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Sketch
                 </Button>
               </div>
             </div>
