@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link, useLocation } from 'react-router-dom'
-import { 
-  Home, 
-  Layers, 
-  Users, 
-  FileImage, 
-  HelpCircle, 
-  Settings, 
-  LogOut, 
+import {
+  Home,
+  Layers,
+  Users,
+  FileImage,
+  HelpCircle,
+  Settings,
+  LogOut,
   User,
   MessageSquare,
-  Coins
+  Coins,
+  Crown
 } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useTour } from '../../contexts/TourContext'
