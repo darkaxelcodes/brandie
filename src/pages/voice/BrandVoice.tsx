@@ -131,12 +131,16 @@ export const BrandVoice: React.FC = () => {
   }
 
   const addKeyMessage = () => {
-    if (newKeyMessage.trim() && !brandVoice.messaging?.keyMessages.includes(newKeyMessage.trim())) {
+    const trimmedMessage = newKeyMessage.trim()
+    const isDuplicate = brandVoice.messaging?.keyMessages.some(
+      msg => msg.toLowerCase() === trimmedMessage.toLowerCase()
+    )
+    if (trimmedMessage && !isDuplicate) {
       setBrandVoice(prev => ({
         ...prev,
         messaging: {
           ...prev.messaging!,
-          keyMessages: [...prev.messaging!.keyMessages, newKeyMessage.trim()]
+          keyMessages: [...prev.messaging!.keyMessages, trimmedMessage]
         }
       }))
       setNewKeyMessage('')
@@ -154,12 +158,16 @@ export const BrandVoice: React.FC = () => {
   }
 
   const addDo = () => {
-    if (newDo.trim() && !brandVoice.guidelines?.dosList.includes(newDo.trim())) {
+    const trimmedDo = newDo.trim()
+    const isDuplicate = brandVoice.guidelines?.dosList.some(
+      item => item.toLowerCase() === trimmedDo.toLowerCase()
+    )
+    if (trimmedDo && !isDuplicate) {
       setBrandVoice(prev => ({
         ...prev,
         guidelines: {
           ...prev.guidelines!,
-          dosList: [...prev.guidelines!.dosList, newDo.trim()]
+          dosList: [...prev.guidelines!.dosList, trimmedDo]
         }
       }))
       setNewDo('')
@@ -177,12 +185,16 @@ export const BrandVoice: React.FC = () => {
   }
 
   const addDont = () => {
-    if (newDont.trim() && !brandVoice.guidelines?.dontsList.includes(newDont.trim())) {
+    const trimmedDont = newDont.trim()
+    const isDuplicate = brandVoice.guidelines?.dontsList.some(
+      item => item.toLowerCase() === trimmedDont.toLowerCase()
+    )
+    if (trimmedDont && !isDuplicate) {
       setBrandVoice(prev => ({
         ...prev,
         guidelines: {
           ...prev.guidelines!,
-          dontsList: [...prev.guidelines!.dontsList, newDont.trim()]
+          dontsList: [...prev.guidelines!.dontsList, trimmedDont]
         }
       }))
       setNewDont('')

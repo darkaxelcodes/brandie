@@ -4,6 +4,7 @@ import { CheckCircle, AlertCircle, Upload, FileText, Sparkles, RefreshCw, Check,
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { consistencyService } from '../../lib/consistencyService'
+import { useToast } from '../../contexts/ToastContext'
 
 interface BrandComplianceCheckerProps {
   brandData: any
@@ -12,6 +13,7 @@ interface BrandComplianceCheckerProps {
 export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
   brandData
 }) => {
+  const { showToast } = useToast()
   const [file, setFile] = useState<File | null>(null)
   const [fileContent, setFileContent] = useState<any>(null)
   const [fileType, setFileType] = useState<string>('')
@@ -92,8 +94,11 @@ export const BrandComplianceChecker: React.FC<BrandComplianceCheckerProps> = ({
       
       // For images, check colors and logo usage
       if (fileType.includes('image') && fileContent.imageUrl) {
-        assetToCheck.colors = ['#3B82F6', '#1E40AF', '#F59E0B'] // Mock colors extracted from image
-        assetToCheck.logo = { aspectRatio: 2.5, clearSpace: 0.8, size: { width: 200 } } // Mock logo data
+        // Note: Image analysis is not yet implemented
+        // Future implementation will extract colors and analyze logo usage
+        showToast('info', 'Image analysis coming soon! For now, checking basic properties only.')
+        assetToCheck.colors = brandData?.visual?.colors?.colors || []
+        assetToCheck.logo = brandData?.visual?.logo || {}
       }
       
       // For text files, check voice and messaging

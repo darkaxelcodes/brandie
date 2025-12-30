@@ -85,6 +85,50 @@ export const BrandStrategy: React.FC = () => {
     }))
   }
 
+  const validateCurrentStep = (): boolean => {
+    const sectionTypes = ['purpose', 'values', 'audience', 'competitive', 'archetype']
+    const sectionType = sectionTypes[currentStep]
+    const sectionData = formData[sectionType as keyof StrategyFormData]
+
+    if (!sectionData) {
+      showToast('error', 'Please complete this step before proceeding')
+      return false
+    }
+
+    // Validate each step has required fields
+    switch (sectionType) {
+      case 'purpose':
+        if (!sectionData.mission?.trim()) {
+          showToast('error', 'Please add your brand mission')
+          return false
+        }
+        break
+      case 'values':
+        if (!sectionData.coreValues || sectionData.coreValues.length === 0) {
+          showToast('error', 'Please add at least one core value')
+          return false
+        }
+        break
+      case 'audience':
+        if (!sectionData.segments || sectionData.segments.length === 0) {
+          showToast('error', 'Please add at least one audience segment')
+          return false
+        }
+        break
+      case 'competitive':
+        // Optional step, always valid
+        break
+      case 'archetype':
+        if (!sectionData.primaryArchetype) {
+          showToast('error', 'Please select a brand archetype')
+          return false
+        }
+        break
+    }
+
+    return true
+  }
+
   const saveCurrentStep = async (completed: boolean = false) => {
     if (!brandId) return
 
@@ -112,12 +156,20 @@ export const BrandStrategy: React.FC = () => {
   }
 
   const handleNext = async () => {
+    // Validate current step before proceeding
+    if (!validateCurrentStep()) {
+      return
+    }
+
     await saveCurrentStep(true)
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1)
     } else {
-      // All steps completed, redirect to dashboard
-      navigate('/dashboard')
+      // All steps completed, show completion feedback and redirect
+      showToast('success', 'Brand strategy completed! 🎉')
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 1500)
     }
   }
 

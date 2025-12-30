@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
+import DOMPurify from 'dompurify'
 import { FileText, Sparkles, Eye, Palette, Type, MessageSquare, Target, Download, ArrowRight } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
@@ -254,13 +255,13 @@ export const GuidelinesPreview: React.FC<GuidelinesPreviewProps> = ({
                 <h4 className="font-medium text-gray-900 mb-3">Logo</h4>
                 <div className="aspect-square bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center mb-3">
                   {brandData?.visual?.logo?.url ? (
-                    <img 
-                      src={brandData.visual.logo.url} 
+                    <img
+                      src={brandData.visual.logo.url}
                       alt="Brand logo"
                       className="max-w-full max-h-full object-contain"
                     />
                   ) : brandData?.visual?.logo?.svg ? (
-                    <div dangerouslySetInnerHTML={{ __html: brandData.visual.logo.svg }} />
+                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(brandData.visual.logo.svg) }} />
                   ) : (
                     <div className="text-gray-400 text-center">
                       <Palette className="w-8 h-8 mx-auto mb-2" />

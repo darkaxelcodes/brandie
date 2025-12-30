@@ -129,6 +129,14 @@ export const LandingPageGenerator: React.FC = () => {
     loadBrandData()
   }, [brandId])
 
+  // Sanitize brand name for email addresses
+  const sanitizeForEmail = (name: string): string => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '')  // Remove non-alphanumeric
+      .substring(0, 50) || 'brand'  // Limit length with fallback
+  }
+
   const loadBrandData = async () => {
     try {
       setLoading(true)
@@ -145,7 +153,7 @@ export const LandingPageGenerator: React.FC = () => {
       }
 
       setBrand(brandInfo)
-      
+
       const compiledData = {
         brand: brandInfo,
         strategy: strategyData,
@@ -158,14 +166,14 @@ export const LandingPageGenerator: React.FC = () => {
       }
 
       setBrandData(compiledData)
-      
+
       // Pre-populate landing page data from brand data
       setLandingPageData(prev => ({
         ...prev,
         heroTitle: strategyData.purpose?.mission || `${brandInfo.name} - Innovation Simplified`,
         heroSubtitle: strategyData.values?.positioning || 'Transform your business with cutting-edge solutions',
         footerText: `© ${new Date().getFullYear()} ${brandInfo.name}. All rights reserved.`,
-        contactEmail: 'hello@' + brandInfo.name.toLowerCase().replace(/\s+/g, '') + '.com',
+        contactEmail: `hello@${sanitizeForEmail(brandInfo.name)}.com`,
         features: generateDefaultFeatures(strategyData),
         testimonials: generateDefaultTestimonials(brandInfo.name)
       }))
@@ -297,6 +305,16 @@ export const LandingPageGenerator: React.FC = () => {
     }
   }
 
+  // Sanitize brand name for subdomain
+  const sanitizeForSubdomain = (name: string): string => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-')  // Replace invalid chars with hyphens
+      .replace(/-+/g, '-')  // Collapse multiple hyphens
+      .replace(/^-|-$/g, '')  // Remove leading/trailing hyphens
+      .substring(0, 50) || 'brand'
+  }
+
   const deployLandingPage = async () => {
     if (!brandData || !v0Files.length) return
 
@@ -305,8 +323,8 @@ export const LandingPageGenerator: React.FC = () => {
       // In a real implementation, this would deploy the v0-generated files
       // For now, we'll simulate deployment
       await new Promise(resolve => setTimeout(resolve, 3000))
-      
-      const subdomain = brandData.brand?.name?.toLowerCase().replace(/\s+/g, '-') || 'brand'
+
+      const subdomain = sanitizeForSubdomain(brandData.brand?.name || 'brand')
       const deploymentUrl = `https://${subdomain}-${Date.now()}.netlify.app`
       
       setDeployedUrl(deploymentUrl)

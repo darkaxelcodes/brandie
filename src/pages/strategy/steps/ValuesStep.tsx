@@ -39,9 +39,15 @@ export const ValuesStep: React.FC<ValuesStepProps> = ({
   }
 
   const addValue = () => {
-    if (newValue.trim() && !valuesData.coreValues.includes(newValue.trim())) {
-      updateValues('coreValues', [...valuesData.coreValues, newValue.trim()])
+    const trimmedValue = newValue.trim()
+    const isDuplicate = valuesData.coreValues.some(
+      value => value.toLowerCase() === trimmedValue.toLowerCase()
+    )
+    if (trimmedValue && !isDuplicate) {
+      updateValues('coreValues', [...valuesData.coreValues, trimmedValue])
       setNewValue('')
+    } else if (isDuplicate) {
+      // Optional: Show toast that value already exists
     }
   }
 

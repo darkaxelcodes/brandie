@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import DOMPurify from 'dompurify'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { Palette, Type, Circle, Square, Triangle, Star, Heart, Zap } from 'lucide-react'
@@ -58,10 +59,29 @@ export const LogoGenerator: React.FC<LogoGeneratorProps> = ({
     }
   }
 
+  // Sanitize text for SVG/XML context
+  const sanitizeSVGText = (text: string): string => {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;')
+  }
+
+  // Validate hex color
+  const isValidHexColor = (color: string): boolean => {
+    return /^#[0-9A-F]{6}$/i.test(color)
+  }
+
   const generateSVGLogo = () => {
-    const primaryColor = brandColors[0] || '#3B82F6'
-    const secondaryColor = brandColors[1] || '#1E40AF'
-    
+    // Validate and sanitize colors
+    const primaryColor = isValidHexColor(brandColors[0]) ? brandColors[0] : '#3B82F6'
+    const secondaryColor = isValidHexColor(brandColors[1]) ? brandColors[1] : '#1E40AF'
+
+    // Sanitize brand name for SVG
+    const safeBrandName = sanitizeSVGText(brandName)
+
     // Create a simple SVG logo based on selected options
     const svgContent = `
       <svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
@@ -73,11 +93,11 @@ export const LogoGenerator: React.FC<LogoGeneratorProps> = ({
         </defs>
         ${getIconSVG(selectedIcon, primaryColor)}
         <text x="50" y="45" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="${primaryColor}">
-          ${brandName}
+          ${safeBrandName}
         </text>
       </svg>
     `
-    
+
     return svgContent.trim()
   }
 
@@ -168,9 +188,9 @@ export const LogoGenerator: React.FC<LogoGeneratorProps> = ({
               Preview
             </label>
             <div className="border rounded-lg p-6 bg-gray-50 flex items-center justify-center">
-              <div 
+              <div
                 className="bg-white p-4 rounded-lg shadow-sm"
-                dangerouslySetInnerHTML={{ __html: generateSVGLogo() }}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(generateSVGLogo()) }}
               />
             </div>
           </div>

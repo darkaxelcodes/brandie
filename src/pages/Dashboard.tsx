@@ -48,6 +48,7 @@ export const Dashboard: React.FC = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [showProfileBanner, setShowProfileBanner] = useState(true)
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
 
   useEffect(() => {
     loadBrands()
@@ -545,26 +546,36 @@ export const Dashboard: React.FC = () => {
                           </div>
                         )}
                       </div>
-                      <div className="relative group user-menu">
+                      <div className="relative user-menu">
                         <Button
                           variant="ghost"
                           size="sm"
                           className="rounded-full p-2"
+                          onClick={() => setOpenDropdownId(openDropdownId === brand.id ? null : brand.id)}
+                          aria-label="Brand actions menu"
+                          aria-expanded={openDropdownId === brand.id}
                         >
                           <MoreHorizontal className="w-5 h-5" />
                         </Button>
-                        
+
                         {/* Dropdown Menu */}
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10 hidden group-hover:block">
+                        {openDropdownId === brand.id && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
                           <button
-                            onClick={() => handleEditBrand(brand)}
+                            onClick={() => {
+                              setOpenDropdownId(null)
+                              handleEditBrand(brand)
+                            }}
                             className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           >
                             <Edit className="w-4 h-4 mr-2" />
                             Edit Brand
                           </button>
                           <button
-                            onClick={() => handleDuplicateBrand(brand)}
+                            onClick={() => {
+                              setOpenDropdownId(null)
+                              handleDuplicateBrand(brand)
+                            }}
                             className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           >
                             <Copy className="w-4 h-4 mr-2" />
@@ -573,14 +584,20 @@ export const Dashboard: React.FC = () => {
                           {showArchivedBrands ? (
                             <>
                               <button
-                                onClick={() => handleRestoreBrand(brand)}
+                                onClick={() => {
+                                  setOpenDropdownId(null)
+                                  handleRestoreBrand(brand)
+                                }}
                                 className="flex items-center w-full px-4 py-2 text-sm text-green-700 hover:bg-gray-100"
                               >
                                 <RefreshCw className="w-4 h-4 mr-2" />
                                 Restore
                               </button>
                               <button
-                                onClick={() => handleDeleteBrand(brand)}
+                                onClick={() => {
+                                  setOpenDropdownId(null)
+                                  handleDeleteBrand(brand)
+                                }}
                                 className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-gray-100"
                               >
                                 <Trash2 className="w-4 h-4 mr-2" />
@@ -589,7 +606,10 @@ export const Dashboard: React.FC = () => {
                             </>
                           ) : (
                             <button
-                              onClick={() => handleArchiveBrand(brand)}
+                              onClick={() => {
+                                setOpenDropdownId(null)
+                                handleArchiveBrand(brand)
+                              }}
                               className="flex items-center w-full px-4 py-2 text-sm text-red-700 hover:bg-gray-100"
                             >
                               <Archive className="w-4 h-4 mr-2" />
@@ -597,6 +617,7 @@ export const Dashboard: React.FC = () => {
                             </button>
                           )}
                         </div>
+                        )}
                       </div>
                     </div>
                   </div>

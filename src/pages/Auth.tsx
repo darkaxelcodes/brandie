@@ -20,8 +20,8 @@ export const Auth: React.FC = () => {
 
   // Keyboard shortcut for form submission
   useKeyboardShortcut('Enter', () => {
-    if (email && password) {
-      handleSubmit(new Event('submit') as any)
+    if (email && password && !loading) {
+      performAuth()
     }
   }, { enabled: !loading })
 
@@ -36,8 +36,7 @@ export const Auth: React.FC = () => {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const performAuth = async () => {
     setLoading(true)
     setError('')
 
@@ -59,6 +58,11 @@ export const Auth: React.FC = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    await performAuth()
   }
 
   const handleGoogleSignIn = async () => {
@@ -160,16 +164,23 @@ export const Auth: React.FC = () => {
                 aria-label="Email"
               />
               
-              <Input
-                type="password"
-                label="Password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                icon={<Lock className="w-4 h-4" />}
-                aria-label="Password"
-              />
+              <div>
+                <Input
+                  type="password"
+                  label="Password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  icon={<Lock className="w-4 h-4" />}
+                  aria-label="Password"
+                />
+                {isSignUp && (
+                  <p className="text-xs text-gray-600 mt-1">
+                    Password must be at least 6 characters
+                  </p>
+                )}
+              </div>
 
               <Button
                 type="submit"
