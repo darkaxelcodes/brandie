@@ -1,18 +1,45 @@
 import { generateStrategySuggestions } from './openai'
 import { storageService } from './storageService'
 import { supabase } from './supabase'
+import { logoPromptService } from './logoPromptService'
+import type {
+  BrandContext,
+  VisualPreferences,
+  GenerationOptions,
+  LogoGenerationRequest,
+  LogoGenerationResponse,
+  LogoStyle,
+  ImageQuality,
+  ImageSize,
+  ImageBackground,
+  ImageFormat
+} from '../types/logoGeneration'
 
 export interface AILogoRequest {
   brandName: string
-  strategy: any
-  style: string
+  strategy: {
+    brand?: { id?: string; name?: string; industry?: string }
+    purpose?: { mission?: string; vision?: string; why?: string }
+    values?: { coreValues?: string[]; positioning?: string; uniqueValue?: string }
+    audience?: { primaryAudience?: string; demographics?: string; psychographics?: string; painPoints?: string[] }
+    competitive?: { competitiveAdvantage?: string; marketGap?: string; directCompetitors?: string[] }
+    archetype?: { selectedArchetype?: string; reasoning?: string }
+  }
+  style: LogoStyle
   industry?: string
   keywords?: string[]
+  options?: {
+    count?: number
+    quality?: ImageQuality
+    size?: ImageSize
+    background?: ImageBackground
+    format?: ImageFormat
+  }
 }
 
 export interface AIColorRequest {
   brandName: string
-  strategy: any
+  strategy: Record<string, unknown>
   archetype: string
   industry?: string
   mood?: string[]
@@ -20,25 +47,64 @@ export interface AIColorRequest {
 
 export interface AITypographyRequest {
   brandName: string
-  strategy: any
+  strategy: Record<string, unknown>
   archetype: string
   industry?: string
   personality?: string[]
 }
 
+export interface GeneratedLogoResult {
+  id: string
+  url?: string
+  base64?: string
+  style: string
+  prompt?: string
+  revisedPrompt?: string
+  variations: Array<{ type: string; description: string }>
+  aiGenerated: boolean
+  metadata?: {
+    model: string
+    quality: string
+    size: string
+    hasTransparency: boolean
+    generationTimeMs?: number
+  }
+}
+
 export const aiVisualService = {
-  // Generate AI logo concepts using DALL-E via Supabase Edge Function
-  async generateLogoConcepts(request: AILogoRequest): Promise<any[]> {
+  async generateLogoConcepts(request: AILogoRequest): Promise<GeneratedLogoResult[]> {
     try {
-      const prompt = this.buildLogoPrompt(request)
-      
-      // Use Supabase Edge Function to call OpenAI API
-      const { data, error } = await supabase.functions.invoke('generate-logo', {
-        body: {
-          prompt,
-          style: request.style,
-          brandName: request.brandName
-        }
+      const brandContext = logoPromptService.buildContextFromBrandData({
+        brand: {
+          name: request.brandName,
+          industry: request.industry || request.strategy.brand?.industry
+        },
+        strategy: request.strategy
+      })
+
+      const visualPreferences: VisualPreferences = {
+        selected_style: request.style,
+        mood: this.getMoodFromArchetype(request.strategy.archetype?.selectedArchetype || 'sage'),
+        avoid: this.getAvoidFromStyle(request.style),
+        logo_type_preference: logoPromptService.recommendLogoType(brandContext)
+      }
+
+      const generationOptions: GenerationOptions = {
+        count: request.options?.count || 2,
+        size: request.options?.size || '1024x1024',
+        quality: request.options?.quality || 'high',
+        background: request.options?.background || 'transparent',
+        format: request.options?.format || 'png'
+      }
+
+      const logoRequest: LogoGenerationRequest = {
+        brand_context: brandContext,
+        visual_preferences: visualPreferences,
+        generation_options: generationOptions
+      }
+
+      const { data, error } = await supabase.functions.invoke<LogoGenerationResponse>('generate-logo', {
+        body: logoRequest
       })
 
       if (error) {
@@ -46,46 +112,85 @@ export const aiVisualService = {
         throw new Error(`Logo generation failed: ${error.message}`)
       }
 
-      if (!data.success) {
-        console.error('Logo generation API error:', data.error)
-        throw new Error(data.error || 'Logo generation failed')
+      if (!data?.success || !data?.logos?.length) {
+        console.error('Logo generation API error:', data?.error)
+        throw new Error(data?.error || 'Logo generation failed - no logos returned')
       }
-      
-      // Get current user
+
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('User not authenticated')
-      
-      // Process and store each generated image
-      const processedLogos = await Promise.all(data.data.map(async (image: any, index: number) => {
-        // Upload the image to Supabase storage
-        const storedUrl = await storageService.uploadImageFromUrl(
-          image.url,
-          user.id,
-          request.strategy.brand?.id || 'temp',
-          'logo',
-          index + 1
-        )
-        
+
+      const processedLogos = await Promise.all(data.logos.map(async (logo, index) => {
+        let storedUrl: string | undefined
+
+        if (logo.image_data.base64) {
+          storedUrl = await storageService.uploadBase64Image(
+            logo.image_data.base64,
+            user.id,
+            request.strategy.brand?.id || 'temp',
+            'logo',
+            index + 1,
+            logo.image_data.format as 'png' | 'jpeg' | 'webp'
+          )
+        }
+
         return {
-          id: `ai-logo-${index}`,
-          url: storedUrl, // Use the Supabase URL instead of the OpenAI URL
-          originalUrl: image.url, // Keep the original URL for reference
-          prompt: prompt,
-          style: request.style,
-          variations: this.generateLogoVariations(request)
+          id: logo.id,
+          url: storedUrl,
+          base64: logo.image_data.base64,
+          style: logo.style,
+          prompt: data.prompt_info?.enhanced_prompt,
+          revisedPrompt: logo.metadata?.revised_prompt,
+          variations: this.generateLogoVariations(),
+          aiGenerated: true,
+          metadata: {
+            model: data.metadata?.model || 'gpt-image-1',
+            quality: data.metadata?.quality || 'high',
+            size: logo.image_data.size,
+            hasTransparency: logo.image_data.has_transparency,
+            generationTimeMs: data.metadata?.generation_time_ms
+          }
         }
       }))
-      
+
       return processedLogos
     } catch (error) {
       console.error('Error generating AI logos:', error)
-      // Fallback to programmatic generation
       return this.generateFallbackLogos(request)
     }
   },
 
-  // Generate AI color palettes
-  async generateColorPalettes(request: AIColorRequest): Promise<any[]> {
+  getMoodFromArchetype(archetype: string): string[] {
+    const moodMap: Record<string, string[]> = {
+      innocent: ['pure', 'simple', 'honest', 'optimistic'],
+      explorer: ['adventurous', 'bold', 'authentic', 'free'],
+      sage: ['wise', 'trusted', 'thoughtful', 'expert'],
+      hero: ['powerful', 'confident', 'courageous', 'determined'],
+      outlaw: ['rebellious', 'bold', 'revolutionary', 'disruptive'],
+      magician: ['inspiring', 'innovative', 'transformative', 'visionary'],
+      regular: ['friendly', 'honest', 'dependable', 'relatable'],
+      lover: ['passionate', 'elegant', 'luxurious', 'intimate'],
+      jester: ['fun', 'playful', 'entertaining', 'joyful'],
+      caregiver: ['nurturing', 'caring', 'protective', 'supportive'],
+      creator: ['innovative', 'creative', 'artistic', 'expressive'],
+      ruler: ['prestigious', 'luxurious', 'commanding', 'powerful']
+    }
+    return moodMap[archetype.toLowerCase()] || ['professional', 'trustworthy', 'modern']
+  },
+
+  getAvoidFromStyle(style: LogoStyle): string[] {
+    const avoidMap: Record<LogoStyle, string[]> = {
+      minimal: ['complex patterns', 'gradients', 'multiple colors', 'decorative elements'],
+      modern: ['dated elements', 'overly traditional forms', 'heavy serifs'],
+      classic: ['trendy effects', 'overly modern elements', 'casual styling'],
+      playful: ['corporate sterility', 'dark themes', 'serious imagery'],
+      bold: ['soft colors', 'delicate forms', 'subtle effects'],
+      organic: ['sharp geometric forms', 'cold colors', 'mechanical elements']
+    }
+    return avoidMap[style] || []
+  },
+
+  async generateColorPalettes(request: AIColorRequest): Promise<unknown[]> {
     try {
       const context = {
         brandName: request.brandName,
@@ -96,11 +201,9 @@ export const aiVisualService = {
       }
 
       const response = await generateStrategySuggestions('colors', context)
-      
-      // Parse AI suggestions into color palettes
+
       const palettes = this.parseColorSuggestions(response.suggestions, request)
-      
-      // Enhance with color theory
+
       return palettes.map(palette => ({
         ...palette,
         harmony: this.analyzeColorHarmony(palette.colors),
@@ -114,8 +217,7 @@ export const aiVisualService = {
     }
   },
 
-  // Generate AI typography recommendations
-  async generateTypographyRecommendations(request: AITypographyRequest): Promise<any[]> {
+  async generateTypographyRecommendations(request: AITypographyRequest): Promise<unknown[]> {
     try {
       const context = {
         brandName: request.brandName,
@@ -126,7 +228,7 @@ export const aiVisualService = {
       }
 
       const response = await generateStrategySuggestions('typography', context)
-      
+
       return this.parseTypographySuggestions(response.suggestions, request)
     } catch (error) {
       console.error('Error generating AI typography:', error)
@@ -134,67 +236,19 @@ export const aiVisualService = {
     }
   },
 
-  // Build optimized DALL-E prompt for logo generation
-  buildLogoPrompt(request: AILogoRequest): string {
-    const { brandName, strategy, style } = request
-    
-    let prompt = `Professional logo design for "${brandName}"`
-    
-    // Add brand archetype influence
-    if (strategy?.archetype?.selectedArchetype) {
-      const archetypeMap: Record<string, string> = {
-        'innocent': 'clean, pure, simple, friendly',
-        'explorer': 'adventurous, bold, dynamic, outdoor',
-        'sage': 'wise, sophisticated, academic, trustworthy',
-        'hero': 'strong, confident, triumphant, powerful',
-        'outlaw': 'rebellious, edgy, unconventional, bold',
-        'magician': 'mystical, transformative, innovative, inspiring',
-        'regular': 'approachable, down-to-earth, reliable, friendly',
-        'lover': 'elegant, passionate, luxurious, romantic',
-        'jester': 'playful, fun, colorful, energetic',
-        'caregiver': 'nurturing, warm, protective, caring',
-        'creator': 'artistic, creative, imaginative, innovative',
-        'ruler': 'prestigious, authoritative, sophisticated, premium'
-      }
-      
-      const archetypeStyle = archetypeMap[strategy.archetype.selectedArchetype]
-      if (archetypeStyle) {
-        prompt += `, ${archetypeStyle} aesthetic`
-      }
-    }
-    
-    // Add style specifications
-    const styleMap: Record<string, string> = {
-      'minimal': 'minimalist, clean lines, negative space, geometric',
-      'modern': 'contemporary, sleek, tech-inspired, gradient',
-      'classic': 'timeless, elegant, traditional, serif elements',
-      'playful': 'fun, colorful, rounded, whimsical',
-      'bold': 'strong, impactful, high contrast, dramatic',
-      'organic': 'natural, flowing, organic shapes, earth tones'
-    }
-    
-    if (styleMap[style]) {
-      prompt += `, ${styleMap[style]} style`
-    }
-    
-    // Add industry context
-    if (request.industry) {
-      prompt += `, ${request.industry} industry`
-    }
-    
-    // Add technical specifications
-    prompt += ', vector style, scalable, professional, brand identity, white background, high quality'
-    
-    return prompt
-  },
-
-  // Parse AI color suggestions into structured palettes
-  parseColorSuggestions(suggestions: string[], request: AIColorRequest): any[] {
+  parseColorSuggestions(suggestions: string[], request: AIColorRequest): Array<{
+    id: string
+    name: string
+    description: string
+    colors: string[]
+    primary: string
+    wcagScore: number
+    aiGenerated: boolean
+    reasoning: string
+  }> {
     const palettes = []
-    
-    // Generate palettes based on brand archetype
     const archetypeColors = this.getArchetypeColors(request.archetype)
-    
+
     for (let i = 0; i < 6; i++) {
       const baseColor = archetypeColors[i % archetypeColors.length]
       const palette = {
@@ -203,36 +257,35 @@ export const aiVisualService = {
         description: suggestions[i] || 'AI-generated color harmony',
         colors: this.generateColorHarmony(baseColor),
         primary: baseColor,
-        wcagScore: Math.floor(Math.random() * 20) + 80,
+        wcagScore: this.calculateWCAGScore(baseColor),
         aiGenerated: true,
         reasoning: suggestions[i] || 'Generated based on brand personality'
       }
       palettes.push(palette)
     }
-    
+
     return palettes
   },
 
-  // Generate color harmony from base color
+  calculateWCAGScore(primaryColor: string): number {
+    const hsl = this.hexToHsl(primaryColor)
+    const lightnessScore = hsl.l > 50 ? 90 : 85
+    const saturationBonus = hsl.s > 50 ? 5 : 0
+    return Math.min(100, lightnessScore + saturationBonus)
+  },
+
   generateColorHarmony(baseColor: string): string[] {
-    // Convert hex to HSL for manipulation
     const hsl = this.hexToHsl(baseColor)
     const colors = [baseColor]
-    
-    // Complementary
+
     colors.push(this.hslToHex((hsl.h + 180) % 360, hsl.s, hsl.l))
-    
-    // Triadic
     colors.push(this.hslToHex((hsl.h + 120) % 360, hsl.s, hsl.l))
     colors.push(this.hslToHex((hsl.h + 240) % 360, hsl.s, hsl.l))
-    
-    // Analogous
     colors.push(this.hslToHex((hsl.h + 30) % 360, hsl.s, hsl.l))
-    
+
     return colors
   },
 
-  // Get archetype-based color suggestions
   getArchetypeColors(archetype: string): string[] {
     const archetypeColorMap: Record<string, string[]> = {
       'innocent': ['#FFFFFF', '#F0F8FF', '#E6F3FF', '#87CEEB'],
@@ -248,62 +301,70 @@ export const aiVisualService = {
       'creator': ['#FF4500', '#FF6347', '#9370DB', '#20B2AA'],
       'ruler': ['#800080', '#4B0082', '#B8860B', '#2F4F4F']
     }
-    
+
     return archetypeColorMap[archetype] || ['#3B82F6', '#1E40AF', '#F59E0B', '#EF4444']
   },
 
-  // Analyze color accessibility
-  analyzeAccessibility(colors: string[]): any {
+  analyzeAccessibility(colors: string[]): {
+    wcagAA: number
+    wcagAAA: number
+    colorBlindFriendly: boolean
+    recommendations: string[]
+  } {
+    const primaryHsl = this.hexToHsl(colors[0])
+    const hasGoodContrast = primaryHsl.l < 40 || primaryHsl.l > 60
+
     return {
-      wcagAA: colors.length * 0.8, // Mock calculation
-      wcagAAA: colors.length * 0.6,
-      colorBlindFriendly: true,
+      wcagAA: hasGoodContrast ? 4.5 : 3.0,
+      wcagAAA: hasGoodContrast ? 7.0 : 4.5,
+      colorBlindFriendly: primaryHsl.s < 80,
       recommendations: [
-        'Use sufficient contrast ratios',
+        'Use sufficient contrast ratios (minimum 4.5:1 for normal text)',
         'Test with color blindness simulators',
-        'Provide alternative indicators beyond color'
+        'Provide alternative indicators beyond color alone',
+        'Ensure text remains readable on all backgrounds'
       ]
     }
   },
 
-  // Get color psychology insights
-  getColorPsychology(colors: string[]): any {
-    const psychology: Record<string, string> = {
-      '#FF0000': 'Energy, passion, urgency',
-      '#0000FF': 'Trust, stability, professionalism',
-      '#00FF00': 'Growth, nature, harmony',
-      '#FFFF00': 'Optimism, creativity, attention',
-      '#800080': 'Luxury, creativity, mystery',
-      '#FFA500': 'Enthusiasm, creativity, warmth'
-    }
-    
+  getColorPsychology(colors: string[]): {
+    emotions: string[]
+    overall: string
+  } {
+    const primaryHsl = this.hexToHsl(colors[0])
+
+    let primaryEmotion = 'Balanced and professional'
+    if (primaryHsl.h >= 0 && primaryHsl.h < 30) primaryEmotion = 'Energy, passion, urgency'
+    else if (primaryHsl.h >= 30 && primaryHsl.h < 60) primaryEmotion = 'Optimism, creativity, warmth'
+    else if (primaryHsl.h >= 60 && primaryHsl.h < 150) primaryEmotion = 'Growth, nature, harmony'
+    else if (primaryHsl.h >= 150 && primaryHsl.h < 210) primaryEmotion = 'Trust, calm, stability'
+    else if (primaryHsl.h >= 210 && primaryHsl.h < 270) primaryEmotion = 'Trust, professionalism, depth'
+    else if (primaryHsl.h >= 270 && primaryHsl.h < 330) primaryEmotion = 'Luxury, creativity, mystery'
+    else primaryEmotion = 'Passion, romance, excitement'
+
     return {
-      emotions: colors.map(color => psychology[color] || 'Balanced, neutral'),
-      overall: 'Professional and trustworthy with creative energy'
+      emotions: [primaryEmotion, 'Professional appeal', 'Brand recognition'],
+      overall: `${primaryEmotion} with professional undertones`
     }
   },
 
-  // Generate fallback logos when AI fails
-  async generateFallbackLogos(request: AILogoRequest): Promise<any[]> {
-    const styles = ['minimal', 'modern', 'classic', 'bold']
-    
-    // Get current user
+  async generateFallbackLogos(request: AILogoRequest): Promise<GeneratedLogoResult[]> {
+    const styles: LogoStyle[] = ['minimal', 'modern', 'classic', 'bold']
+
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       return styles.map((style, index) => ({
         id: `fallback-logo-${index}`,
         style,
         svg: this.generateSVGLogo(request.brandName, style),
-        description: `${style} logo concept for ${request.brandName}`,
+        variations: this.generateLogoVariations(),
         aiGenerated: false
       }))
     }
-    
-    // Generate and store SVG logos
+
     const logos = await Promise.all(styles.map(async (style, index) => {
       const svg = this.generateSVGLogo(request.brandName, style)
-      
-      // Store SVG in Supabase
+
       const storedUrl = await storageService.uploadSvgContent(
         svg,
         user.id,
@@ -311,42 +372,53 @@ export const aiVisualService = {
         'logo',
         index + 1
       )
-      
+
       return {
         id: `fallback-logo-${index}`,
         style,
         svg,
         url: storedUrl || undefined,
-        description: `${style} logo concept for ${request.brandName}`,
+        variations: this.generateLogoVariations(),
         aiGenerated: false
       }
     }))
-    
+
     return logos
   },
 
-  // Generate fallback color palettes
-  generateFallbackPalettes(request: AIColorRequest): any[] {
+  generateFallbackPalettes(request: AIColorRequest): Array<{
+    id: string
+    name: string
+    colors: string[]
+    primary: string
+    wcagScore: number
+    aiGenerated: boolean
+  }> {
     const baseColors = this.getArchetypeColors(request.archetype)
     return baseColors.map((color, index) => ({
       id: `fallback-palette-${index}`,
       name: `Palette ${index + 1}`,
       colors: this.generateColorHarmony(color),
       primary: color,
-      wcagScore: 85 + Math.floor(Math.random() * 15),
+      wcagScore: this.calculateWCAGScore(color),
       aiGenerated: false
     }))
   },
 
-  // Generate fallback typography
-  generateFallbackTypography(request: AITypographyRequest): any[] {
+  generateFallbackTypography(request: AITypographyRequest): Array<{
+    id: string
+    name: string
+    heading: { family: string }
+    body: { family: string }
+    aiGenerated: boolean
+  }> {
     const fonts = [
       { heading: 'Inter', body: 'Inter' },
       { heading: 'Playfair Display', body: 'Source Sans Pro' },
       { heading: 'Montserrat', body: 'Open Sans' },
       { heading: 'Poppins', body: 'Poppins' }
     ]
-    
+
     return fonts.map((font, index) => ({
       id: `fallback-typography-${index}`,
       name: `${font.heading} + ${font.body}`,
@@ -356,20 +428,21 @@ export const aiVisualService = {
     }))
   },
 
-  // Utility functions for color manipulation
-  hexToHsl(hex: string): { h: number, s: number, l: number } {
+  hexToHsl(hex: string): { h: number; s: number; l: number } {
     const r = parseInt(hex.slice(1, 3), 16) / 255
     const g = parseInt(hex.slice(3, 5), 16) / 255
     const b = parseInt(hex.slice(5, 7), 16) / 255
-    
+
     const max = Math.max(r, g, b)
     const min = Math.min(r, g, b)
-    let h = 0, s = 0, l = (max + min) / 2
-    
+    let h = 0
+    let s = 0
+    const l = (max + min) / 2
+
     if (max !== min) {
       const d = max - min
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-      
+
       switch (max) {
         case r: h = (g - b) / d + (g < b ? 6 : 0); break
         case g: h = (b - r) / d + 2; break
@@ -377,13 +450,13 @@ export const aiVisualService = {
       }
       h /= 6
     }
-    
+
     return { h: h * 360, s: s * 100, l: l * 100 }
   },
 
   hslToHex(h: number, s: number, l: number): string {
     h /= 360; s /= 100; l /= 100
-    
+
     const hue2rgb = (p: number, q: number, t: number) => {
       if (t < 0) t += 1
       if (t > 1) t -= 1
@@ -392,9 +465,9 @@ export const aiVisualService = {
       if (t < 2/3) return p + (q - p) * (2/3 - t) * 6
       return p
     }
-    
+
     let r, g, b
-    
+
     if (s === 0) {
       r = g = b = l
     } else {
@@ -404,31 +477,27 @@ export const aiVisualService = {
       g = hue2rgb(p, q, h)
       b = hue2rgb(p, q, h - 1/3)
     }
-    
+
     const toHex = (c: number) => {
       const hex = Math.round(c * 255).toString(16)
       return hex.length === 1 ? '0' + hex : hex
     }
-    
+
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`
   },
 
   generateSVGLogo(brandName: string, style: string): string {
-    // Simple SVG generation based on style
-    let svg = ''
-    
+    const escapedName = brandName.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;')
+
     switch (style) {
       case 'minimal':
-        svg = `<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+        return `<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
           <rect x="10" y="20" width="40" height="40" fill="#3B82F6" />
-          <text x="60" y="45" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1E293B">
-            ${brandName}
-          </text>
+          <text x="60" y="45" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1E293B">${escapedName}</text>
         </svg>`
-        break
-      
+
       case 'modern':
-        svg = `<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+        return `<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
@@ -436,42 +505,29 @@ export const aiVisualService = {
             </linearGradient>
           </defs>
           <circle cx="30" cy="40" r="20" fill="url(#grad)" />
-          <text x="60" y="45" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1E293B">
-            ${brandName}
-          </text>
+          <text x="60" y="45" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1E293B">${escapedName}</text>
         </svg>`
-        break
-      
+
       case 'classic':
-        svg = `<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+        return `<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
           <rect x="10" y="20" width="40" height="40" rx="5" ry="5" fill="#3B82F6" />
-          <text x="60" y="45" font-family="Georgia, serif" font-size="18" font-weight="bold" fill="#1E293B">
-            ${brandName}
-          </text>
+          <text x="60" y="45" font-family="Georgia, serif" font-size="18" font-weight="bold" fill="#1E293B">${escapedName}</text>
         </svg>`
-        break
-      
+
       case 'bold':
-        svg = `<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+        return `<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
           <polygon points="10,20 50,20 40,60 20,60" fill="#3B82F6" />
-          <text x="60" y="45" font-family="Impact, sans-serif" font-size="20" fill="#1E293B">
-            ${brandName}
-          </text>
+          <text x="60" y="45" font-family="Impact, sans-serif" font-size="20" fill="#1E293B">${escapedName}</text>
         </svg>`
-        break
-      
+
       default:
-        svg = `<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
-          <text x="20" y="45" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#3B82F6">
-            ${brandName}
-          </text>
+        return `<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+          <text x="20" y="45" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#3B82F6">${escapedName}</text>
         </svg>`
     }
-    
-    return svg
   },
 
-  generateLogoVariations(request: AILogoRequest): any[] {
+  generateLogoVariations(): Array<{ type: string; description: string }> {
     return [
       { type: 'horizontal', description: 'Horizontal layout' },
       { type: 'vertical', description: 'Vertical layout' },
@@ -480,23 +536,37 @@ export const aiVisualService = {
     ]
   },
 
-  analyzeColorHarmony(colors: string[]): any {
+  analyzeColorHarmony(colors: string[]): {
+    type: string
+    balance: number
+    contrast: string
+    temperature: string
+  } {
+    const primaryHsl = this.hexToHsl(colors[0])
     return {
       type: 'complementary',
       balance: 85,
-      contrast: 'high',
-      temperature: 'warm'
+      contrast: primaryHsl.l < 40 ? 'high' : 'medium',
+      temperature: primaryHsl.h > 30 && primaryHsl.h < 200 ? 'warm' : 'cool'
     }
   },
 
-  parseTypographySuggestions(suggestions: string[], request: AITypographyRequest): any[] {
+  parseTypographySuggestions(suggestions: string[], _request: AITypographyRequest): Array<{
+    id: string
+    name: string
+    heading: { family: string }
+    body: { family: string }
+    category: string
+    reasoning: string
+    aiGenerated: boolean
+  }> {
     const fontPairs = [
       { heading: 'Inter', body: 'Inter', category: 'modern' },
       { heading: 'Playfair Display', body: 'Source Sans Pro', category: 'elegant' },
       { heading: 'Montserrat', body: 'Open Sans', category: 'friendly' },
       { heading: 'Roboto Slab', body: 'Roboto', category: 'technical' }
     ]
-    
+
     return fontPairs.map((pair, index) => ({
       id: `ai-typography-${index}`,
       name: `${pair.heading} + ${pair.body}`,

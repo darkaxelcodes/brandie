@@ -86,31 +86,71 @@ export const storageService = {
     version: number = 1
   ): Promise<string> {
     try {
-      // Convert SVG string to blob
       const blob = new Blob([svgContent], { type: 'image/svg+xml' })
-      
-      // Generate a unique file path
       const filePath = `${userId}/${brandId}/${assetType}/v${version}.svg`
-      
-      // Upload to Supabase storage
-      const { data, error } = await supabase.storage
+
+      const { error } = await supabase.storage
         .from('brand_assets')
         .upload(filePath, blob, {
           upsert: true,
           contentType: 'image/svg+xml'
         })
-      
+
       if (error) throw error
-      
-      // Get the public URL
+
       const { data: publicUrlData } = supabase.storage
         .from('brand_assets')
         .getPublicUrl(filePath)
-      
+
       return publicUrlData.publicUrl
     } catch (error) {
       console.error('Error uploading SVG to Supabase storage:', error)
-      // Re-throw the error instead of returning empty string
+      throw error
+    }
+  },
+
+  async uploadBase64Image(
+    base64Data: string,
+    userId: string,
+    brandId: string,
+    assetType: string,
+    version: number = 1,
+    format: 'png' | 'jpeg' | 'webp' = 'png'
+  ): Promise<string> {
+    try {
+      const binaryString = atob(base64Data)
+      const bytes = new Uint8Array(binaryString.length)
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i)
+      }
+
+      const mimeTypes: Record<string, string> = {
+        png: 'image/png',
+        jpeg: 'image/jpeg',
+        webp: 'image/webp'
+      }
+      const mimeType = mimeTypes[format] || 'image/png'
+
+      const blob = new Blob([bytes], { type: mimeType })
+      const timestamp = Date.now()
+      const filePath = `${userId}/${brandId}/${assetType}/v${version}_${timestamp}.${format}`
+
+      const { error } = await supabase.storage
+        .from('brand_assets')
+        .upload(filePath, blob, {
+          upsert: true,
+          contentType: mimeType
+        })
+
+      if (error) throw error
+
+      const { data: publicUrlData } = supabase.storage
+        .from('brand_assets')
+        .getPublicUrl(filePath)
+
+      return publicUrlData.publicUrl
+    } catch (error) {
+      console.error('Error uploading base64 image to Supabase storage:', error)
       throw error
     }
   }
