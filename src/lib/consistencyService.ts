@@ -1,4 +1,5 @@
 import { assetExportService } from './assetExportService'
+import { templateGeneratorService, SOCIAL_MEDIA_SIZES, MARKETING_SIZES, TemplateElements } from './templateGeneratorService'
 
 export interface ConsistencyCheckResult {
   score: number
@@ -516,31 +517,46 @@ export const consistencyService = {
     }
   },
   
-  // Generate a template with brand assets
   async generateTemplate(templateId: string, brandData: any): Promise<Blob> {
-    // In a real implementation, this would generate actual templates
-    // For now, we'll return a mock JSON file with template data
-    
-    const templateData = {
-      templateId,
-      brandName: brandData.brand?.name,
-      colors: brandData.visual?.colors?.colors || [],
+    const colors = brandData.visual?.colors?.colors || ['#3B82F6', '#1E40AF']
+
+    const elements: TemplateElements = {
+      background: colors[0] || '#3B82F6',
+      secondaryColor: colors[1] || colors[0],
+      text: brandData.brand?.name || 'Your Brand',
+      subtext: brandData.brand?.tagline || '',
+      logo: brandData.visual?.logo ? {
+        url: brandData.visual.logo.url,
+        svg: brandData.visual.logo.svg
+      } : undefined,
       typography: {
-        heading: brandData.visual?.typography?.heading?.family,
-        body: brandData.visual?.typography?.body?.family
+        heading: { family: brandData.visual?.typography?.heading?.family || 'Arial' },
+        body: { family: brandData.visual?.typography?.body?.family || 'Arial' }
       },
-      logo: brandData.visual?.logo?.url || brandData.visual?.logo?.svg,
-      generatedAt: new Date().toISOString()
+      brandName: brandData.brand?.name,
+      showLogo: true
     }
-    
-    // Track template usage
+
+    const templateType = templateId.split('-')[0]
+    let config = SOCIAL_MEDIA_SIZES[templateId] || MARKETING_SIZES[templateId]
+
+    if (!config) {
+      config = { id: templateId, name: templateId, width: 1200, height: 630 }
+    }
+
+    let generated
+    if (templateType === 'social' || SOCIAL_MEDIA_SIZES[templateId]) {
+      generated = await templateGeneratorService.generateSocialMediaTemplate(config, elements, 'png')
+    } else {
+      generated = await templateGeneratorService.generateMarketingTemplate(config, elements, 'png')
+    }
+
     if (brandData.brand?.id) {
-      const templateType = templateId.split('-')[0] // e.g., 'social', 'marketing'
       this.trackTemplateUsage(brandData.brand.id, templateId, templateType)
         .catch(err => console.error('Error tracking template usage:', err))
     }
-    
-    return new Blob([JSON.stringify(templateData, null, 2)], { type: 'application/json' })
+
+    return generated.blob
   },
   
   // Helper methods

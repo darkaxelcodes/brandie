@@ -1,42 +1,67 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { 
-  Instagram, Facebook, Twitter, Linkedin, Youtube, Download, Edit, 
-  Copy, Trash, Plus, Image, Type, Palette, Sparkles, Check
+import {
+  Instagram, Facebook, Twitter, Linkedin, Youtube, Download, Edit,
+  Trash, Image, Type, Palette, Sparkles, Check, X, Loader2
 } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { Card } from '../ui/Card'
 import { Input } from '../ui/Input'
+import {
+  templateGeneratorService,
+  SOCIAL_MEDIA_SIZES,
+  GeneratedTemplate,
+  TemplateElements
+} from '../../lib/templateGeneratorService'
+import { useToast } from '../../contexts/ToastContext'
 
 interface SocialMediaTemplatesProps {
   brandData: any
 }
 
-interface SocialTemplate {
+interface PlatformTemplate {
   id: string
   platform: 'instagram' | 'facebook' | 'twitter' | 'linkedin' | 'youtube'
-  type: 'post' | 'story' | 'cover' | 'profile'
+  type: string
   name: string
   dimensions: string
-  preview: string
-  elements: {
-    background: string
-    logo: boolean
-    text: string
-    colors: string[]
-  }
+  configKey: string
 }
 
-export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
-  brandData
-}) => {
-  const [activeTab, setActiveTab] = useState<string>('instagram')
-  const [activeTemplate, setActiveTemplate] = useState<SocialTemplate | null>(null)
-  const [customText, setCustomText] = useState('')
-  const [generating, setGenerating] = useState(false)
-  const [generatedTemplates, setGeneratedTemplates] = useState<SocialTemplate[]>([])
+const PLATFORM_TEMPLATES: Record<string, PlatformTemplate[]> = {
+  instagram: [
+    { id: 'instagram-post', platform: 'instagram', type: 'post', name: 'Square Post', dimensions: '1080 × 1080px', configKey: 'instagram-post' },
+    { id: 'instagram-story', platform: 'instagram', type: 'story', name: 'Story Template', dimensions: '1080 × 1920px', configKey: 'instagram-story' },
+  ],
+  facebook: [
+    { id: 'facebook-post', platform: 'facebook', type: 'post', name: 'Feed Post', dimensions: '1200 × 630px', configKey: 'facebook-post' },
+    { id: 'facebook-cover', platform: 'facebook', type: 'cover', name: 'Page Cover', dimensions: '820 × 312px', configKey: 'facebook-cover' },
+  ],
+  twitter: [
+    { id: 'twitter-post', platform: 'twitter', type: 'post', name: 'Tweet Image', dimensions: '1200 × 675px', configKey: 'twitter-post' },
+    { id: 'twitter-header', platform: 'twitter', type: 'header', name: 'Profile Header', dimensions: '1500 × 500px', configKey: 'twitter-header' },
+  ],
+  linkedin: [
+    { id: 'linkedin-post', platform: 'linkedin', type: 'post', name: 'LinkedIn Post', dimensions: '1200 × 627px', configKey: 'linkedin-post' },
+    { id: 'linkedin-cover', platform: 'linkedin', type: 'cover', name: 'Company Cover', dimensions: '1584 × 396px', configKey: 'linkedin-cover' },
+  ],
+  youtube: [
+    { id: 'youtube-thumbnail', platform: 'youtube', type: 'thumbnail', name: 'Video Thumbnail', dimensions: '1280 × 720px', configKey: 'youtube-thumbnail' },
+    { id: 'youtube-banner', platform: 'youtube', type: 'banner', name: 'Channel Banner', dimensions: '2560 × 1440px', configKey: 'youtube-banner' },
+  ]
+}
 
-  // Early return if brandData is null or undefined
+export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({ brandData }) => {
+  const { showToast } = useToast()
+  const [activeTab, setActiveTab] = useState<string>('instagram')
+  const [activeTemplate, setActiveTemplate] = useState<PlatformTemplate | null>(null)
+  const [customText, setCustomText] = useState('')
+  const [customSubtext, setCustomSubtext] = useState('')
+  const [generating, setGenerating] = useState(false)
+  const [downloading, setDownloading] = useState<string | null>(null)
+  const [generatedTemplates, setGeneratedTemplates] = useState<Array<GeneratedTemplate & { platform: string; customText?: string }>>([])
+  const [previewTemplate, setPreviewTemplate] = useState<GeneratedTemplate | null>(null)
+
   if (!brandData) {
     return (
       <div className="space-y-6">
@@ -44,183 +69,131 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
           <div className="text-center py-12">
             <Instagram className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <h4 className="text-lg font-medium text-gray-900 mb-2">Loading brand data...</h4>
-            <p className="text-gray-500">
-              Please wait while we load your brand information
-            </p>
+            <p className="text-gray-500">Please wait while we load your brand information</p>
           </div>
         </Card>
       </div>
     )
   }
 
-  // Sample templates based on brand data
-  const templates: Record<string, SocialTemplate[]> = {
-    instagram: [
-      {
-        id: 'instagram-post-1',
-        platform: 'instagram',
-        type: 'post',
-        name: 'Square Post',
-        dimensions: '1080 × 1080px',
-        preview: 'https://images.pexels.com/photos/5417837/pexels-photo-5417837.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        elements: {
-          background: brandData.visual?.colors?.colors?.[0] || '#3B82F6',
-          logo: true,
-          text: 'Your caption here',
-          colors: brandData.visual?.colors?.colors || ['#3B82F6', '#1E40AF']
-        }
+  const getBrandColors = () => brandData.visual?.colors?.colors || ['#3B82F6', '#1E40AF']
+
+  const getTemplateElements = (text?: string, subtext?: string): TemplateElements => {
+    const colors = getBrandColors()
+    return {
+      background: colors[0] || '#3B82F6',
+      secondaryColor: colors[1] || colors[0],
+      text: text || 'Your Message Here',
+      subtext: subtext || '',
+      logo: brandData.visual?.logo ? {
+        url: brandData.visual.logo.url,
+        svg: brandData.visual.logo.svg
+      } : undefined,
+      typography: {
+        heading: { family: brandData.visual?.typography?.heading?.family || 'Arial' },
+        body: { family: brandData.visual?.typography?.body?.family || 'Arial' }
       },
-      {
-        id: 'instagram-story-1',
-        platform: 'instagram',
-        type: 'story',
-        name: 'Story Template',
-        dimensions: '1080 × 1920px',
-        preview: 'https://images.pexels.com/photos/5417837/pexels-photo-5417837.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        elements: {
-          background: brandData.visual?.colors?.colors?.[1] || '#1E40AF',
-          logo: true,
-          text: 'Your story text here',
-          colors: brandData.visual?.colors?.colors || ['#3B82F6', '#1E40AF']
-        }
-      }
-    ],
-    facebook: [
-      {
-        id: 'facebook-post-1',
-        platform: 'facebook',
-        type: 'post',
-        name: 'Feed Post',
-        dimensions: '1200 × 630px',
-        preview: 'https://images.pexels.com/photos/5417837/pexels-photo-5417837.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        elements: {
-          background: brandData.visual?.colors?.colors?.[2] || '#F59E0B',
-          logo: true,
-          text: 'Your Facebook post text',
-          colors: brandData.visual?.colors?.colors || ['#3B82F6', '#1E40AF']
-        }
-      },
-      {
-        id: 'facebook-cover-1',
-        platform: 'facebook',
-        type: 'cover',
-        name: 'Page Cover',
-        dimensions: '820 × 312px',
-        preview: 'https://images.pexels.com/photos/5417837/pexels-photo-5417837.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        elements: {
-          background: brandData.visual?.colors?.colors?.[0] || '#3B82F6',
-          logo: true,
-          text: '',
-          colors: brandData.visual?.colors?.colors || ['#3B82F6', '#1E40AF']
-        }
-      }
-    ],
-    twitter: [
-      {
-        id: 'twitter-post-1',
-        platform: 'twitter',
-        type: 'post',
-        name: 'Tweet Image',
-        dimensions: '1200 × 675px',
-        preview: 'https://images.pexels.com/photos/5417837/pexels-photo-5417837.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        elements: {
-          background: brandData.visual?.colors?.colors?.[3] || '#EF4444',
-          logo: true,
-          text: 'Your tweet text here',
-          colors: brandData.visual?.colors?.colors || ['#3B82F6', '#1E40AF']
-        }
-      }
-    ],
-    linkedin: [
-      {
-        id: 'linkedin-post-1',
-        platform: 'linkedin',
-        type: 'post',
-        name: 'LinkedIn Post',
-        dimensions: '1200 × 627px',
-        preview: 'https://images.pexels.com/photos/5417837/pexels-photo-5417837.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        elements: {
-          background: brandData.visual?.colors?.colors?.[0] || '#3B82F6',
-          logo: true,
-          text: 'Your LinkedIn post content',
-          colors: brandData.visual?.colors?.colors || ['#3B82F6', '#1E40AF']
-        }
-      }
-    ],
-    youtube: [
-      {
-        id: 'youtube-thumbnail-1',
-        platform: 'youtube',
-        type: 'post',
-        name: 'Video Thumbnail',
-        dimensions: '1280 × 720px',
-        preview: 'https://images.pexels.com/photos/5417837/pexels-photo-5417837.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-        elements: {
-          background: brandData.visual?.colors?.colors?.[2] || '#F59E0B',
-          logo: true,
-          text: 'Video Title Here',
-          colors: brandData.visual?.colors?.colors || ['#3B82F6', '#1E40AF']
-        }
-      }
-    ]
+      brandName: brandData.brand?.name,
+      showLogo: true
+    }
   }
 
   const getPlatformIcon = (platform: string) => {
+    const iconProps = { className: 'w-5 h-5' }
     switch (platform) {
-      case 'instagram': return <Instagram className="w-5 h-5" />
-      case 'facebook': return <Facebook className="w-5 h-5" />
-      case 'twitter': return <Twitter className="w-5 h-5" />
-      case 'linkedin': return <Linkedin className="w-5 h-5" />
-      case 'youtube': return <Youtube className="w-5 h-5" />
-      default: return <Image className="w-5 h-5" />
+      case 'instagram': return <Instagram {...iconProps} />
+      case 'facebook': return <Facebook {...iconProps} />
+      case 'twitter': return <Twitter {...iconProps} />
+      case 'linkedin': return <Linkedin {...iconProps} />
+      case 'youtube': return <Youtube {...iconProps} />
+      default: return <Image {...iconProps} />
     }
   }
 
-  const handleGenerateTemplate = () => {
+  const handleGenerateTemplate = useCallback(async () => {
     if (!activeTemplate) return
-    
-    setGenerating(true)
-    
-    // Simulate template generation
-    setTimeout(() => {
-      const newTemplate: SocialTemplate = {
-        ...activeTemplate,
-        id: `${activeTemplate.id}-custom-${Date.now()}`,
-        name: `Custom ${activeTemplate.name}`,
-        elements: {
-          ...activeTemplate.elements,
-          text: customText || activeTemplate.elements.text
-        }
-      }
-      
-      setGeneratedTemplates(prev => [newTemplate, ...prev])
-      setGenerating(false)
-      setCustomText('')
-    }, 1500)
-  }
 
-  const downloadTemplate = (template: SocialTemplate) => {
-    // In a real implementation, this would generate and download the actual template
-    // For now, we'll just create a JSON file with the template data
-    
-    const templateData = {
-      ...template,
-      brandName: brandData.brand?.name,
-      generatedAt: new Date().toISOString()
+    setGenerating(true)
+    try {
+      const config = SOCIAL_MEDIA_SIZES[activeTemplate.configKey]
+      if (!config) {
+        throw new Error('Template configuration not found')
+      }
+
+      const elements = getTemplateElements(
+        customText || 'Your Message Here',
+        customSubtext || ''
+      )
+
+      const template = await templateGeneratorService.generateSocialMediaTemplate(config, elements, 'png')
+
+      setGeneratedTemplates(prev => [{
+        ...template,
+        platform: activeTemplate.platform,
+        customText: customText || 'Your Message Here'
+      }, ...prev])
+
+      showToast('success', 'Template generated successfully!')
+      setCustomText('')
+      setCustomSubtext('')
+      setActiveTemplate(null)
+    } catch (error) {
+      console.error('Error generating template:', error)
+      showToast('error', 'Failed to generate template. Please try again.')
+    } finally {
+      setGenerating(false)
     }
-    
-    const blob = new Blob([JSON.stringify(templateData, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${brandData.brand?.name}-${template.platform}-${template.type}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+  }, [activeTemplate, customText, customSubtext, brandData, showToast])
+
+  const handleDownloadTemplate = useCallback(async (template: PlatformTemplate) => {
+    setDownloading(template.id)
+    try {
+      const config = SOCIAL_MEDIA_SIZES[template.configKey]
+      if (!config) {
+        throw new Error('Template configuration not found')
+      }
+
+      const elements = getTemplateElements()
+      const generated = await templateGeneratorService.generateSocialMediaTemplate(config, elements, 'png')
+
+      const filename = `${brandData.brand?.name || 'brand'}-${template.platform}-${template.type}-${Date.now()}.png`
+      templateGeneratorService.downloadTemplate(generated, filename)
+
+      showToast('success', `Downloaded ${template.name}`)
+    } catch (error) {
+      console.error('Error downloading template:', error)
+      showToast('error', 'Failed to download template')
+    } finally {
+      setDownloading(null)
+    }
+  }, [brandData, showToast])
+
+  const handleDownloadGenerated = useCallback((template: GeneratedTemplate) => {
+    const filename = `${brandData.brand?.name || 'brand'}-${template.name.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.png`
+    templateGeneratorService.downloadTemplate(template, filename)
+    showToast('success', `Downloaded ${template.name}`)
+  }, [brandData, showToast])
+
+  const handleDeleteGenerated = useCallback((templateId: string) => {
+    setGeneratedTemplates(prev => prev.filter(t => t.id !== templateId))
+    showToast('info', 'Template removed')
+  }, [showToast])
+
+  const handlePreviewTemplate = useCallback(async (template: PlatformTemplate) => {
+    try {
+      const config = SOCIAL_MEDIA_SIZES[template.configKey]
+      if (!config) return
+
+      const elements = getTemplateElements()
+      const generated = await templateGeneratorService.generateSocialMediaTemplate(config, elements, 'png')
+      setPreviewTemplate(generated)
+    } catch (error) {
+      console.error('Error generating preview:', error)
+    }
+  }, [brandData])
 
   return (
     <div className="space-y-6">
-      {/* Platform Tabs */}
       <Card className="p-2">
         <div className="grid grid-cols-5 gap-1">
           {['instagram', 'facebook', 'twitter', 'linkedin', 'youtube'].map((platform) => (
@@ -230,7 +203,7 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
               className={`
                 flex flex-col items-center space-y-1 px-4 py-3 rounded-lg font-medium transition-all
                 ${activeTab === platform
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                  ? 'bg-gradient-to-r from-blue-600 to-teal-600 text-white shadow-lg'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                 }
               `}
@@ -242,49 +215,38 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
         </div>
       </Card>
 
-      {/* Template Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {templates[activeTab]?.map((template) => (
-          <Card key={template.id} className="overflow-hidden">
-            <div 
-              className="aspect-video bg-gray-100 relative"
-              style={{ 
-                backgroundColor: template.elements.background,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
+        {PLATFORM_TEMPLATES[activeTab]?.map((template) => (
+          <Card key={template.id} className="overflow-hidden group">
+            <div
+              className="aspect-video relative cursor-pointer"
+              style={{ backgroundColor: getBrandColors()[0] }}
+              onClick={() => handlePreviewTemplate(template)}
             >
-              <img 
-                src={template.preview} 
-                alt={template.name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-transparent" />
+              <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-white text-center p-4">
-                  {template.elements.logo && brandData.visual?.logo && (
-                    <div className="mb-2 flex justify-center">
-                      {brandData.visual.logo.url ? (
-                        <img 
-                          src={brandData.visual.logo.url} 
-                          alt="Logo"
-                          className="h-8 object-contain"
-                        />
-                      ) : (
-                        <div className="h-8 w-8 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold">
-                          {brandData.brand?.name?.charAt(0) || 'B'}
-                        </div>
-                      )}
+                  {brandData.visual?.logo?.url ? (
+                    <img
+                      src={brandData.visual.logo.url}
+                      alt="Logo"
+                      className="h-10 mx-auto mb-2 object-contain"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 mx-auto mb-2 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold">
+                      {brandData.brand?.name?.charAt(0) || 'B'}
                     </div>
                   )}
-                  <div 
+                  <div
                     className="text-lg font-bold"
-                    style={{ 
-                      fontFamily: brandData.visual?.typography?.heading?.family || 'sans-serif'
-                    }}
+                    style={{ fontFamily: brandData.visual?.typography?.heading?.family || 'sans-serif' }}
                   >
-                    {template.elements.text}
+                    Your Message Here
                   </div>
                 </div>
+              </div>
+              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span className="text-white text-sm font-medium">Click to preview</span>
               </div>
             </div>
             <div className="p-4">
@@ -296,25 +258,26 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex space-x-1">
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => setActiveTemplate(template)}
                   >
                     <Edit className="w-4 h-4 mr-1" />
                     Customize
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
-                    onClick={() => downloadTemplate(template)}
+                    onClick={() => handleDownloadTemplate(template)}
+                    loading={downloading === template.id}
                   >
                     <Download className="w-4 h-4" />
                   </Button>
                 </div>
                 <div className="flex space-x-1">
-                  {template.elements.colors.slice(0, 3).map((color, index) => (
-                    <div 
+                  {getBrandColors().slice(0, 3).map((color, index) => (
+                    <div
                       key={index}
                       className="w-5 h-5 rounded-full border border-gray-200"
                       style={{ backgroundColor: color }}
@@ -327,7 +290,6 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
         ))}
       </div>
 
-      {/* Generated Templates */}
       {generatedTemplates.length > 0 && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-gray-900">Your Custom Templates</h3>
@@ -337,91 +299,47 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
                 key={template.id}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="border border-purple-200 bg-purple-50 rounded-xl overflow-hidden"
+                className="border border-teal-200 bg-teal-50 rounded-xl overflow-hidden"
               >
-                <div 
-                  className="aspect-video bg-gray-100 relative"
-                  style={{ 
-                    backgroundColor: template.elements.background,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
-                >
-                  <img 
-                    src={template.preview} 
+                <div className="aspect-video relative">
+                  <img
+                    src={template.dataUrl}
                     alt={template.name}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-                    <div className="text-white text-center p-4">
-                      {template.elements.logo && brandData.visual?.logo && (
-                        <div className="mb-2 flex justify-center">
-                          {brandData.visual.logo.url ? (
-                            <img 
-                              src={brandData.visual.logo.url} 
-                              alt="Logo"
-                              className="h-8 object-contain"
-                            />
-                          ) : (
-                            <div className="h-8 w-8 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold">
-                              {brandData.brand?.name?.charAt(0) || 'B'}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      <div 
-                        className="text-lg font-bold"
-                        style={{ 
-                          fontFamily: brandData.visual?.typography?.heading?.family || 'sans-serif'
-                        }}
-                      >
-                        {template.elements.text}
-                      </div>
-                    </div>
-                  </div>
                 </div>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <h4 className="font-medium text-gray-900">{template.name}</h4>
-                      <span className="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
+                      <span className="text-xs bg-teal-100 text-teal-800 px-2 py-0.5 rounded-full">
                         Custom
                       </span>
                     </div>
                     <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                      {template.dimensions}
+                      {template.width} × {template.height}px
                     </span>
                   </div>
+                  {template.customText && (
+                    <p className="text-sm text-gray-600 mb-2 truncate">"{template.customText}"</p>
+                  )}
                   <div className="flex items-center justify-between">
                     <div className="flex space-x-1">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
-                        onClick={() => downloadTemplate(template)}
+                        onClick={() => handleDownloadGenerated(template)}
                       >
                         <Download className="w-4 h-4 mr-1" />
                         Download
                       </Button>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
-                        onClick={() => {
-                          setGeneratedTemplates(prev => 
-                            prev.filter(t => t.id !== template.id)
-                          )
-                        }}
+                        onClick={() => handleDeleteGenerated(template.id)}
                       >
                         <Trash className="w-4 h-4 text-red-500" />
                       </Button>
-                    </div>
-                    <div className="flex space-x-1">
-                      {template.elements.colors.slice(0, 3).map((color, index) => (
-                        <div 
-                          key={index}
-                          className="w-5 h-5 rounded-full border border-gray-200"
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
                     </div>
                   </div>
                 </div>
@@ -431,7 +349,6 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
         </div>
       )}
 
-      {/* Template Customizer */}
       {activeTemplate && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -439,62 +356,54 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
         >
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Customize Template</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Customize {activeTemplate.name}
+              </h3>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setActiveTemplate(null)}
               >
-                Close
+                <X className="w-4 h-4" />
               </Button>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <div 
+                <div
                   className="aspect-video bg-gray-100 rounded-lg relative overflow-hidden"
-                  style={{ 
-                    backgroundColor: activeTemplate.elements.background,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  }}
+                  style={{ backgroundColor: getBrandColors()[0] }}
                 >
-                  <img 
-                    src={activeTemplate.preview} 
-                    alt={activeTemplate.name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-gradient-to-br from-black/20 to-transparent" />
+                  <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-white text-center p-4">
-                      {activeTemplate.elements.logo && brandData.visual?.logo && (
-                        <div className="mb-2 flex justify-center">
-                          {brandData.visual.logo.url ? (
-                            <img 
-                              src={brandData.visual.logo.url} 
-                              alt="Logo"
-                              className="h-8 object-contain"
-                            />
-                          ) : (
-                            <div className="h-8 w-8 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold">
-                              {brandData.brand?.name?.charAt(0) || 'B'}
-                            </div>
-                          )}
+                      {brandData.visual?.logo?.url && (
+                        <img
+                          src={brandData.visual.logo.url}
+                          alt="Logo"
+                          className="h-8 mx-auto mb-2 object-contain"
+                        />
+                      )}
+                      <div
+                        className="text-lg font-bold mb-1"
+                        style={{ fontFamily: brandData.visual?.typography?.heading?.family || 'sans-serif' }}
+                      >
+                        {customText || 'Your Message Here'}
+                      </div>
+                      {customSubtext && (
+                        <div
+                          className="text-sm opacity-80"
+                          style={{ fontFamily: brandData.visual?.typography?.body?.family || 'sans-serif' }}
+                        >
+                          {customSubtext}
                         </div>
                       )}
-                      <div 
-                        className="text-lg font-bold"
-                        style={{ 
-                          fontFamily: brandData.visual?.typography?.heading?.family || 'sans-serif'
-                        }}
-                      >
-                        {customText || activeTemplate.elements.text}
-                      </div>
                     </div>
                   </div>
                 </div>
                 <div className="mt-4 text-center">
                   <span className="text-sm text-gray-500">
-                    {activeTemplate.dimensions} • {activeTemplate.platform} {activeTemplate.type}
+                    {activeTemplate.dimensions} - {activeTemplate.platform} {activeTemplate.type}
                   </span>
                 </div>
               </div>
@@ -502,33 +411,24 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Custom Text
+                    Main Text
                   </label>
                   <Input
                     value={customText}
                     onChange={(e) => setCustomText(e.target.value)}
-                    placeholder={activeTemplate.elements.text}
+                    placeholder="Your Message Here"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Template Elements
+                    Subtext (optional)
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    <Button variant="outline" size="sm" className="flex items-center space-x-2">
-                      <Image className="w-4 h-4" />
-                      <span>Background</span>
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex items-center space-x-2">
-                      <Type className="w-4 h-4" />
-                      <span>Typography</span>
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex items-center space-x-2">
-                      <Palette className="w-4 h-4" />
-                      <span>Colors</span>
-                    </Button>
-                  </div>
+                  <Input
+                    value={customSubtext}
+                    onChange={(e) => setCustomSubtext(e.target.value)}
+                    placeholder="Additional details..."
+                  />
                 </div>
 
                 <div>
@@ -538,10 +438,10 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center space-x-3 mb-3">
                       <div className="flex space-x-1">
-                        {activeTemplate.elements.colors.slice(0, 3).map((color, index) => (
-                          <div 
+                        {getBrandColors().slice(0, 4).map((color, index) => (
+                          <div
                             key={index}
-                            className="w-5 h-5 rounded-full border border-gray-200"
+                            className="w-6 h-6 rounded-full border border-gray-200"
                             style={{ backgroundColor: color }}
                           />
                         ))}
@@ -549,11 +449,11 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
                       <span className="text-sm text-gray-600">Brand Colors</span>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center">
-                        <Type className="w-3 h-3 text-gray-600" />
+                      <div className="w-6 h-6 bg-gray-100 rounded flex items-center justify-center">
+                        <Type className="w-4 h-4 text-gray-600" />
                       </div>
                       <span className="text-sm text-gray-600">
-                        {brandData.visual?.typography?.heading?.family || 'Default'} / 
+                        {brandData.visual?.typography?.heading?.family || 'Default'} /
                         {brandData.visual?.typography?.body?.family || 'Default'}
                       </span>
                     </div>
@@ -566,8 +466,17 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
                     loading={generating}
                     className="w-full"
                   >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Generate Custom Template
+                    {generating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Generate Template
+                      </>
+                    )}
                   </Button>
                 </div>
               </div>
@@ -576,26 +485,94 @@ export const SocialMediaTemplates: React.FC<SocialMediaTemplatesProps> = ({
         </motion.div>
       )}
 
-      {/* AI Template Generation */}
-      <Card className="p-6 bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
-        <div className="flex items-start space-x-4">
-          <div className="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-xl">
-            <Sparkles className="w-6 h-6 text-purple-600" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-2">AI Template Generation</h3>
-            <p className="text-gray-700 mb-4">
-              Need a custom template? Let AI generate a perfectly branded template based on your description.
-            </p>
-            <div className="flex space-x-3">
-              <Input 
-                placeholder="Describe the template you need..."
-                className="flex-1"
-              />
-              <Button className="flex items-center space-x-2">
-                <Sparkles className="w-4 h-4" />
-                <span>Generate</span>
+      {previewTemplate && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+          onClick={() => setPreviewTemplate(null)}
+        >
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            className="max-w-4xl max-h-[90vh] relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={previewTemplate.dataUrl}
+              alt={previewTemplate.name}
+              className="max-w-full max-h-[80vh] rounded-lg shadow-2xl"
+            />
+            <div className="absolute top-4 right-4 flex space-x-2">
+              <Button
+                size="sm"
+                onClick={() => {
+                  const filename = `${brandData.brand?.name || 'brand'}-preview-${Date.now()}.png`
+                  templateGeneratorService.downloadTemplate(previewTemplate, filename)
+                  showToast('success', 'Template downloaded!')
+                }}
+              >
+                <Download className="w-4 h-4 mr-1" />
+                Download
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-white"
+                onClick={() => setPreviewTemplate(null)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-1 rounded text-sm">
+              {previewTemplate.width} × {previewTemplate.height}px
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      <Card className="p-6 bg-gradient-to-r from-teal-50 to-blue-50 border-teal-200">
+        <div className="flex items-start space-x-4">
+          <div className="flex items-center justify-center w-12 h-12 bg-teal-100 rounded-xl">
+            <Sparkles className="w-6 h-6 text-teal-600" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-900 mb-2">Batch Template Generation</h3>
+            <p className="text-gray-700 mb-4">
+              Generate all templates for a platform at once with your brand elements applied.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {['instagram', 'facebook', 'twitter', 'linkedin', 'youtube'].map((platform) => (
+                <Button
+                  key={platform}
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    try {
+                      showToast('info', `Generating ${platform} templates...`)
+                      const templates = PLATFORM_TEMPLATES[platform]
+                      const elements = getTemplateElements()
+
+                      for (const template of templates) {
+                        const config = SOCIAL_MEDIA_SIZES[template.configKey]
+                        if (config) {
+                          const generated = await templateGeneratorService.generateSocialMediaTemplate(config, elements, 'png')
+                          const filename = `${brandData.brand?.name || 'brand'}-${template.platform}-${template.type}.png`
+                          templateGeneratorService.downloadTemplate(generated, filename)
+                        }
+                      }
+
+                      showToast('success', `All ${platform} templates downloaded!`)
+                    } catch (error) {
+                      showToast('error', 'Failed to generate templates')
+                    }
+                  }}
+                  className="capitalize"
+                >
+                  {getPlatformIcon(platform)}
+                  <span className="ml-1">{platform}</span>
+                </Button>
+              ))}
             </div>
           </div>
         </div>
